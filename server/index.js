@@ -3,7 +3,11 @@ const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config();
 const questionRoutes = require('./routes/faylYuklashRoute');
-const quizRoutes = require('./routes/savollar'); // questionRoutes'ni import qilish
+const quizRoutes = require('./routes/savollar');
+const admin = require('./routes/adminlar')
+const admins = require('./routes/adminlar') 
+const adminPut = require('./routes/adminlar') 
+const adminDel = require('./routes/adminlar')  // questionRoutes'ni import qilish
 const cors = require("cors")
 const path = require('path');
 
@@ -15,9 +19,12 @@ app.use(cors())
 app.use(express.static(path.join(__dirname, 'uploads')));
 
 // Routes
-app.use('/api', questionRoutes);
+app.use('/api', questionRoutes)
 app.use('/api', quizRoutes);
-
+app.use('/api',  admin);
+app.use('/api',  admins)
+app.use('/api',  adminPut)
+app.use('/api',  adminDel)
 // MongoDB ga ulanish
 const connectDB = async () => {
     try {
