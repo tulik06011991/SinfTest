@@ -4,7 +4,7 @@ const path = require('path');
 const mammoth = require('mammoth');
 const fs = require('fs');
 
-const app = express();
+
 
 // Multer konfiguratsiyasi - yuklangan fayllarni saqlash
 const storage = multer.diskStorage({
@@ -83,7 +83,3 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 // Serverni ishga tushirish
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
