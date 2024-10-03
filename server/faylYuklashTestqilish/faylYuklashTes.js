@@ -3,24 +3,12 @@ const multer = require('multer');
 const path = require('path');
 const mammoth = require('mammoth');
 const mongoose = require('mongoose');
-const Question = require('./questionModel'); // Savollar modeli
+const Question = require('../Model/questionModel'); // Savollar modeli
 
-const app = express();
+
 
 // MongoDB ga ulanish
-const connectDB = async () => {
-    try {
-        await mongoose.connect('mongodb://tolqinmirsaliyev:baliq06011991@<hostname>/?ssl=true&replicaSet=atlas-mjc1py-shard-0&authSource=admin&retryWrites=true&w=majority&appName=Cluster0', {
-            
-        });
-        console.log('MongoDB connected');
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error.message);
-        process.exit(1);
-    }
-};
 
-connectDB();
 
 // Multer konfiguratsiyasi
 const storage = multer.diskStorage({
@@ -113,7 +101,3 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 // Serverni ishga tushirish
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});

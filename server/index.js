@@ -1,25 +1,26 @@
 const expres = require('express')
 const app = expres()
 const mongoose = require('mongoose');
-
+require('dotenv').config()
 
 
 
 // MongoDB ga ulanish
 const connectDB = async () => {
     try {
-        await mongoose.connect('mongodb://localhost:27017/quizDB', {
+        await mongoose.connect(process.env.MONGO_URL, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        console.log('MongoDB connected');
+        console.log('MongoDB Atlas bilan ulanish o\'rnatildi');
     } catch (error) {
-        console.error('Error connecting to MongoDB:', error.message);
-        process.exit(1);
+        console.error('MongoDB Atlas bilan ulanishda xato:', error.message);
+        process.exit(1); // Xato bo'lsa serverni to'xtatadi
     }
 };
 
-connectDB();
+// MongoDB ulanishini chaqirish
+connectDB()
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
