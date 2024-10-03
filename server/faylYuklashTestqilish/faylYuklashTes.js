@@ -11,8 +11,7 @@ const app = express();
 const connectDB = async () => {
     try {
         await mongoose.connect('mongodb://tolqinmirsaliyev:baliq06011991@<hostname>/?ssl=true&replicaSet=atlas-mjc1py-shard-0&authSource=admin&retryWrites=true&w=majority&appName=Cluster0', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
+            
         });
         console.log('MongoDB connected');
     } catch (error) {
