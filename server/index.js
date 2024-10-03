@@ -11,7 +11,7 @@ const cors = require("cors")
 app.use(express.json());
 
 // Routes
-app.use('/api/questions', questionRoutes);
+app.use('/api', questionRoutes);
 app.use(cors())
 
 // MongoDB ga ulanish

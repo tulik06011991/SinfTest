@@ -31,7 +31,7 @@ const FileUpload = () => {
       setUploadStatus("Uploading...");
 
       // Send POST request to the REST API
-      const response = await axios.post("http://localhost:5173//api/questions/upload", formData, {
+      const response = await axios.post("http://localhost:5173/api/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
