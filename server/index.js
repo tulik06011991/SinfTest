@@ -4,14 +4,15 @@ const mongoose = require('mongoose');
 require('dotenv').config()
 
 
+app.use(express.json());
+
+// Routes
+app.use('/api/questions', questionRoutes);
 
 // MongoDB ga ulanish
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        await mongoose.connect(process.env.MONGO_URL,);
         console.log('MongoDB Atlas bilan ulanish o\'rnatildi');
     } catch (error) {
         console.error('MongoDB Atlas bilan ulanishda xato:', error.message);
