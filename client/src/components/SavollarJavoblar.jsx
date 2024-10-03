@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios'; // Backend bilan muloqot qilish uchun axiosni import qilamiz
 
 const Quiz = () => {
-    const [subjects, setSubjects] = useState(['Matematika', 'Kimyo', 'Biologiya']); // Fanlar ro'yxati
+    const [subjects, setSubjects] = useState(['Matematika', 'Kimyo', 'Biologiya', 'Tarix', 'Ona-tili',' Adabiyot', 'Geografiya', 'Algebra', 'ingliz-tili', 'Tarbiya']); // Fanlar ro'yxati
     const [selectedSubject, setSelectedSubject] = useState(''); // Tanlangan fan
     const [questions, setQuestions] = useState([]); // Savollarni saqlash uchun state
     const [selectedAnswers, setSelectedAnswers] = useState({}); // Foydalanuvchining tanlagan javoblari
