@@ -4,15 +4,17 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const questionRoutes = require('./routes/faylYuklashRoute'); // questionRoutes'ni import qilish
 const cors = require("cors")
+const path = require('path');
 
 
 
 
 app.use(express.json());
+app.use(cors())
+app.use(express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api', questionRoutes);
-app.use(cors())
 
 // MongoDB ga ulanish
 const connectDB = async () => {

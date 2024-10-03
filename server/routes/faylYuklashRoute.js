@@ -18,6 +18,6 @@ const upload = multer({ storage: storage });
 
 
 // Word fayl yuklash va savollarni extract qilish
-router.post('/upload', upload.single('file'), uploadQuestions); // Callback sifatida funksiya
+router.post('/uploads', upload.single('file'), uploadQuestions); // Callback sifatida funksiya
 
 module.exports = router;
