@@ -51,8 +51,9 @@ const Quiz = () => {
                 ))}
             </select>
 
+            {/* Savollarni ko'rsatish */}
             {questions.length === 0 ? (
-                <p>Savollar yuklanmoqda...</p>
+                <p>{selectedSubject ? 'Savollar yo\'q' : 'Iltimos, fan tanlang'}</p>
             ) : (
                 questions.map((question, index) => (
                     <div key={question._id} className="question-block">
