@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'; // Backend bilan muloqot qilish uchun axiosni import qilamiz
 
-const Quiz = ({ subject }) => { // subject ni props sifatida qabul qilamiz
+const Quiz = () => {
+    const [subjects, setSubjects] = useState(['Matematika', 'Kimyo', 'Biologiya']); // Fanlar ro'yxati
+    const [selectedSubject, setSelectedSubject] = useState(''); // Tanlangan fan
     const [questions, setQuestions] = useState([]); // Savollarni saqlash uchun state
     const [selectedAnswers, setSelectedAnswers] = useState({}); // Foydalanuvchining tanlagan javoblari
 
     // Backenddan savollarni olish uchun useEffect
     useEffect(() => {
         const fetchQuestions = async () => {
+            if (!selectedSubject) return; // Tanlangan fan bo'lmasa hech narsa qilmaymiz
+
             try {
-                const response = await axios.get(`http://localhost:5000/api/questions/subject/${'kimyo'}`); // API chaqiruv fan nomi bilan
+                const response = await axios.get(`http://localhost:5000/api/questions/subject/${selectedSubject.toLowerCase()}`); // API chaqiruv tanlangan fan bilan
                 setQuestions(response.data); // Savollarni state ga o'rnatamiz
             } catch (error) {
                 console.error('Savollarni olishda xato:', error);
             }
         };
         fetchQuestions();
-    }, [subject]); // subject ga o'zgarganda savollarni qayta yuklaymiz
+    }, [selectedSubject]); // selectedSubject o'zgarganda savollarni qayta yuklaymiz
 
     // Foydalanuvchi variantni tanlaganda uni saqlash
     const handleAnswerSelect = (questionId, selectedOption) => {
@@ -26,10 +30,27 @@ const Quiz = ({ subject }) => { // subject ni props sifatida qabul qilamiz
         }));
     };
 
+    // Fanni tanlashni boshqarish
+    const handleSubjectChange = (event) => {
+        setSelectedSubject(event.target.value);
+        setQuestions([]); // Fan tanlanganda eski savollarni tozalash
+        setSelectedAnswers({}); // Javoblarni tozalash
+    };
+
     // Savollar va variantlarni render qilish
     return (
         <div className="quiz-container">
             <h2>Quiz Test</h2>
+            
+            {/* Fan tanlash dropdown */}
+            <label htmlFor="subject-select">Kerakli fan tanlang:</label>
+            <select id="subject-select" onChange={handleSubjectChange}>
+                <option value="">-- Fan tanlang --</option>
+                {subjects.map((subject) => (
+                    <option key={subject} value={subject}>{subject}</option>
+                ))}
+            </select>
+
             {questions.length === 0 ? (
                 <p>Savollar yuklanmoqda...</p>
             ) : (
