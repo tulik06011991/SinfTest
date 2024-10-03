@@ -1,15 +1,20 @@
-const Question = require('../Model/questionModel'); // Savollar modeli
+const Question = require('../Model/questionModel'); // Savollar modelini chaqiramiz
 
-// Barcha savollarni olish funksiyasi
-const getAllQuestions = async (req, res) => {
+// Ma'lum bir fan bo'yicha savollarni olish
+exports.getQuestionsBySubject = async (req, res) => {
     try {
-        const questions = await Question.find(); // Barcha savollarni bazadan olamiz
-        res.status(200).json(questions); // Savollarni JSON formatda qaytaramiz
+        const { subject } = req.params; // URL parametrlardan fan nomini olish
+
+        // Savollarni fan nomi bo'yicha filtrlaymiz
+        const questions = await Question.find({ subject });
+
+        if (!questions.length) {
+            return res.status(404).json({ message: 'Savollar topilmadi!' });
+        }
+
+        res.status(200).json(questions);
     } catch (error) {
-        res.status(500).json({ message: 'Error retrieving questions', error });
+        res.status(500).json({ error: 'Savollarni olishda xato yuz berdi!' });
     }
 };
 
-module.exports = {
-    getAllQuestions
-};

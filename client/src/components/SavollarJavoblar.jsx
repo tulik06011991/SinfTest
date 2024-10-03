@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'; // Backend bilan muloqot qilish uchun axiosni import qilamiz
 
-const Quiz = () => {
+const Quiz = ({ subject }) => { // subject ni props sifatida qabul qilamiz
     const [questions, setQuestions] = useState([]); // Savollarni saqlash uchun state
     const [selectedAnswers, setSelectedAnswers] = useState({}); // Foydalanuvchining tanlagan javoblari
 
@@ -9,14 +9,14 @@ const Quiz = () => {
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/questions'); // API chaqiruv
+                const response = await axios.get(`http://localhost:5000/api/questions/subject/${'kimyo'}`); // API chaqiruv fan nomi bilan
                 setQuestions(response.data); // Savollarni state ga o'rnatamiz
             } catch (error) {
                 console.error('Savollarni olishda xato:', error);
             }
         };
         fetchQuestions();
-    }, []);
+    }, [subject]); // subject ga o'zgarganda savollarni qayta yuklaymiz
 
     // Foydalanuvchi variantni tanlaganda uni saqlash
     const handleAnswerSelect = (questionId, selectedOption) => {

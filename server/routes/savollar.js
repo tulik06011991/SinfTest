@@ -1,8 +1,9 @@
 const express = require('express');
-const router = express.Router();
-const { getAllQuestions } = require('../faylController/Savollar');
+const { getQuestionsBySubject } = require('../faylController/Savollar'); // Controller funksiyasini chaqirish
 
-// Barcha savollarni olish uchun marshrut
-router.get('/questions', getAllQuestions);
+const router = express.Router();
+
+// Ma'lum bir fan bo'yicha savollarni olish
+router.get('/questions/subject/:subject', getQuestionsBySubject);
 
 module.exports = router;
