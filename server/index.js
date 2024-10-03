@@ -2,7 +2,8 @@ const express = require('express'); // express'ni to'g'ri yozish
 const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config();
-const questionRoutes = require('./routes/faylYuklashRoute'); // questionRoutes'ni import qilish
+const questionRoutes = require('./routes/faylYuklashRoute');
+const quizRoutes = require('./routes/savollar'); // questionRoutes'ni import qilish
 const cors = require("cors")
 const path = require('path');
 
@@ -15,6 +16,7 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api', questionRoutes);
+app.use('/api', quizRoutes);
 
 // MongoDB ga ulanish
 const connectDB = async () => {
