@@ -10,7 +10,7 @@ const app = express();
 // MongoDB ga ulanish
 const connectDB = async () => {
     try {
-        await mongoose.connect('mongodb://localhost:27017/quizDB', {
+        await mongoose.connect('mongodb://tolqinmirsaliyev:baliq06011991@<hostname>/?ssl=true&replicaSet=atlas-mjc1py-shard-0&authSource=admin&retryWrites=true&w=majority&appName=Cluster0', {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
