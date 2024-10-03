@@ -1,82 +1,90 @@
 
 import "./App.css"
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
+import { FiUploadCloud } from "react-icons/fi";  // Upload icon
+import { AiOutlineFile } from "react-icons/ai";  // File icon
 
 const FileUpload = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadStatus, setUploadStatus] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
+  const [file, setFile] = useState(null);
+  const [fileName, setFileName] = useState("No file chosen");
+  const [uploadStatus, setUploadStatus] = useState("");
 
-  // Fayl tanlash funksiyasi
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-    setUploadStatus('');
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
+    setFileName(selectedFile ? selectedFile.name : "No file chosen");
   };
 
-  // Faylni yuklash funksiyasi
-  const handleFileUpload = async (event) => {
-    event.preventDefault();
-
-    if (!selectedFile) {
-      setUploadStatus('Please select a file first!');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!file) {
+      alert("Please select a file first!");
       return;
     }
 
+    // File upload to the server
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    formData.append("file", file);
 
     try {
-      setIsUploading(true);
-      const response = await axios.post('/api/upload', formData, {
+      setUploadStatus("Uploading...");
+
+      // Send POST request to the REST API
+      const response = await axios.post("https://your-server.com/upload", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
-      setUploadStatus('File uploaded successfully!');
+
+      setUploadStatus("File uploaded successfully!");
+      console.log("File uploaded:", response.data);
+
     } catch (error) {
-      setUploadStatus('File upload failed. Please try again.');
-    } finally {
-      setIsUploading(false);
+      console.error("Error uploading file:", error);
+      setUploadStatus("Failed to upload file.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-300 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Upload Your File</h2>
-        
-        <form onSubmit={handleFileUpload}>
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Choose File
-            </label>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full">
+        <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
+          Upload Your File
+        </h2>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="relative border border-gray-300 rounded-lg p-4 bg-gray-50 flex items-center">
+            <AiOutlineFile className="text-gray-400 text-2xl mr-4" />
             <input
               type="file"
+              id="fileInput"
+              className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
               onChange={handleFileChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
+            <label htmlFor="fileInput" className="block text-sm text-gray-600 w-full">
+              {fileName}
+            </label>
           </div>
 
-          <div className="mb-4">
-            <button
-              type="submit"
-              disabled={isUploading}
-              className={`w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-3 rounded-lg text-lg font-semibold tracking-wide transition-colors duration-200 hover:from-blue-600 hover:to-indigo-600 focus:outline-none ${isUploading && 'opacity-50 cursor-not-allowed'}`}
-            >
-              {isUploading ? 'Uploading...' : 'Upload File'}
-            </button>
-          </div>
-
-          {uploadStatus && (
-            <div className={`mt-4 text-center font-medium ${uploadStatus.includes('successfully') ? 'text-green-600' : 'text-red-600'}`}>
-              {uploadStatus}
-            </div>
-          )}
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 rounded-lg shadow-md hover:bg-blue-600 transition-colors flex items-center justify-center"
+          >
+            <FiUploadCloud className="text-white text-xl mr-2" />
+            Upload File
+          </button>
         </form>
+
+        {uploadStatus && (
+          <p className={`text-center mt-4 ${uploadStatus.includes("successfully") ? "text-green-600" : "text-red-600"}`}>
+            {uploadStatus}
+          </p>
+        )}
       </div>
     </div>
   );
 };
 
 export default FileUpload;
+
+
