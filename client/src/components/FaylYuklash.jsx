@@ -1,14 +1,13 @@
-
-
 import React, { useState } from "react";
 import axios from "axios";
-import { FiUploadCloud } from "react-icons/fi";  // Upload icon
-import { AiOutlineFile } from "react-icons/ai";  // File icon
+import { FiUploadCloud } from "react-icons/fi"; // Upload icon
+import { AiOutlineFile } from "react-icons/ai"; // File icon
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("No file chosen");
   const [uploadStatus, setUploadStatus] = useState("");
+  const [subject, setSubject] = useState(""); // Fan nomi uchun state
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -18,14 +17,15 @@ const FileUpload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) {
-      alert("Please select a file first!");
+    if (!file || !subject) { // Fan nomi bo'sh emasligini tekshirish
+      alert("Please select a file and enter a subject!");
       return;
     }
 
     // File upload to the server
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("subject", subject); // Fan nomini qo'shish
 
     try {
       setUploadStatus("Uploading...");
@@ -66,6 +66,16 @@ const FileUpload = () => {
             </label>
           </div>
 
+          {/* Fan nomini kiritish uchun input */}
+          <input
+            type="text"
+            placeholder="Enter Subject"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)} // Fan nomini saqlash
+            className="border border-gray-300 p-2 rounded-lg"
+            required // Kiritilishini talab qilamiz
+          />
+
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded-lg shadow-md hover:bg-blue-600 transition-colors flex items-center justify-center"
@@ -86,5 +96,3 @@ const FileUpload = () => {
 };
 
 export default FileUpload;
-
-

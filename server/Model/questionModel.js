@@ -10,7 +10,8 @@ const optionSchema = new mongoose.Schema({
 const questionSchema = new mongoose.Schema({
     question: { type: String, required: true },
     options: [optionSchema], // Variantlar
-    correctAnswer: { type: String, required: true } // To'g'ri javob
+    correctAnswer: { type: String, required: true }, // To'g'ri javob
+    subject: { type: String, required: true } // Fan nomi
 });
 
 // Savollar modelini yaratish
