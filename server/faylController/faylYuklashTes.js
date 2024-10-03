@@ -1,6 +1,6 @@
 const path = require('path');
 const mammoth = require('mammoth');
-const Question = require('../models/questionModel');
+const Question = require('../Model/questionModel');
 
 // Fayldan savollar va variantlarni extract qilish va saqlash
 const parseWordFile = async (filePath) => {

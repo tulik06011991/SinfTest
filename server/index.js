@@ -1,8 +1,8 @@
-const expres = require('express')
-const app = expres()
+const express = require('express'); // express'ni to'g'ri yozish
+const app = express();
 const mongoose = require('mongoose');
-require('dotenv').config()
-
+require('dotenv').config();
+const questionRoutes = require('./routes/faylYuklashRoute'); // questionRoutes'ni import qilish
 
 app.use(express.json());
 
@@ -12,7 +12,9 @@ app.use('/api/questions', questionRoutes);
 // MongoDB ga ulanish
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URL,);
+        await mongoose.connect(process.env.MONGO_URL, {
+            
+        });
         console.log('MongoDB Atlas bilan ulanish o\'rnatildi');
     } catch (error) {
         console.error('MongoDB Atlas bilan ulanishda xato:', error.message);
@@ -21,7 +23,7 @@ const connectDB = async () => {
 };
 
 // MongoDB ulanishini chaqirish
-connectDB()
+connectDB();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

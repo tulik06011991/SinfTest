@@ -1,7 +1,8 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const { uploadQuestions } = require('../controllers/questionController');
+const {uploadQuestions} = require('../faylController/faylYuklashTes'); // To'g'ridan-to'g'ri import
+const router = express.Router();
 
 // Multer konfiguratsiyasi
 const storage = multer.diskStorage({
@@ -15,9 +16,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const router = express.Router();
 
 // Word fayl yuklash va savollarni extract qilish
-router.post('/upload', upload.single('file'), uploadQuestions);
+router.post('/upload', upload.single('file'), uploadQuestions); // Callback sifatida funksiya
 
 module.exports = router;
