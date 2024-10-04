@@ -31,6 +31,7 @@ const NavbarSidebar = () => {
                     <li><Link to="/" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Home</Link></li>
                     <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
                     <li><Link to="/quiz" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Admin</Link></li>
+                    <li><Link to="/fanlar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Fanlar</Link></li>
                 </ul>
             </div>
 
@@ -50,6 +51,7 @@ const NavbarSidebar = () => {
                         <li><Link to="/" className="hover:text-gray-400">Home</Link></li>
                         <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
                         <li><Link to="/quiz" className="hover:text-gray-400">Admin</Link></li>
+                        <li><Link to="/fanlar" className="hover:text-gray-400" >Fanlar</Link></li>
                     </ul>
                 </div>
             </nav>

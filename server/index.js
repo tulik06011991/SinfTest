@@ -7,7 +7,8 @@ const quizRoutes = require('./routes/savollar');
 const admin = require('./routes/adminlar')
 const admins = require('./routes/adminlar') 
 const adminPut = require('./routes/adminlar') 
-const adminDel = require('./routes/adminlar')  // questionRoutes'ni import qilish
+const adminDel = require('./routes/adminlar') 
+const fanlar2 = require('./routes/fanlar2') // questionRoutes'ni import qilish
 const cors = require("cors")
 const path = require('path');
 
@@ -25,6 +26,7 @@ app.use('/api',  admin);
 app.use('/api',  admins)
 app.use('/api',  adminPut)
 app.use('/api',  adminDel)
+app.use('/api', fanlar2)
 // MongoDB ga ulanish
 const connectDB = async () => {
     try {
