@@ -3,7 +3,7 @@ const mammoth = require('mammoth');
 const Question = require('../Model/questionModel');
 
 // Fayldan savollar va variantlarni extract qilish va saqlash
-const parseWordFile = async (filePath, subject) => {
+const parseWordFile = async (filePath, subjectId) => {
     try {
         const data = await mammoth.extractRawText({ path: filePath });
         const content = data.value;
@@ -18,7 +18,7 @@ const parseWordFile = async (filePath, subject) => {
                     isCorrect: option === questionData.correctAnswer
                 })),
                 correctAnswer: questionData.correctAnswer,
-                subject // Fan nomini kiritamiz
+                subject: subjectId // Fan ID'sini kiritamiz
             });
             await newQuestion.save(); // Savollarni saqlash
         }
@@ -90,8 +90,8 @@ const extractQuestions = (content) => {
 const uploadQuestions = async (req, res) => {
     try {
         const filePath = req.file.path;
-        const { subject } = req.body; // Fan nomini request body'dan olamiz
-        const questions = await parseWordFile(filePath, subject);
+        const { subjectId } = req.body; // Fan ID'sini request body'dan olamiz
+        const questions = await parseWordFile(filePath, subjectId);
         res.json({ questions });
     } catch (error) {
         res.status(500).json({ message: 'Error extracting questions' });

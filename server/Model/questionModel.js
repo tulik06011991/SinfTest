@@ -11,7 +11,11 @@ const questionSchema = new mongoose.Schema({
     question: { type: String, required: true },
     options: [optionSchema], // Variantlar
     correctAnswer: { type: String, required: true }, // To'g'ri javob
-    subject: { type: String, required: true } // Fan nomi
+    subject: { 
+        type: mongoose.Schema.Types.ObjectId, // Fan ID'sini qabul qiladi
+        ref: 'Subject', // Fanlar modeliga havola qilamiz
+        required: true
+    }
 });
 
 // Savollar modelini yaratish

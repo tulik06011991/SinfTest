@@ -36,7 +36,7 @@ const UploadFile = () => {
 
     const formData = new FormData();
     formData.append('file', file); // Faylni FormData ga qo'shamiz
-    formData.append('subject', selectedSubject); // Tanlangan fanni qo'shamiz
+    formData.append('subjectId', selectedSubject); // Tanlangan fan ID'sini qo'shamiz
 
     try {
       const response = await axios.post('http://localhost:5000/api/upload', formData, {
