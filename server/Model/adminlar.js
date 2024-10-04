@@ -7,6 +7,7 @@ const adminSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true }, // Login (email)
     password: { type: String, required: true }, // Parol
     subject: { type: String, required: true }, // Admin bog'langan fan nomi
+    role: { type: String, default: 'admin' }, // Adminning roli, default 'admin'
     createdAt: { type: Date, default: Date.now }
 });
 

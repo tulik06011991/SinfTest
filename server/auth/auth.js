@@ -1,76 +1,68 @@
-const User = require('../Model/auth');
-const jwt = require('jsonwebtoken');
+const Admin = require('../Model/adminlar'); // Admin modelini import qilish
+const User = require('../Model/auth'); // User modelini import qilish
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-// JWT token yaratish funksiyasi
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '30d',
-    });
-};
-
-// Ro'yxatdan o'tish (Register)
-const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
+// Register Controller
+const registerController = async (req, res) => {
+    const { name, email, password, role } = req.body;
 
     try {
-        // Foydalanuvchi mavjudligini tekshirish
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: 'Foydalanuvchi allaqachon mavjud' });
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Bu email bilan foydalanuvchi mavjud!' });
         }
 
-        // Foydalanuvchini yaratish
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const user = await User.create({
+        const user = new User({
             name,
             email,
-            password: hashedPassword,
+            password,
+            role // Admin yoki user
         });
 
-        // Token yaratish va qaytarish
-        if (user) {
-            res.status(201).json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                token: generateToken(user._id),
-            });
-        } else {
-            res.status(400).json({ message: 'Foydalanuvchini yaratishda xatolik yuz berdi' });
-        }
+        await user.save();
+        res.status(201).json({ message: 'Foydalanuvchi muvaffaqiyatli ro\'yxatdan o\'tdi!' });
     } catch (error) {
-        res.status(500).json({ message: 'Ro\'yxatdan o\'tishda xatolik' });
+        console.error(error);
+        res.status(500).json({ message: 'Serverda xato yuz berdi!' });
     }
 };
 
-// Kirish (Login)
-const loginUser = async (req, res) => {
+// Login Controller
+const loginController = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Foydalanuvchini topish
-        const user = await User.findOne({ email });
+        // Adminni qidirish
+        const admin = await Admin.findOne({ email });
+        if (admin) {
+            const isMatch = await admin.comparePassword(password);
+            if (!isMatch) {
+                return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
+            }
 
-        // Parolni tekshirish va token yaratish
-        if (user && (await bcrypt.compare(password, user.password))) {
-            res.json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                token: generateToken(user._id),
-            });
-        } else {
-            res.status(401).json({ message: 'Email yoki parol noto\'g\'ri' });
+            const token = jwt.sign({ userId: admin._id, role: admin.role }, 'your_jwt_secret', { expiresIn: '1h' });
+            return res.status(200).json({ token, redirect: '/admin/dashboard' });
         }
+
+        // Agar admin topilmasa, userni qidirish
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'Foydalanuvchi topilmadi!' });
+        }
+
+        const isMatch = await user.matchPassword(password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
+        }
+
+        const token = jwt.sign({ userId: user._id, role: user.role }, 'your_jwt_secret', { expiresIn: '1h' });
+        return res.status(200).json({ token, redirect: '/user/dashboard' });
+
     } catch (error) {
-        res.status(500).json({ message: 'Kirishda xatolik yuz berdi' });
+        console.error(error);
+        return res.status(500).json({ message: 'Serverda xato yuz berdi!' });
     }
 };
 
-module.exports = {
-    registerUser,
-    loginUser,
-};
+module.exports = { registerController, loginController };

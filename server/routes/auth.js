@@ -1,13 +1,16 @@
 const express = require('express');
-const { registerUser, loginUser } = require('../auth/auth');
+const { registerController, loginController } = require('../auth/auth');
 const middleware = require('../middleware/middleware')
 
 const router = express.Router();
 
 // Ro'yxatdan o'tish (POST /api/users/register)
-router.post('/register',  registerUser);
+router.post('/register',  registerController);
 
 // Kirish (POST /api/users/login)
-router.post('/login',  loginUser);
+router.post('/login',  loginController);
+router.get('/admin/dashboard', middleware, (req, res) => {
+    res.json({ message: 'Admin dashboardga xush kelibsiz!' });
+});
 
 module.exports = router;

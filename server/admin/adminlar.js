@@ -6,12 +6,13 @@ exports.createAdmin = async (req, res) => {
     try {
         const { name, email, password, subject } = req.body;
 
-        // Yangi admin yaratish
+        // Yangi admin yaratish, role ni admin deb belgilaymiz
         const newAdmin = new Admin({
             name,
             email,
             password,
-            subject
+            subject,
+            role: 'admin' // Admin roli
         });
 
         await newAdmin.save();
@@ -36,6 +37,11 @@ exports.updateAdmin = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = req.body;
+
+        // Agar yangilash jarayonida role maydoni berilgan bo'lsa, uni admin bo'lishiga ishonch hosil qilish
+        if (updates.role && updates.role !== 'admin') {
+            return res.status(400).json({ error: 'Admin roli faqat admin bo\'lishi mumkin!' });
+        }
 
         // Adminni yangilash
         const updatedAdmin = await Admin.findByIdAndUpdate(id, updates, { new: true });

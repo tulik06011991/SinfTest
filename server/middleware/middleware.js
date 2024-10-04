@@ -1,28 +1,14 @@
 const jwt = require('jsonwebtoken');
-const User = require('../Model/auth');
 
-const protect = async (req, res, next) => {
-    let token;
+// Middleware for admin check
+const adminMiddleware = (req, res, next) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(token, 'your_jwt_secret');
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        try {
-            token = req.headers.authorization.split(' ')[1]; // Tokenni olish
-
-            // Tokenni tekshirish
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-            // Foydalanuvchini token orqali olish
-            req.user = await User.findById(decoded.id).select('-password');
-
-            next();
-        } catch (error) {
-            res.status(401).json({ message: 'Token noto\'g\'ri' });
-        }
+    if (decoded.role !== 'admin') {
+        return res.status(403).json({ message: 'Sizda admin huquqlari yo\'q!' });
     }
-
-    if (!token) {
-        res.status(401).json({ message: 'Token mavjud emas, kirish talab qilinadi' });
-    }
+    next();
 };
 
-module.exports = protect;
+module.exports = adminMiddleware;
