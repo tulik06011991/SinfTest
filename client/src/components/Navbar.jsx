@@ -13,14 +13,14 @@ const NavbarSidebar = () => {
         <>
             {/* Mobil qurilmalar uchun Sidebar ochuvchi tugma */}
             <button 
-                className="block lg:hidden text-white text-2xl p-2 bg-gray-800 rounded fixed top-2 left-2 z-20" 
+                className="block lg:hidden text-white text-2xl p-2 bg-gray-800   rounded fixed top-2 left-2 z-20" 
                 onClick={toggleSidebar}
             >
                 &#9776; {/* Mobil uchun menyu ikonkasi */}
             </button>
 
             {/* Sidebar (faqat mobil uchun) */}
-            <div className={`fixed top-0 left-0 w-64 h-full bg-gray-800 text-white z-20 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 lg:hidden`}>
+            <div className={`fixed top-0 left-0 w-64 h-full bg-gray-800 shadow text-white z-20 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 lg:hidden`}>
                 <button 
                     className="text-4xl p-4" 
                     onClick={toggleSidebar}
