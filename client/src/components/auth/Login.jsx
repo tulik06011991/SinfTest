@@ -11,7 +11,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5000/api/users/login', { email, password });
+            const response = await axios.post('http://localhost:5000/api/login', { email, password });
             localStorage.setItem('token', response.data.token); // Tokenni saqlash
             navigate('/dashboard'); // Kirish muvaffaqiyatli bo'lsa, dashboard sahifasiga o'tish
         } catch (err) {
