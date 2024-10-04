@@ -5,6 +5,9 @@ import SavollarJavoblar from './components/SavollarJavoblar';
 import Admin from './components/admin/Admin'; // About sahifasi
 import NavbarSidebar from './components/Navbar';
 import CreateSubject  from './components/admin/Fanlar'
+import Register from './components/auth/Register';
+import Login from './components/auth/Login';
+
 // import Quiz from './components/Quiz'; // Quiz sahifasi
 
 const App = () => {
@@ -19,7 +22,9 @@ const App = () => {
                     <Route path="/" element={<Home />} /> {/* Bosh sahifa */}
                     <Route path="/about" element={<SavollarJavoblar />} /> {/* About sahifasi */}
                     <Route path="/quiz" element={<Admin />} /> Quiz sahifasi
-                    <Route path="/fanlar" element={<CreateSubject />} /> Quiz sahifasi
+                    <Route path="/fanlar" element={<CreateSubject />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} /> Quiz sahifasi
                 </Routes>
             </>
         </Router>
