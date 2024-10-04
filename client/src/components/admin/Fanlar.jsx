@@ -25,11 +25,17 @@ const CreateSubject = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/api/subjects', { name, adminId }); // Fan yaratish uchun so'rov yuborish
+      const response = await axios.post('http://localhost:5000/api/create', { name, adminId }); // Fan yaratish uchun so'rov yuborish
       setMessage(response.data.message); // Xabarni o'rnatamiz
     } catch (error) {
-      console.error('Fan yaratishda xato:', error);
-      setMessage('Fan yaratishda xato yuz berdi!');
+      if (error.response && error.response.status === 400) {
+        // Agar status kodi 400 bo'lsa, bu fan allaqachon mavjud deb xabar chiqaramiz
+        setMessage('Bu fan allaqachon mavjud!');
+      } else {
+        // Boshqa xatoliklar uchun umumiy xabar
+        console.error('Fan yaratishda xato:', error);
+        setMessage('Fan yaratishda xato yuz berdi!');
+      }
     }
   };
 
