@@ -2,18 +2,32 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const Quiz = () => {
-    const [subjects, setSubjects] = useState(['Matematika', 'Kimyo', 'Biologiya', 'Tarix', 'Ona-tili', 'Adabiyot', 'Geografiya', 'Algebra', 'Ingliz-tili', 'Tarbiya']);
-    const [selectedSubject, setSelectedSubject] = useState('');
-    const [questions, setQuestions] = useState([]);
-    const [selectedAnswers, setSelectedAnswers] = useState({});
+    const [subjects, setSubjects] = useState([]); // Fanlar ro'yxati
+    const [selectedSubject, setSelectedSubject] = useState(''); // Tanlangan fanning ID'si
+    const [questions, setQuestions] = useState([]); // Savollar ro'yxati
+    const [selectedAnswers, setSelectedAnswers] = useState({}); // Belgilangan javoblar
 
+    // Fanlar ro'yxatini backenddan olish
+    useEffect(() => {
+        const fetchSubjects = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/subjects');
+                setSubjects(response.data); // Backenddan kelgan fanlar ro'yxatini yuklaymiz
+            } catch (error) {
+                console.error('Fanlarni olishda xato:', error);
+            }
+        };
+        fetchSubjects();
+    }, []);
+
+    // Tanlangan fanga ko'ra savollarni olish
     useEffect(() => {
         const fetchQuestions = async () => {
             if (!selectedSubject) return;
 
             try {
-                const response = await axios.get(`http://localhost:5000/api/questions/subject/${selectedSubject.toLowerCase()}`);
-                setQuestions(response.data);
+                const response = await axios.get(`http://localhost:5000/api/questions/subject/${selectedSubject}`);
+                setQuestions(response.data); // Backenddan savollarni yuklaymiz
             } catch (error) {
                 console.error('Savollarni olishda xato:', error);
             }
@@ -21,6 +35,7 @@ const Quiz = () => {
         fetchQuestions();
     }, [selectedSubject]);
 
+    // Javob tanlash
     const handleAnswerSelect = (questionId, selectedOption) => {
         setSelectedAnswers((prevAnswers) => ({
             ...prevAnswers,
@@ -28,10 +43,11 @@ const Quiz = () => {
         }));
     };
 
+    // Fan tanlash funksiyasi
     const handleSubjectChange = (event) => {
-        setSelectedSubject(event.target.value);
-        setQuestions([]);
-        setSelectedAnswers({});
+        setSelectedSubject(event.target.value); // Fan ID si
+        setQuestions([]); // Savollarni tozalaymiz
+        setSelectedAnswers({}); // Belgilangan javoblarni tozalaymiz
     };
 
     return (
@@ -46,7 +62,7 @@ const Quiz = () => {
                 className="p-2 mb-6 bg-white border border-gray-300 rounded shadow-lg w-60 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">-- Fan tanlang --</option>
                 {subjects.map((subject) => (
-                    <option key={subject} value={subject}>{subject}</option>
+                    <option key={subject._id} value={subject._id}>{subject.name}</option>
                 ))}
             </select>
 
