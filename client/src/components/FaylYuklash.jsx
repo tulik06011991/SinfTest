@@ -1,98 +1,101 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { FiUploadCloud } from "react-icons/fi"; // Upload icon
-import { AiOutlineFile } from "react-icons/ai"; // File icon
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const FileUpload = () => {
-  const [file, setFile] = useState(null);
-  const [fileName, setFileName] = useState("No file chosen");
-  const [uploadStatus, setUploadStatus] = useState("");
-  const [subject, setSubject] = useState(""); // Fan nomi uchun state
+const UploadFile = () => {
+  const [file, setFile] = useState(null); // Faylni saqlash
+  const [selectedSubject, setSelectedSubject] = useState(''); // Tanlangan fan
+  const [subjects, setSubjects] = useState([]); // Barcha fanlarni saqlash
+  const [message, setMessage] = useState(''); // Xabarni saqlash
 
+  // Backenddan fanlar ro'yxatini olish uchun useEffect
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/subjects'); // Fanlarni olish
+        setSubjects(response.data); // Fanlarni state ga o'rnatamiz
+      } catch (error) {
+        console.error('Fanlarni olishda xato:', error);
+      }
+    };
+    fetchSubjects();
+  }, []);
+
+  // Fayl tanlanganida
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-    setFileName(selectedFile ? selectedFile.name : "No file chosen");
+    setFile(e.target.files[0]);
   };
 
+  // Formani submit qilganda fayl yuklash funksiyasi
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file || !subject) { // Fan nomi bo'sh emasligini tekshirish
-      alert("Please select a file and enter a subject!");
+
+    if (!selectedSubject || !file) {
+      setMessage('Iltimos, fan va faylni tanlang!');
       return;
     }
 
-    // File upload to the server
     const formData = new FormData();
-    formData.append("file", file);
-    formData.append("subject", subject); // Fan nomini qo'shish
+    formData.append('file', file); // Faylni FormData ga qo'shamiz
+    formData.append('subject', selectedSubject); // Tanlangan fanni qo'shamiz
 
     try {
-      setUploadStatus("Uploading...");
-
-      // Send POST request to the REST API
-      const response = await axios.post("http://localhost:5000/api/upload", formData, {
+      const response = await axios.post('http://localhost:5000/api/upload', formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
-
-      setUploadStatus("File uploaded successfully!");
-      console.log("File uploaded:", response.data);
-
+      setMessage('Fayl muvaffaqiyatli yuklandi!');
     } catch (error) {
-      console.error("Error uploading file:", error);
-      setUploadStatus("Failed to upload file.");
+      console.error('Faylni yuklashda xato:', error);
+      setMessage('Faylni yuklashda xato yuz berdi!');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full">
-        <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
-          Upload Your File
-        </h2>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="relative border border-gray-300 rounded-lg p-4 bg-gray-50 flex items-center">
-            <AiOutlineFile className="text-gray-400 text-2xl mr-4" />
-            <input
-              type="file"
-              id="fileInput"
-              className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-              onChange={handleFileChange}
-            />
-            <label htmlFor="fileInput" className="block text-sm text-gray-600 w-full">
-              {fileName}
-            </label>
-          </div>
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
+      <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Fan Tanlash va Fayl Yuklash</h2>
 
-          {/* Fan nomini kiritish uchun input */}
-          <input
-            type="text"
-            placeholder="Enter Subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)} // Fan nomini saqlash
-            className="border border-gray-300 p-2 rounded-lg"
-            required // Kiritilishini talab qilamiz
-          />
-
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg shadow-md hover:bg-blue-600 transition-colors flex items-center justify-center"
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex flex-col">
+          <label htmlFor="subject" className="mb-1 text-gray-600">Fan Tanlang:</label>
+          <select
+            id="subject"
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            required
+            className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <FiUploadCloud className="text-white text-xl mr-2" />
-            Upload File
-          </button>
-        </form>
+            <option value="">Fan tanlang</option>
+            {subjects.map((subject) => (
+              <option key={subject._id} value={subject._id}>
+                {subject.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        {uploadStatus && (
-          <p className={`text-center mt-4 ${uploadStatus.includes("successfully") ? "text-green-600" : "text-red-600"}`}>
-            {uploadStatus}
-          </p>
-        )}
-      </div>
+        <div className="flex flex-col">
+          <label htmlFor="file" className="mb-1 text-gray-600">Faylni Yuklang:</label>
+          <input
+            type="file"
+            id="file"
+            onChange={handleFileChange}
+            required
+            className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors duration-300"
+        >
+          Yuklash
+        </button>
+
+        {message && <p className="text-center text-red-500 mt-4">{message}</p>}
+      </form>
     </div>
   );
 };
 
-export default FileUpload;
+export default UploadFile;
