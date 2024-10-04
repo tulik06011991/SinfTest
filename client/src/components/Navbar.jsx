@@ -13,7 +13,7 @@ const NavbarSidebar = () => {
         <>
             {/* Mobil qurilmalar uchun Sidebar ochuvchi tugma */}
             <button 
-                className="block lg:hidden text-white text-3xl p-2 bg-gray-800 fixed top-4 left-4 z-20" 
+                className="block lg:hidden text-white text-2xl p-2 bg-gray-800 rounded fixed top-2 left-2 z-20" 
                 onClick={toggleSidebar}
             >
                 &#9776; {/* Mobil uchun menyu ikonkasi */}
