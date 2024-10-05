@@ -14,8 +14,8 @@ const parseWordFile = async (filePath, subjectId) => {
             const newQuestion = new Question({
                 question: questionData.question,
                 options: questionData.options.map(option => ({
-                    text: option,
-                    isCorrect: option === questionData.correctAnswer
+                    text: option.text,
+                    isCorrect: option.isCorrect
                 })),
                 correctAnswer: questionData.correctAnswer,
                 subject: subjectId // Fan ID'sini kiritamiz
@@ -44,7 +44,7 @@ const extractQuestions = (content) => {
             if (currentQuestion.question) {
                 if (!currentQuestion.correctAnswer) {
                     // Agar to'g'ri javob aniqlanmagan bo'lsa, birinchi variantni tanlaymiz
-                    currentQuestion.correctAnswer = currentQuestion.options[0];
+                    currentQuestion.correctAnswer = currentQuestion.options.find(opt => opt.isCorrect)?.text || currentQuestion.options[0].text;
                 }
                 questions.push(currentQuestion);
             }
@@ -56,29 +56,33 @@ const extractQuestions = (content) => {
             };
         }
 
-        // Variantlarni olish: "A)", "B)", "C)", "A.", "B." shaklida keladi yoki oldida nuqta bilan boshlanishi mumkin
-        const optionMatch = line.match(/^[A-D][).]|\.[A-D][).]?/);
-        if (optionMatch) {
-            // Variant matnini olish
-            let optionText = line.replace(/^[A-D][).]\s*|\.[A-D][).]?\s*/, '').trim();
+        // Bir qator ichida bir nechta variantlar mavjud bo'lsa, ularni ajratib olish
+        let optionRegex = /(\.?[A-D])[).]\s*([^A-D]*)/g; // "A)" yoki ".A)" ko'rinishdagi variantlarni qidirish
+        let match;
+        while ((match = optionRegex.exec(line)) !== null) {
+            let optionLabel = match[1]; // A, B, C, D va ularning oldidagi nuqta
+            let optionText = match[2].trim(); // Variantning matni
 
-            // Agar variant oldida nuqta bilan boshlansa, to'g'ri javob bo'ladi
-            const isCorrect = line.trim().startsWith('.');
-
-            // Agar to'g'ri variant bo'lsa, uni belgiliymiz
-            if (isCorrect) {
-                currentQuestion.correctAnswer = optionText; // To'g'ri javobni belgilaymiz
-            }
+            // Agar variant oldida nuqta bo'lsa, uni to'g'ri variant deb belgilaymiz
+            let isCorrect = optionLabel.startsWith('.');
 
             // Variantni qo'shamiz
-            currentQuestion.options.push(optionText);
+            currentQuestion.options.push({
+                text: optionText, // Variant matni
+                isCorrect: isCorrect // To'g'ri javob bo'lsa belgilaymiz
+            });
+
+            // Agar to'g'ri variant bo'lsa, uni currentQuestion.correctAnswer ga o'rnatamiz
+            if (isCorrect) {
+                currentQuestion.correctAnswer = optionText;
+            }
         }
     });
 
     // Oxirgi savolni qo'shish, to'g'ri javob aniqlanmagan bo'lsa, birinchi variantni tanlaymiz
     if (currentQuestion.question) {
         if (!currentQuestion.correctAnswer) {
-            currentQuestion.correctAnswer = currentQuestion.options[0]; // Birinchi variantni to'g'ri deb belgilaymiz
+            currentQuestion.correctAnswer = currentQuestion.options.find(opt => opt.isCorrect)?.text || currentQuestion.options[0].text;
         }
         questions.push(currentQuestion);
     }
