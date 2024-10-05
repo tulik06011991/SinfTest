@@ -7,6 +7,7 @@ const Quiz = () => {
     const [questions, setQuestions] = useState([]); // Savollar ro'yxati
     const [selectedAnswers, setSelectedAnswers] = useState({}); // Belgilangan javoblar
     const [submissionStatus, setSubmissionStatus] = useState(''); // Javoblarni yuborish statusi
+    const [result, setResult] = useState(null); // Foydalanuvchi natijasi
 
     // Fanlar ro'yxatini backenddan olish
     useEffect(() => {
@@ -50,33 +51,41 @@ const Quiz = () => {
         setQuestions([]); // Savollarni tozalaymiz
         setSelectedAnswers({}); // Belgilangan javoblarni tozalaymiz
         setSubmissionStatus(''); // Javob yuborish statusini tozalaymiz
+        setResult(null); // Natijani tozalaymiz
     };
 
     // Javoblarni backendga yuborish
-   // Javoblarni backendga yuborish
-const submitAnswers = async () => {
-    const token = localStorage.getItem('token'); // Tokenni localStorage'dan olish
+    const submitAnswers = async () => {
+        const token = localStorage.getItem('token'); // Tokenni localStorage'dan olish
 
-    try {
-        const response = await axios.post(
-            'http://localhost:5000/api/submit-answers',
-            {
-                subjectId: selectedSubject, // Fan ID
-                answers: selectedAnswers    // Savollar va variantlar IDlari
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${token}` // Tokenni Authorization header orqali yuborish
+        try {
+            const response = await axios.post(
+                'http://localhost:5000/api/submit-answers',
+                {
+                    subjectId: selectedSubject, // Fan ID
+                    answers: selectedAnswers    // Savollar va variantlar IDlari
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Tokenni Authorization header orqali yuborish
+                    }
                 }
-            }
-        );
-        setSubmissionStatus(response.data.message);
-    } catch (error) {
-        console.error('Javoblarni yuborishda xato:', error);
-        setSubmissionStatus('Javoblarni yuborishda xato yuz berdi.');
-    }
-};
+            );
 
+            const { message, correctAnswersCount, totalQuestions, correctPercentage } = response.data;
+
+            // Natijalarni ko'rsatish uchun statusni va resultni yangilash
+            setSubmissionStatus(message);
+            setResult({
+                correctAnswersCount,
+                totalQuestions,
+                correctPercentage
+            });
+        } catch (error) {
+            console.error('Javoblarni yuborishda xato:', error);
+            setSubmissionStatus('Javoblarni yuborishda xato yuz berdi.');
+        }
+    };
 
     return (
         <div className="quiz-container bg-gray-100 min-h-screen flex flex-col items-center py-8">
@@ -134,6 +143,15 @@ const submitAnswers = async () => {
             {/* Yuborish natijasini ko'rsatish */}
             {submissionStatus && (
                 <p className="mt-4 text-lg font-medium text-green-600">{submissionStatus}</p>
+            )}
+
+            {/* Foydalanuvchi natijalarini ko'rsatish */}
+            {result && (
+                <div className="mt-6 p-4 bg-white shadow-md rounded-lg">
+                    <p className="text-xl font-semibold">Sizning Natijalaringiz:</p>
+                    <p className="text-lg">To'g'ri javoblar: {result.correctAnswersCount} / {result.totalQuestions}</p>
+                    <p className="text-lg">To'g'ri javoblar foizi: {result.correctPercentage}</p>
+                </div>
             )}
         </div>
     );

@@ -13,11 +13,12 @@ const submitAnswers = async (req, res) => {
     try {
         // Tokenni dekodlash va foydalanuvchini olish
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.userId;
-        console.log(userId) // Foydalanuvchi ID'si token ichidan
+        const userId = decoded.userId; // Foydalanuvchi ID'si token ichidan
 
         const { subjectId, answers } = req.body; // Fan ID va javoblar
         const savedAnswers = [];
+        let correctAnswersCount = 0; // To'g'ri javoblar soni
+        const totalQuestions = Object.keys(answers).length; // Umumiy savollar soni
 
         // Javoblarni qayta ishlash va saqlash
         for (let questionId in answers) {
@@ -28,6 +29,11 @@ const submitAnswers = async (req, res) => {
                 // Tanlangan variantning ID'sini olish
                 const selectedOption = question.options.find(option => option.text === optionText);
                 const isCorrect = selectedOption.isCorrect; // Variant to'g'ri yoki noto'g'ri
+
+                // Agar javob to'g'ri bo'lsa, hisoblash
+                if (isCorrect) {
+                    correctAnswersCount++; // To'g'ri javobni sanash
+                }
 
                 // Javobni saqlash
                 const answer = new Answer({
@@ -42,7 +48,17 @@ const submitAnswers = async (req, res) => {
             }
         }
 
-        return res.status(200).json({ message: 'Javoblar saqlandi', answers: savedAnswers });
+        // To'g'ri javoblar foizini hisoblash
+        const correctPercentage = (correctAnswersCount / totalQuestions) * 100;
+
+        // Javoblarni qaytarish
+        return res.status(200).json({
+            message: 'Javoblar saqlandi',
+            answers: savedAnswers,
+            correctAnswersCount: correctAnswersCount, // To'g'ri javoblar soni
+            totalQuestions: totalQuestions, // Umumiy savollar soni
+            correctPercentage: correctPercentage.toFixed(2) + '%' // To'g'ri javoblar foizi
+        });
     } catch (error) {
         console.error('Javoblarni saqlashda xato:', error);
         return res.status(500).json({ message: 'Xatolik yuz berdi' });
