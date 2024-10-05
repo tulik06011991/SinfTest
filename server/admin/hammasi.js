@@ -1,4 +1,3 @@
-// Fanlar model
 
 // Admin tokenini tekshirish funksiyasi
 const jwt = require('jsonwebtoken');
@@ -26,6 +25,7 @@ const verifyAdminToken = (req, res, next) => {
 };
 
 // Fan bo'yicha ma'lumotlarni olish va natijalarni hisoblash
+// Fan bo'yicha ma'lumotlarni olish va natijalarni hisoblash
 const getSubjectDetails = async (req, res) => {
     try {
         const subjectId = req.params.subjectId;
@@ -33,7 +33,7 @@ const getSubjectDetails = async (req, res) => {
         // Fan ID orqali savollar va variantlarni olish
         const questions = await Question.find({ subject: subjectId }).populate('options');
 
-        // Foydalanuvchilarning javoblari va variantlar
+        // Foydalanuvchilarning javoblari
         const answers = await Answer.find({ subjectId })
             .populate('userId', 'name') // Foydalanuvchi ismini olish
             .populate('questionId') // Savollarni olish
@@ -42,15 +42,18 @@ const getSubjectDetails = async (req, res) => {
         // Har bir foydalanuvchining to'g'ri javoblarini hisoblash
         const userResults = [];
 
-        for (const user of await User.find()) {
+        // Har bir foydalanuvchining natijalarini olish
+        const users = await User.find();
+        
+        for (const user of users) {
             // Foydalanuvchining bergan javoblari
-            const userAnswers = answers.filter(answer => answer.userId.toString() === user._id.toString());
-            
+            const userAnswers = answers.filter(answer => answer.userId._id.toString() === user._id.toString());
+
             let correctAnswersCount = 0;
 
             // Har bir javobni tekshirish
             for (const answer of userAnswers) {
-                const option = await Option.findById(answer.optionId);
+                const option = await Option.findById(answer.optionId); // Variantni olish
                 if (option && option.isCorrect) {
                     correctAnswersCount++; // To'g'ri javoblar soni
                 }
@@ -78,6 +81,7 @@ const getSubjectDetails = async (req, res) => {
         res.status(500).json({ message: 'Ma\'lumotlarni olishda xatolik yuz berdi.' });
     }
 };
+
 
 module.exports = {
     verifyAdminToken,
