@@ -6,6 +6,7 @@ const Quiz = () => {
     const [selectedSubject, setSelectedSubject] = useState(''); // Tanlangan fanning ID'si
     const [questions, setQuestions] = useState([]); // Savollar ro'yxati
     const [selectedAnswers, setSelectedAnswers] = useState({}); // Belgilangan javoblar
+    const [submissionStatus, setSubmissionStatus] = useState(''); // Javoblarni yuborish statusi
 
     // Fanlar ro'yxatini backenddan olish
     useEffect(() => {
@@ -48,7 +49,34 @@ const Quiz = () => {
         setSelectedSubject(event.target.value); // Fan ID si
         setQuestions([]); // Savollarni tozalaymiz
         setSelectedAnswers({}); // Belgilangan javoblarni tozalaymiz
+        setSubmissionStatus(''); // Javob yuborish statusini tozalaymiz
     };
+
+    // Javoblarni backendga yuborish
+   // Javoblarni backendga yuborish
+const submitAnswers = async () => {
+    const token = localStorage.getItem('token'); // Tokenni localStorage'dan olish
+
+    try {
+        const response = await axios.post(
+            'http://localhost:5000/api/submit-answers',
+            {
+                subjectId: selectedSubject, // Fan ID
+                answers: selectedAnswers    // Savollar va variantlar IDlari
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}` // Tokenni Authorization header orqali yuborish
+                }
+            }
+        );
+        setSubmissionStatus(response.data.message);
+    } catch (error) {
+        console.error('Javoblarni yuborishda xato:', error);
+        setSubmissionStatus('Javoblarni yuborishda xato yuz berdi.');
+    }
+};
+
 
     return (
         <div className="quiz-container bg-gray-100 min-h-screen flex flex-col items-center py-8">
@@ -98,10 +126,15 @@ const Quiz = () => {
 
             {/* Natijalarni yuborish tugmasi */}
             <button 
-                onClick={() => console.log(selectedAnswers)}
+                onClick={submitAnswers}
                 className="mt-6 px-6 py-2 bg-blue-600 text-white text-lg font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
                 Natijalarni Yuborish
             </button>
+
+            {/* Yuborish natijasini ko'rsatish */}
+            {submissionStatus && (
+                <p className="mt-4 text-lg font-medium text-green-600">{submissionStatus}</p>
+            )}
         </div>
     );
 };
