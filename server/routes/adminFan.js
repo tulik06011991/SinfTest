@@ -9,7 +9,7 @@ router.get('/subjects', async (req, res) => {
   try {
     // Tokenni request header'dan olish
     const token = req.headers.authorization.split(' ')[1];
-console.log(token)
+// console.log(token)
     if (!token) {
       return res.status(401).json({ message: 'Token taqdim etilmagan.' });
     }

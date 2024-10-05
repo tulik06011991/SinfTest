@@ -61,7 +61,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-  console.log(subjectDetails)
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
@@ -104,27 +103,35 @@ const Dashboard = () => {
               <div>
                 <h4 className="text-lg font-semibold mt-4">Savollar:</h4>
                 <ul className="list-disc pl-6">
-                  {subjectDetails.questions.map((question) => (
-                    <li key={question._id}>
-                      <strong>{question.question}</strong>
-                      <ul className="list-circle pl-4">
-                        {question.options.map((option) => (
-                          <li key={option._id}>
-                            {option.text} {option.isCorrect ? '(To\'g\'ri)' : ''}
-                          </li>
-                        ))}
-                      </ul>
-                    </li>
-                  ))}
+                  {subjectDetails.questions && subjectDetails.questions.length > 0 ? (
+                    subjectDetails.questions.map((question) => (
+                      <li key={question._id}>
+                        <strong>{question.question}</strong>
+                        <ul className="list-circle pl-4">
+                          {question.options.map((option) => (
+                            <li key={option._id}>
+                              {option.text} {option.isCorrect ? '(To\'g\'ri)' : ''}
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-gray-500 italic">Savollar topilmadi.</li>
+                  )}
                 </ul>
 
                 <h4 className="text-lg font-semibold mt-4">Foydalanuvchilar Natijalari:</h4>
                 <ul className="list-disc pl-6">
-                  {subjectDetails.answers.map((answer) => (
-                    <li key={answer._id}>
-                      {answer.userId.name}: {answer.isCorrect ? 'To\'g\'ri javob' : 'Noto\'g\'ri javob'}
-                    </li>
-                  ))}
+                  {subjectDetails.answers && subjectDetails.answers.length > 0 ? (
+                    subjectDetails.answers.map((answer) => (
+                      <li key={answer._id}>
+                        {answer.userId.name}: {answer.isCorrect ? 'To\'g\'ri javob' : 'Noto\'g\'ri javob'}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-gray-500 italic">Natijalar topilmadi.</li>
+                  )}
                 </ul>
               </div>
             ) : (
