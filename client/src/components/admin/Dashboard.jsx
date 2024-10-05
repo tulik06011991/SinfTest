@@ -61,6 +61,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+  console.log(subjectDetails)
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
