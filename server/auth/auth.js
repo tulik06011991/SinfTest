@@ -41,7 +41,8 @@ const loginController = async (req, res) => {
                 return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
             }
 
-            const token = jwt.sign({ userId: admin._id, role: admin.role }, 'your_jwt_secret', { expiresIn: '1h' });
+            // JWT token yaratish
+            const token = jwt.sign({ userId: admin._id, role: admin.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
             return res.status(200).json({ token, redirect: '/admin/dashboard' });
         }
 
@@ -56,7 +57,8 @@ const loginController = async (req, res) => {
             return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
         }
 
-        const token = jwt.sign({ userId: user._id, role: user.role }, 'your_jwt_secret', { expiresIn: '1h' });
+        // JWT token yaratish
+        const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
         return res.status(200).json({ token, redirect: '/user/dashboard' });
 
     } catch (error) {

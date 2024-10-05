@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Answer = require('../Model/Javoblar');
 const Question = require('../Model/questionModel');
-require('dotenv').config()
+require('dotenv').config();
 
 // Javoblarni qabul qiladigan funksiya
 const submitAnswers = async (req, res) => {
@@ -9,11 +9,12 @@ const submitAnswers = async (req, res) => {
     if (!token) {
         return res.status(401).json({ message: 'Token mavjud emas' });
     }
-console.log(token)
+
     try {
         // Tokenni dekodlash va foydalanuvchini olish
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.id; // Foydalanuvchi ID'si token ichidan
+        const userId = decoded.userId;
+        console.log(userId) // Foydalanuvchi ID'si token ichidan
 
         const { subjectId, answers } = req.body; // Fan ID va javoblar
         const savedAnswers = [];
