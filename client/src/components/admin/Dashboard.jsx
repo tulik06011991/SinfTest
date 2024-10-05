@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const Dashboard = () => {
-  const [subjects, setSubjects] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [subjects, setSubjects] = useState([]); // Fanlar ro'yxati
+  const [loading, setLoading] = useState(false); // Yuklanish holati
+  const [error, setError] = useState(''); // Xato xabarlari
   const [selectedSubject, setSelectedSubject] = useState(null); // Tanlangan fanni saqlash
+  const [subjectDetails, setSubjectDetails] = useState(null); // Fan haqida ma'lumotlar (savollar, natijalar va hokazo)
 
+  // Fanlar ro'yxatini olish
   const fetchSubjects = async () => {
     setLoading(true);
+    setError('');
     try {
       const token = localStorage.getItem('token');
 
@@ -32,20 +35,23 @@ const Dashboard = () => {
     }
   };
 
+  // Tanlangan fan bo'yicha savollar, foydalanuvchilar va natijalarni olish
   const handleSubjectClick = async (subject) => {
     setLoading(true);
     setSelectedSubject(subject); // Tanlangan fanni yangilash
+    setError('');
+    setSubjectDetails(null); // Ma'lumotlarni tozalash
+
     try {
       const token = localStorage.getItem('token');
 
-      const response = await axios.get(`http://localhost:5000/admin/subjects/${subject._id}`, {
+      const response = await axios.get(`http://localhost:5000/admin/subjects/${subject._id}/details`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      // Natijalarni ko'rsatish uchun kerakli ma'lumotlar bilan ishlang
-      console.log(response.data); // Bu yerda natijalarni konsolga chiqaramiz
+      setSubjectDetails(response.data); // Fan haqida ma'lumotlarni saqlash
     } catch (err) {
       setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
       console.error(err);
@@ -90,7 +96,37 @@ const Dashboard = () => {
         {selectedSubject && (
           <div className="mt-6 p-4 border border-gray-300 rounded-lg bg-gray-50">
             <h3 className="text-xl font-semibold text-gray-700">Tanlangan Fan: {selectedSubject.name}</h3>
-            {/* Bu yerda savollar va variantlar bo'lishi mumkin */}
+
+            {subjectDetails ? (
+              <div>
+                <h4 className="text-lg font-semibold mt-4">Savollar:</h4>
+                <ul className="list-disc pl-6">
+                  {subjectDetails.questions.map((question) => (
+                    <li key={question._id}>
+                      <strong>{question.question}</strong>
+                      <ul className="list-circle pl-4">
+                        {question.options.map((option) => (
+                          <li key={option._id}>
+                            {option.text} {option.isCorrect ? '(To\'g\'ri)' : ''}
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+
+                <h4 className="text-lg font-semibold mt-4">Foydalanuvchilar Natijalari:</h4>
+                <ul className="list-disc pl-6">
+                  {subjectDetails.answers.map((answer) => (
+                    <li key={answer._id}>
+                      {answer.userId.name}: {answer.isCorrect ? 'To\'g\'ri javob' : 'Noto\'g\'ri javob'}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="text-gray-600 italic">Fan bo'yicha ma'lumotlarni yuklash...</div>
+            )}
           </div>
         )}
       </div>
