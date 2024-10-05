@@ -42,7 +42,7 @@ const loginController = async (req, res) => {
             }
 
             // JWT token yaratish
-            const token = jwt.sign({ userId: admin._id, role: admin.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ userId: admin._id, role: admin.role }, process.env.JWT_SECRET, { expiresIn: '5h' });
             return res.status(200).json({ token, redirect: '/admin/dashboard' });
         }
 
