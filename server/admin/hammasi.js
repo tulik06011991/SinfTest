@@ -1,9 +1,12 @@
+// Fanlar model
+
+// Admin tokenini tekshirish funksiyasi
 const jwt = require('jsonwebtoken');
 const Answer = require('../Model/Javoblar'); // Foydalanuvchilar natijalari model
 const Question = require('../Model/questionModel'); // Savollar model
 const User = require('../Model/auth'); // Foydalanuvchilar model
 const Subject = require('../Model/Fanlar');
-const options = require('../Model/hammasi') // Fanlar model
+const Option = require('../Model/hammasi'); // Variantlar model
 
 // Admin tokenini tekshirish funksiyasi
 const verifyAdminToken = (req, res, next) => {
@@ -22,25 +25,53 @@ const verifyAdminToken = (req, res, next) => {
     });
 };
 
-// Fan bo'yicha ma'lumotlarni olish
+// Fan bo'yicha ma'lumotlarni olish va natijalarni hisoblash
 const getSubjectDetails = async (req, res) => {
     try {
         const subjectId = req.params.subjectId;
 
-        // Fan ID orqali savollar va foydalanuvchilar natijalarini olish
+        // Fan ID orqali savollar va variantlarni olish
         const questions = await Question.find({ subject: subjectId }).populate('options');
+
+        // Foydalanuvchilarning javoblari va variantlar
         const answers = await Answer.find({ subjectId })
-            .populate('userId', 'name') // Foydalanuvchini ko'rsatish uchun
-            .populate('questionId') // Savolni ko'rsatish uchun
-            .populate('optionId'); // Variantni ko'rsatish uchun
+            .populate('userId', 'name') // Foydalanuvchi ismini olish
+            .populate('questionId') // Savollarni olish
+            .populate('optionId'); // Variantlarni olish
 
-        // Foydalanuvchilar ro'yxatini olish
-        const users = await User.find();
+        // Har bir foydalanuvchining to'g'ri javoblarini hisoblash
+        const userResults = [];
 
+        for (const user of await User.find()) {
+            // Foydalanuvchining bergan javoblari
+            const userAnswers = answers.filter(answer => answer.userId.toString() === user._id.toString());
+            
+            let correctAnswersCount = 0;
+
+            // Har bir javobni tekshirish
+            for (const answer of userAnswers) {
+                const option = await Option.findById(answer.optionId);
+                if (option && option.isCorrect) {
+                    correctAnswersCount++; // To'g'ri javoblar soni
+                }
+            }
+
+            // Umumiy savollar soni va foiz hisoblash
+            const totalQuestions = questions.length;
+            const correctPercentage = totalQuestions > 0 ? (correctAnswersCount / totalQuestions) * 100 : 0;
+
+            userResults.push({
+                user: user.name,
+                totalQuestions,
+                correctAnswersCount,
+                correctPercentage: correctPercentage.toFixed(2), // Foizni yaxlitlash
+            });
+        }
+
+        // Natijalar va savollarni qaytarish
         res.status(200).json({
             questions,
-            answers,
-            users,
+            userResults, // Har bir foydalanuvchining natijalari
         });
     } catch (error) {
         console.error(error);
@@ -52,3 +83,4 @@ module.exports = {
     verifyAdminToken,
     getSubjectDetails,
 };
+

@@ -27,6 +27,7 @@ const Dashboard = () => {
       });
 
       setSubjects(response.data.subjects);
+      
     } catch (err) {
       setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
       console.error(err);
@@ -51,7 +52,8 @@ const Dashboard = () => {
         },
       });
 
-      setSubjectDetails(response.data); // Fan haqida ma'lumotlarni saqlash
+      setSubjectDetails(response.data);
+      // Fan haqida ma'lumotlarni saqlash
     } catch (err) {
       setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
       console.error(err);
@@ -59,6 +61,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+  console.log(subjectDetails)
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
