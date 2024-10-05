@@ -5,6 +5,7 @@ const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState(null); // Tanlangan fanni saqlash
 
   const fetchSubjects = async () => {
     setLoading(true);
@@ -23,6 +24,28 @@ const Dashboard = () => {
       });
 
       setSubjects(response.data.subjects);
+    } catch (err) {
+      setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubjectClick = async (subject) => {
+    setLoading(true);
+    setSelectedSubject(subject); // Tanlangan fanni yangilash
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await axios.get(`http://localhost:5000/admin/subjects/${subject._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Natijalarni ko'rsatish uchun kerakli ma'lumotlar bilan ishlang
+      console.log(response.data); // Bu yerda natijalarni konsolga chiqaramiz
     } catch (err) {
       setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
       console.error(err);
@@ -52,7 +75,8 @@ const Dashboard = () => {
             subjects.map((subject) => (
               <li
                 key={subject._id}
-                className="p-2 border-b border-gray-300 last:border-b-0 text-gray-800"
+                onClick={() => handleSubjectClick(subject)} // Ustiga bosilganda so'rov yuborish
+                className="cursor-pointer p-2 border-b border-gray-300 last:border-b-0 text-gray-800 hover:bg-gray-100 transition duration-200"
               >
                 {subject.name}
               </li>
@@ -61,6 +85,14 @@ const Dashboard = () => {
             <li className="text-gray-500 italic text-center">Fanlar topilmadi.</li>
           )}
         </ul>
+
+        {/* Tanlangan fan haqida qo'shimcha ma'lumotlarni ko'rsatish */}
+        {selectedSubject && (
+          <div className="mt-6 p-4 border border-gray-300 rounded-lg bg-gray-50">
+            <h3 className="text-xl font-semibold text-gray-700">Tanlangan Fan: {selectedSubject.name}</h3>
+            {/* Bu yerda savollar va variantlar bo'lishi mumkin */}
+          </div>
+        )}
       </div>
     </div>
   );
