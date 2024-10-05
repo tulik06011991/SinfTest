@@ -1,5 +1,6 @@
 const Admin = require('../Model/adminlar'); // Admin modelini import qilish
-const User = require('../Model/auth'); // User modelini import qilish
+const User = require('../Model/auth');
+const Subjects = require('../Model/Fanlar') // User modelini import qilish
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 

@@ -7,6 +7,8 @@ import NavbarSidebar from './components/Navbar';
 import CreateSubject  from './components/admin/Fanlar'
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
+import Dashboard from './components/admin/Dashboard';
+
 
 // import Quiz from './components/Quiz'; // Quiz sahifasi
 
@@ -24,7 +26,9 @@ const App = () => {
                     <Route path="/quiz" element={<Admin />} /> Quiz sahifasi
                     <Route path="/fanlar" element={<CreateSubject />} />
                     <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} /> Quiz sahifasi
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/dashboard" element={<Dashboard/>} />
+                     
                 </Routes>
             </>
         </Router>

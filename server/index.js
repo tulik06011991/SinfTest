@@ -11,7 +11,8 @@ const adminDel = require('./routes/adminlar')
 const fanlar2 = require('./routes/fanlar2')
 const fanOlish = require('./routes/fanlarOlish')
 const auth  = require('./routes/auth')
-const javob = require('./routes/Javoblar') // questionRoutes'ni import qilish
+const javob = require('./routes/Javoblar')
+const adminFan = require('./routes/adminFan')// questionRoutes'ni import qilish
 const cors = require("cors")
 const path = require('path');
 
@@ -33,6 +34,7 @@ app.use('/api', fanlar2)
 app.use('/api', fanOlish)
 app.use('/api', auth)
 app.use('/api', javob)
+app.use('/admin', adminFan)
 // MongoDB ga ulanish
 const connectDB = async () => {
     try {
