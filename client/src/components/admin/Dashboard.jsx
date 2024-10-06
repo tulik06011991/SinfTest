@@ -53,7 +53,6 @@ const Dashboard = () => {
       });
 
       setSubjectDetails(response.data);
-      // Fan haqida ma'lumotlarni saqlash
     } catch (err) {
       setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
       console.error(err);
@@ -61,7 +60,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-  console.log(subjectDetails)
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
@@ -124,10 +122,10 @@ const Dashboard = () => {
 
                 <h4 className="text-lg font-semibold mt-4">Foydalanuvchilar Natijalari:</h4>
                 <ul className="list-disc pl-6">
-                  {subjectDetails.answers && subjectDetails.answers.length > 0 ? (
-                    subjectDetails.answers.map((answer) => (
-                      <li key={answer._id}>
-                        {answer.userId.name}: {answer.isCorrect ? 'To\'g\'ri javob' : 'Noto\'g\'ri javob'}
+                  {subjectDetails.userResults && subjectDetails.userResults.length > 0 ? (
+                    subjectDetails.userResults.map((result) => (
+                      <li key={result.user}>
+                        <strong>{result.user}:</strong> {result.correctAnswersCount}/{result.totalQuestions} to'g'ri ({result.correctPercentage}%)
                       </li>
                     ))
                   ) : (
