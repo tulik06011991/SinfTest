@@ -29,7 +29,7 @@ const NavbarSidebar = () => {
                 </button>
                 <ul className="mt-10 space-y-4 text-xl">
                     <li><Link to="/" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
-                    <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Test</Link></li>
+                    <li><Link to="//savollarjavoblar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Test</Link></li>
                     <li><Link to="/quiz" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Admin</Link></li>
                     <li><Link to="/fanlar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Fanlar</Link></li>
                 </ul>
@@ -49,7 +49,7 @@ const NavbarSidebar = () => {
                     <Link to="/" className="text-3xl font-bold">MyApp</Link>
                     <ul className="flex space-x-8 text-xl">
                         <li><Link to="/" className="hover:text-gray-400">Word</Link></li>
-                        <li><Link to="/about" className="hover:text-gray-400">Test</Link></li>
+                        <li><Link to="/savollarjavoblar" className="hover:text-gray-400">Test</Link></li>
                         <li><Link to="/quiz" className="hover:text-gray-400">Admin</Link></li>
                         <li><Link to="/fanlar" className="hover:text-gray-400" >Fanlar</Link></li>
                     </ul>

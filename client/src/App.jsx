@@ -22,7 +22,7 @@ const App = () => {
                 <NavbarSidebar/>
                 <Routes>
                     <Route path="/" element={<Home />} /> {/* Bosh sahifa */}
-                    <Route path="/about" element={<SavollarJavoblar />} /> {/* About sahifasi */}
+                    <Route path="/savollarjavoblar" element={<SavollarJavoblar />} /> {/* About sahifasi */}
                     <Route path="/quiz" element={<Admin />} /> Quiz sahifasi
                     <Route path="/fanlar" element={<CreateSubject />} />
                     <Route path="/login" element={<Login />} />

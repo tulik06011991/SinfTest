@@ -13,7 +13,13 @@ const Login = () => {
         try {
             const response = await axios.post('http://localhost:5000/api/login', { email, password });
             localStorage.setItem('token', response.data.token); // Tokenni saqlash
-            navigate('/dashboard'); // Kirish muvaffaqiyatli bo'lsa, dashboard sahifasiga o'tish
+
+            // Agar redirect '/savollarjavoblar' bo'lsa, SavollarJavoblar sahifasiga yo'naltirish
+            if (response.data.redirect === '/savollarjavoblar') {
+                navigate('/savollarjavoblar');
+            } else {
+                navigate('/dashboard'); // Aks holda, dashboard sahifasiga yo'naltirish
+            }
         } catch (err) {
             setError('Email yoki parol noto\'g\'ri');
         }

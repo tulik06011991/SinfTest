@@ -58,7 +58,15 @@ const loginController = async (req, res) => {
             return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
         }
 
-        // JWT token yaratish
+        // Foydalanuvchi admin bo'lmasa savollarjavoblar sahifasiga yo'naltirish
+        const adminIdCheck = await Admin.findById(user._id);
+        if (!adminIdCheck) {
+            // Agar user admin panelda mavjud bo'lmasa, uni savollarjavoblar sahifasiga yo'naltirish
+            const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            return res.status(200).json({ token, redirect: '/savollarjavoblar' });
+        }
+
+        // Agar user admin IDsi bo'lsa user dashboardga yo'naltirish
         const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
         return res.status(200).json({ token, redirect: '/user/dashboard' });
 
@@ -67,5 +75,6 @@ const loginController = async (req, res) => {
         return res.status(500).json({ message: 'Serverda xato yuz berdi!' });
     }
 };
+
 
 module.exports = { registerController, loginController };
