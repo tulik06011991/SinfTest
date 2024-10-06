@@ -1,19 +1,39 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+
 
 const NavbarSidebar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const navigate = useNavigate();
 
     // Sidebar ochib yopish funksiyasi
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
+    // Foydalanuvchi adminligini tekshirish
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = jwtDecode(token); // Tokenni dekod qilish
+            if (decoded.role === 'admin') {   // Token ichidagi roli admin bo'lsa
+                setIsAdmin(true);
+            }
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token'); // Tokenni o'chirish
+        navigate('/login'); // Login sahifasiga yo'naltirish
+    };
+
     return (
         <>
             {/* Mobil qurilmalar uchun Sidebar ochuvchi tugma */}
             <button 
-                className="block lg:hidden text-white text-2xl p-2 bg-gray-800   rounded fixed top-2 left-2 z-20" 
+                className="block lg:hidden text-white text-2xl p-2 bg-gray-800 rounded fixed top-2 left-2 z-20" 
                 onClick={toggleSidebar}
             >
                 &#9776; {/* Mobil uchun menyu ikonkasi */}
@@ -28,30 +48,44 @@ const NavbarSidebar = () => {
                     &times; {/* Sidebar yopish tugmasi */}
                 </button>
                 <ul className="mt-10 space-y-4 text-xl">
-                    <li><Link to="/" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
-                    <li><Link to="//savollarjavoblar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Test</Link></li>
-                    <li><Link to="/quiz" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Admin</Link></li>
-                    <li><Link to="/fanlar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Fanlar</Link></li>
+                    {/* Agar admin bo'lsa */}
+                    {isAdmin ? (
+                        <>
+                            <li><Link to="/" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
+                            <li><Link to="/quiz" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Admin</Link></li>
+                            <li><Link to="/fanlar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Fanlar</Link></li>
+                        </>
+                    ) : (
+                        <li><Link to="/savollarjavoblar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Test</Link></li>
+                    )}
+                    <li>
+                        <button onClick={handleLogout} className="block w-full p-4 hover:bg-gray-700 text-left">
+                            Logout
+                        </button>
+                    </li>
                 </ul>
             </div>
 
-            {/* Overlay for mobile sidebar */}
-            {isSidebarOpen && (
-                <div 
-                    className="fixed inset-0 bg-black opacity-50 z-10" 
-                    onClick={toggleSidebar}
-                ></div>
-            )}
-
-            {/* Desktop va Medium qurilmalar uchun Navbar */}
+            {/* Desktop uchun Navbar */}
             <nav className="hidden lg:block bg-gray-800 text-white p-4">
                 <div className="container mx-auto flex justify-between items-center">
                     <Link to="/" className="text-3xl font-bold">MyApp</Link>
                     <ul className="flex space-x-8 text-xl">
-                        <li><Link to="/" className="hover:text-gray-400">Word</Link></li>
-                        <li><Link to="/savollarjavoblar" className="hover:text-gray-400">Test</Link></li>
-                        <li><Link to="/quiz" className="hover:text-gray-400">Admin</Link></li>
-                        <li><Link to="/fanlar" className="hover:text-gray-400" >Fanlar</Link></li>
+                        {/* Agar admin bo'lsa */}
+                        {isAdmin ? (
+                            <>
+                                <li><Link to="/" className="hover:text-gray-400">Word</Link></li>
+                                <li><Link to="/quiz" className="hover:text-gray-400">Admin</Link></li>
+                                <li><Link to="/fanlar" className="hover:text-gray-400">Fanlar</Link></li>
+                            </>
+                        ) : (
+                            <li><Link to="/savollarjavoblar" className="hover:text-gray-400">Test</Link></li>
+                        )}
+                        <li>
+                            <button onClick={handleLogout} className="hover:text-gray-400">
+                                Logout
+                            </button>
+                        </li>
                     </ul>
                 </div>
             </nav>
