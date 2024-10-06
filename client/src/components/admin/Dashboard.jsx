@@ -53,6 +53,7 @@ const Dashboard = () => {
       });
 
       setSubjectDetails(response.data);
+      // Fan haqida ma'lumotlarni saqlash
     } catch (err) {
       setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
       console.error(err);
@@ -60,81 +61,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-  console.log(selectedSubject)
-  
-
-  // Savolni o'chirish
-  const handleDeleteQuestion = async (questionId) => {
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      setError('Token topilmadi. Iltimos, qayta login qiling.');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    try {
-      await axios.delete(`http://localhost:5000/admin/questions/${questionId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // O'chirilgandan so'ng, savollarni yangilash
-      setSubjectDetails((prevDetails) => ({
-        ...prevDetails,
-        questions: prevDetails.questions.filter((q) => q._id !== questionId),
-      }));
-
-      setError('Savol muvaffaqiyatli o\'chirildi.');
-    } catch (err) {
-      setError('Savolni o\'chirishda xatolik yuz berdi.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Test natijalarini yuklab olish
-  // Test natijalarini yuklab olish
-const handleDownloadResults = async () => {
-  const token = localStorage.getItem('token');
-
-  if (!token) {
-    setError('Token topilmadi. Iltimos, qayta login qiling.');
-    return;
-  }
-
-  setLoading(true);
-  setError('');
-
-  try {
-    // Tanlangan fanning ID sini olish
-    const response = await axios.get(`http://localhost:5000/admin/subjects/${selectedSubject._id}/results/pdf`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      responseType: 'blob', // Yuklab olish uchun
-    });
-
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${selectedSubject.name}-natijalar.pdf`); // Foydalanuvchi natijalari fayli nomi
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    setError('Natijalar muvaffaqiyatli yuklandi.');
-  } catch (err) {
-    setError('Natijalarni yuklashda xatolik yuz berdi.');
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
-
+  console.log(subjectDetails)
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
@@ -179,23 +106,15 @@ const handleDownloadResults = async () => {
                 <ul className="list-disc pl-6">
                   {subjectDetails.questions && subjectDetails.questions.length > 0 ? (
                     subjectDetails.questions.map((question) => (
-                      <li key={question._id} className="flex justify-between items-center">
-                        <div>
-                          <strong>{question.question}</strong>
-                          <ul className="list-circle pl-4">
-                            {question.options.map((option) => (
-                              <li key={option._id}>
-                                {option.text} {option.isCorrect ? '(To\'g\'ri)' : ''}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        <button
-                          onClick={() => handleDeleteQuestion(question._id)} // O'chirish tugmasi
-                          className="text-red-600 ml-4"
-                        >
-                          O'chirish
-                        </button>
+                      <li key={question._id}>
+                        <strong>{question.question}</strong>
+                        <ul className="list-circle pl-4">
+                          {question.options.map((option) => (
+                            <li key={option._id}>
+                              {option.text} {option.isCorrect ? '(To\'g\'ri)' : ''}
+                            </li>
+                          ))}
+                        </ul>
                       </li>
                     ))
                   ) : (
@@ -205,23 +124,16 @@ const handleDownloadResults = async () => {
 
                 <h4 className="text-lg font-semibold mt-4">Foydalanuvchilar Natijalari:</h4>
                 <ul className="list-disc pl-6">
-                  {subjectDetails.userResults && subjectDetails.userResults.length > 0 ? (
-                    subjectDetails.userResults.map((result) => (
-                      <li key={result.user}>
-                        <strong>{result.user}:</strong> {result.correctAnswersCount}/{result.totalQuestions} to'g'ri ({result.correctPercentage}%)
+                  {subjectDetails.answers && subjectDetails.answers.length > 0 ? (
+                    subjectDetails.answers.map((answer) => (
+                      <li key={answer._id}>
+                        {answer.userId.name}: {answer.isCorrect ? 'To\'g\'ri javob' : 'Noto\'g\'ri javob'}
                       </li>
                     ))
                   ) : (
                     <li className="text-gray-500 italic">Natijalar topilmadi.</li>
                   )}
                 </ul>
-
-                <button
-                  onClick={handleDownloadResults} // Natijalarni yuklab olish tugmasi
-                  className="mt-4 w-full py-2 px-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300"
-                >
-                  Natijalarni yuklab olish
-                </button>
               </div>
             ) : (
               <div className="text-gray-600 italic">Fan bo'yicha ma'lumotlarni yuklash...</div>

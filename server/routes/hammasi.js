@@ -1,5 +1,6 @@
 const express = require('express');
-const { verifyAdminToken, getSubjectDetails, downloadUserResultsPDF } = require('../admin/hammasi');
+const { verifyAdminToken, getSubjectDetails } = require('../admin/hammasi');
+const {downloadUserResultsPDF} = require('../admin/pdf')
 const router = express.Router();
 
 // Admin tomonidan fan bo'yicha ma'lumotlarni olish

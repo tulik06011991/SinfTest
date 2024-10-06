@@ -1,15 +1,13 @@
+
+
+
 const jwt = require('jsonwebtoken');
 const Answer = require('../Model/Javoblar'); // Foydalanuvchilar natijalari model
 const Question = require('../Model/questionModel'); // Savollar model
 const User = require('../Model/auth'); // Foydalanuvchilar model
 const Subject = require('../Model/Fanlar');
-const Option = require('../Model/hammasi'); // Variantlar model
-
-const fs = require('fs');
-const path = require('path');
-const PDFDocument = require('pdfkit');
-const pdf = new PDFDocument();
- // pdfkit kutubxonasini import qilish
+ const Option = require('../Model/hammasi');
+ const Results = require('../Model/pdf');
 
 
 // Admin tokenini tekshirish funksiyasi
@@ -43,11 +41,11 @@ const getSubjectDetails = async (req, res) => {
             .populate('questionId') // Savollarni olish
             .populate('optionId'); // Variantlarni olish
 
-        // Har bir foydalanuvchining to'g'ri javoblarini hisoblash
-        const userResults = [];
-
         // Har bir foydalanuvchining natijalarini olish
         const users = await User.find();
+
+        // Natijalarni saqlash
+        const userResults = [];
 
         for (const user of users) {
             // Foydalanuvchining bergan javoblari
@@ -59,6 +57,16 @@ const getSubjectDetails = async (req, res) => {
             // Umumiy savollar soni va foiz hisoblash
             const totalQuestions = questions.length;
             const correctPercentage = totalQuestions > 0 ? (correctAnswersCount / totalQuestions) * 100 : 0;
+
+            // Natijalarni `Results` modeliga yozish
+            const result = new Results({
+                userId: user._id,
+                subjectId: subjectId,
+                correctAnswersCount,
+                totalQuestions,
+                correctPercentage: correctPercentage.toFixed(2) // Foizni yaxlitlash
+            });
+            await result.save(); // Saqlash
 
             userResults.push({
                 user: user.name,
@@ -79,53 +87,32 @@ const getSubjectDetails = async (req, res) => {
     }
 };
 
-// Foydalanuvchilar natijalarini PDF formatida yuklab olish
-const downloadUserResultsPDF = async (req, res) => {
-    try {
-        const subjectId = req.params.subjectId;
-
-        const answers = await Answer.find({ subjectId: subjectId })
-            .populate('userId', 'name')
-            .populate('questionId')
-            .populate('optionId');
-
-        const doc = new pdf();
-        const filePath = `results-${subjectId}.pdf`;
-        doc.pipe(fs.createWriteStream(filePath));
-
-        // PDFga yozish
-        doc.fontSize(20).text(`Natijalar - Fan ID: ${subjectId}`, { align: 'center' });
-        doc.moveDown();
-
-        answers.forEach(answer => {
-            doc.fontSize(12).text(`Foydalanuvchi: ${answer.userId.name}`);
-            doc.text(`Savol: ${answer.questionId.text}`);
-            doc.text(`Variant: ${answer.optionId.text}`);
-            doc.text(`To'g'ri: ${answer.isCorrect ? 'Ha' : 'Yo\'q'}`);
-            doc.moveDown();
-        });
-
-        doc.end();
-
-        // PDFni yuklash
-        res.download(filePath, (err) => {
-            if (err) {
-                console.error(err);
-                res.status(500).send('PDFni yuklashda xatolik yuz berdi.');
-            }
-            // PDF faylini serverdan o'chirish
-            fs.unlink(filePath, (err) => {
-                if (err) console.error(err);
-            });
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Natijalarni PDF formatida olishda xatolik yuz berdi.' });
-    }
-};
-
 module.exports = {
     verifyAdminToken,
     getSubjectDetails,
-    downloadUserResultsPDF, // Yangi funksiya
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
