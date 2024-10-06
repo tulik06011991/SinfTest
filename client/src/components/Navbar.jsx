@@ -13,7 +13,7 @@ const NavbarSidebar = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/');
+        navigate('/login');
     };
 
     return (
