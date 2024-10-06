@@ -60,6 +60,8 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+  console.log(selectedSubject)
+  
 
   // Savolni o'chirish
   const handleDeleteQuestion = async (questionId) => {
@@ -95,40 +97,44 @@ const Dashboard = () => {
   };
 
   // Test natijalarini yuklab olish
-  const handleDownloadResults = async () => {
-    const token = localStorage.getItem('token');
+  // Test natijalarini yuklab olish
+const handleDownloadResults = async () => {
+  const token = localStorage.getItem('token');
 
-    if (!token) {
-      setError('Token topilmadi. Iltimos, qayta login qiling.');
-      return;
-    }
+  if (!token) {
+    setError('Token topilmadi. Iltimos, qayta login qiling.');
+    return;
+  }
 
-    setLoading(true);
-    setError('');
-    try {
-      const response = await axios.get(`http://localhost:5000/admin/subjects/${selectedSubject._id}/results/download`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        responseType: 'blob', // Yuklab olish uchun
-      });
+  setLoading(true);
+  setError('');
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${selectedSubject.name}-natijalar.csv`); // Foydalanuvchi natijalari fayli nomi
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+  try {
+    // Tanlangan fanning ID sini olish
+    const response = await axios.get(`http://localhost:5000/admin/subjects/${selectedSubject._id}/results/pdf`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      responseType: 'blob', // Yuklab olish uchun
+    });
 
-      setError('Natijalar muvaffaqiyatli yuklandi.');
-    } catch (err) {
-      setError('Natijalarni yuklashda xatolik yuz berdi.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${selectedSubject.name}-natijalar.pdf`); // Foydalanuvchi natijalari fayli nomi
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setError('Natijalar muvaffaqiyatli yuklandi.');
+  } catch (err) {
+    setError('Natijalarni yuklashda xatolik yuz berdi.');
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
