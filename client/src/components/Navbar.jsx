@@ -53,7 +53,7 @@ const NavbarSidebar = () => {
             {/* Desktop uchun Navbar */}
             <nav className="hidden lg:block bg-gray-800 text-white p-4">
                 <div className="container mx-auto flex justify-between items-center">
-                    <Link to="/" className="text-3xl font-bold">MyApp</Link>
+                    <Link to="/" className="text-3xl font-bold">60-makatb</Link>
                     <ul className="flex space-x-8 text-xl">
                         {/* Token mavjud bo'lsa */}
                         {authState.token ? (
