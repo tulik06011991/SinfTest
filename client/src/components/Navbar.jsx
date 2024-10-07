@@ -16,6 +16,12 @@ const NavbarSidebar = () => {
         navigate('/login');
     };
 
+    // localStorage'dan tokenni olish
+    const token = localStorage.getItem('token');
+
+    // Token mavjud bo'lsa Sidebar ni ko'rsatish
+    if (!token) return null;
+
     return (
         <>
             {/* Mobil qurilmalar uchun Sidebar ochuvchi tugma */}
