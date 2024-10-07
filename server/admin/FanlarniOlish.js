@@ -14,7 +14,7 @@ const getSubjects = async (req, res) => {
     } else {
       return res.status(400).json({ message: 'FanId berilmagan!' });
     }
-console.log(subjects);
+
 
     res.status(200).json({ subjects }); // Fanlarni muvaffaqiyatli qaytarish
   } catch (error) {
