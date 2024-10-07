@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { TailSpin } from 'react-loader-spinner'; // Loader import qilindi
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]); // Fanlar ro'yxati
@@ -74,7 +75,17 @@ const Dashboard = () => {
           Fanlarni yuklash
         </button>
         
-        {loading && <div className="text-center text-gray-600">Yuklanmoqda...</div>}
+        {loading && (
+          <div className="flex justify-center items-center">
+            <TailSpin
+              height="50"
+              width="50"
+              color="blue"
+              ariaLabel="loading"
+            />
+          </div>
+        )}
+
         {error && <div className="text-red-600 text-center mb-4">{error}</div>}
 
         <ul className="bg-gray-50 rounded-lg shadow-md p-4">
