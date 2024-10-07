@@ -1,6 +1,6 @@
 const Admin = require('../Model/adminlar'); // Admin modelini import qilish
 const User = require('../Model/auth');
-const Subjects = require('../Model/Fanlar') // User modelini import qilish
+const Subject = require('../Model/Fanlar') // User modelini import qilish
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -42,9 +42,18 @@ const loginController = async (req, res) => {
                 return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
             }
 
+            // Adminning o'ziga tegishli fanlar ro'yxatini olish
+            const subjects = await Subject.find({ adminId: admin._id }).select('_id name');
+
             // JWT token yaratish
             const token = jwt.sign({ userId: admin._id, role: admin.role }, process.env.JWT_SECRET, { expiresIn: '5h' });
-            return res.status(200).json({ token, redirect: '/admin/dashboard' });
+
+            // Fanlar bilan birga tokenni jo'natish
+            return res.status(200).json({ 
+                token, 
+                redirect: '/admin/dashboard',
+                subjects // Adminning o'ziga tegishli fanlar
+            });
         }
 
         // Agar admin topilmasa, userni qidirish
@@ -61,7 +70,6 @@ const loginController = async (req, res) => {
         // Foydalanuvchi admin bo'lmasa savollarjavoblar sahifasiga yo'naltirish
         const adminIdCheck = await Admin.findById(user._id);
         if (!adminIdCheck) {
-            // Agar user admin panelda mavjud bo'lmasa, uni savollarjavoblar sahifasiga yo'naltirish
             const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
             return res.status(200).json({ token, redirect: '/savollarjavoblar' });
         }

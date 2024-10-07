@@ -31,6 +31,7 @@ const verifyAdminToken = (req, res, next) => {
 const getSubjectDetails = async (req, res) => {
     try {
         const subjectId = req.params.subjectId;
+        console.log(subjectId)
 
         // Fan ID orqali savollar va variantlarni olish
         const questions = await Question.find({ subject: subjectId }).populate('options');

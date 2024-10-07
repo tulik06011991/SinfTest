@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import jwt_decode from 'jwt-decode'; // jwt-decode ni import qilamiz
 import { TailSpin } from 'react-loader-spinner'; // Loader import qilindi
 
 const Dashboard = () => {
@@ -21,14 +22,18 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/admin/subjects', {
+      // Tokenni decode qilamiz va fanId ni olamiz
+      const decodedToken = jwt_decode(token);
+      const fanId = decodedToken.fanId; // fanId token ichida saqlangan bo'lishi kerak
+
+      const response = await axios.get(`http://localhost:5000/admin/subjects?fanId=${fanId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
       setSubjects(response.data.subjects);
-      
+
     } catch (err) {
       setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
       console.error(err);
