@@ -18,7 +18,7 @@ const Login = () => {
             
             localStorage.setItem('token', response.data.token);
             const fanId = response.data.subjects[0]._id; // Birinchi elementning _id sini oladi
-             localStorage.setItem('fanId', fanId); // Faqat fanId string holatida saqlanadi
+localStorage.setItem('fanId', fanId); // Faqat fanId string holatida saqlanadi
 
  // Tokenni saqlash
 

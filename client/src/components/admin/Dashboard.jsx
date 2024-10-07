@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode' // jwt-decode ni import qilamiz
 import { TailSpin } from 'react-loader-spinner'; // Loader import qilindi
 
 const Dashboard = () => {
@@ -8,33 +7,30 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false); // Yuklanish holati
   const [error, setError] = useState(''); // Xato xabarlari
   const [selectedSubject, setSelectedSubject] = useState(null); // Tanlangan fanni saqlash
-  const [subjectDetails, setSubjectDetails] = useState(null); // Fan haqida ma'lumotlar (savollar, natijalar va hokazo)
+  const [subjectDetails, setSubjectDetails] = useState(null); // Fan haqida ma'lumotlar
 
   // Fanlar ro'yxatini olish
   const fetchSubjects = async () => {
     setLoading(true);
     setError('');
+
     try {
       const token = localStorage.getItem('token');
+      const fanId = localStorage.getItem('fanId');
 
       if (!token) {
         setError('Token topilmadi. Iltimos, qayta login qiling.');
         return;
       }
-      console.log(token);
-      
 
-      const fanId = localStorage.getItem('fanId') 
-      console.log(fanId)// fanId token ichida saqlangan bo'lishi kerak
-
-      const response = await axios.get(`http://localhost:5000/admin/subjects/${fanId}`,  {
+      // POST so'rovini yuboramiz
+      const response = await axios.post(`http://localhost:5000/api/subjects`, { fanId }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
       setSubjects(response.data.subjects);
-
     } catch (err) {
       setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
       console.error(err);
@@ -43,7 +39,7 @@ const Dashboard = () => {
     }
   };
 
-  // Tanlangan fan bo'yicha savollar, foydalanuvchilar va natijalarni olish
+  // Tanlangan fan bo'yicha savollarni olish
   const handleSubjectClick = async (subject) => {
     setLoading(true);
     setSelectedSubject(subject); // Tanlangan fanni yangilash
@@ -52,8 +48,8 @@ const Dashboard = () => {
 
     try {
       const token = localStorage.getItem('token');
-
-      const response = await axios.get(`http://localhost:5000/admin/subjects/${subject._id}/details`, {
+      const fanId = localStorage.getItem('fanId');
+      const response = await axios.get(`http://localhost:5000/admin/subjects/${fanId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -83,12 +79,7 @@ const Dashboard = () => {
         
         {loading && (
           <div className="flex justify-center items-center">
-            <TailSpin
-              height="50"
-              width="50"
-              color="blue"
-              ariaLabel="loading"
-            />
+            <TailSpin height="50" width="50" color="blue" ariaLabel="loading" />
           </div>
         )}
 
@@ -99,7 +90,7 @@ const Dashboard = () => {
             subjects.map((subject) => (
               <li
                 key={subject._id}
-                onClick={() => handleSubjectClick(subject)} // Ustiga bosilganda so'rov yuborish
+                onClick={() => handleSubjectClick(subject)}
                 className="cursor-pointer p-2 border-b border-gray-300 last:border-b-0 text-gray-800 hover:bg-gray-100 transition duration-200"
               >
                 {subject.name}
@@ -114,7 +105,6 @@ const Dashboard = () => {
         {selectedSubject && (
           <div className="mt-6 p-4 border border-gray-300 rounded-lg bg-gray-50">
             <h3 className="text-xl font-semibold text-gray-700">Tanlangan Fan: {selectedSubject.name}</h3>
-
             {subjectDetails ? (
               <div>
                 <h4 className="text-lg font-semibold mt-4">Savollar:</h4>

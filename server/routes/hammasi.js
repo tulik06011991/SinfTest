@@ -4,7 +4,7 @@ const {downloadUserResultsPDF} = require('../admin/pdf')
 const router = express.Router();
 
 // Admin tomonidan fan bo'yicha ma'lumotlarni olish
-router.get('/subjects/:subjectId/details', verifyAdminToken, getSubjectDetails);
+router.get('/subjects/:subjectId', verifyAdminToken, getSubjectDetails);
 router.get('/subjects/:subjectId/results/pdf', verifyAdminToken, downloadUserResultsPDF);
 
 
