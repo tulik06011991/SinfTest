@@ -7,12 +7,20 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const [fanId, setFanId] = useState({})
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:5000/api/login', { email, password });
-            localStorage.setItem('token', response.data.token); // Tokenni saqlash
+            setFanId(response.data.subjects)
+            console.log(response);
+            
+            localStorage.setItem('token', response.data.token);
+            const fanId = response.data.subjects[0]._id; // Birinchi elementning _id sini oladi
+             localStorage.setItem('fanId', fanId); // Faqat fanId string holatida saqlanadi
+
+ // Tokenni saqlash
 
             // Agar redirect '/savollarjavoblar' bo'lsa, SavollarJavoblar sahifasiga yo'naltirish
             if (response.data.redirect === '/savollarjavoblar') {
@@ -24,6 +32,8 @@ const Login = () => {
             setError('Email yoki parol noto\'g\'ri');
         }
     };
+    console.log(fanId);
+    
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
