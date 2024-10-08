@@ -58,7 +58,7 @@ const Dashboard = () => {
       
       if (type === 'user') {
         // Foydalanuvchini o'chirish uchun POST metodidan foydalanish
-        await axios.delete(`http://localhost:5000/admin/subjects/users/${id}`, {
+        await axios.delete(`http://localhost:5000/admin/subjects/users/${type}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -211,7 +211,7 @@ const Dashboard = () => {
                       <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions} to'g'ri</td>
                       <td className="px-4 py-2 text-center">
                         <button
-                          onClick={() => handleDelete('user', result.userId)}
+                          onClick={() => handleDelete( result.userId)}
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />
