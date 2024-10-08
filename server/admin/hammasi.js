@@ -90,7 +90,8 @@ const getSubjectDetails = async (req, res) => {
 };
 
 const deleteQuestion = async (req, res) => {
-    const { questionId } = req.params;
+    const  {questionId}  = req.params;
+console.log(questionId)
 
     try {
         const question = await Question.findByIdAndDelete(questionId);

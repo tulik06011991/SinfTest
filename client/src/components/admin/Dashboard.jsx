@@ -55,17 +55,25 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/admin/subjects/${type}/${id}`,  {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      // O'chirilgandan keyin ma'lumotlarni yangilash
-      if (type === 'question') {
-        fetchSubjects(); // Savollarni qayta yuklash
+      
+      if (type === 'user') {
+        // Foydalanuvchini o'chirish uchun POST metodidan foydalanish
+        await axios.post(`http://localhost:5000/api/users/delete`, { userId: id }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       } else {
-        fetchUsers(); // Foydalanuvchilarni qayta yuklash
+        // Savolni o'chirish uchun DELETE metodidan foydalanish
+        await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       }
+
+      // O'chirilgandan keyin ma'lumotlarni yangilash
+      fetchSubjects(); // Savollarni va foydalanuvchilarni qayta yuklash
     } catch (err) {
       setError('O\'chirishda xatolik yuz berdi.');
       console.error(err);
@@ -210,11 +218,19 @@ const Dashboard = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-gray-500 italic text-center py-4">Foydalanuvchilar topilmadi.</td>
+                    <td colSpan="3" className="text-gray-500 italic text-center py-4">Foydalanuvchilar natijalari topilmadi.</td>
                   </tr>
                 )}
               </tbody>
             </table>
+         
+            </div>
+        )}
+
+        {/* Tanlangan fan haqida ma'lumot bo'lmasa */}
+        {!selectedSubject && !loading && (
+          <div className="mt-8 text-center text-gray-600">
+            Iltimos, fanlardan birini tanlang yoki yangi fanlar qo'shish uchun yuqoridagi tugmani bosing.
           </div>
         )}
       </div>
@@ -222,4 +238,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Dashboard
