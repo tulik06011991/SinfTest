@@ -17,6 +17,7 @@ const Login = () => {
             // Agar token kelgan bo'lsa, uni localStorage'ga saqlash
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
+                console.log(response)
     
                 // Admin bo'lsa subjects keladi, agar subjects mavjud bo'lsa fanId'ni olishga harakat qilamiz
                 if (response.data.subjects && response.data.subjects.length > 0) {
