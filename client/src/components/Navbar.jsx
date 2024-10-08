@@ -8,12 +8,12 @@ const NavbarSidebar = () => {
     // AuthContext'dan foydalanuvchi ma'lumotlarini olish
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          navigate('/login'); // Token topilmasa, login sahifasiga yo'naltirish
-        }
-      }, [navigate]);
+    // useEffect(() => {
+    //     const token = localStorage.getItem('token');
+    //     if (!token) {
+    //       navigate('/login'); // Token topilmasa, login sahifasiga yo'naltirish
+    //     }
+    //   }, [navigate]);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
