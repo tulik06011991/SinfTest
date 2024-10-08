@@ -71,6 +71,7 @@ const getSubjectDetails = async (req, res) => {
             await result.save(); // Saqlash
 
             userResults.push({
+                userId: user._id,
                 user: user.name,
                 totalQuestions,
                 correctAnswersCount,
