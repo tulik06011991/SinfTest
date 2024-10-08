@@ -6,7 +6,7 @@ const subjectController = require('../admin/Fanlar'); // Fan controllerini chaqi
 router.post('/create', subjectController.createSubject);
 
 // Barcha fanlarni olish
-router.get('/', subjectController.getAllSubjects);
+router.get('/subjects', subjectController.getAllSubjects);
 
 // Fan o'chirish (faqat admin uchun)
 router.delete('/:id', subjectController.deleteSubject);

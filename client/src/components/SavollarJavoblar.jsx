@@ -9,35 +9,37 @@ const Quiz = () => {
     const [submissionStatus, setSubmissionStatus] = useState(''); // Javoblarni yuborish statusi
     const [result, setResult] = useState(null); // Foydalanuvchi natijasi
 
-    // Fanlar ro'yxatini backenddan olish
+    // Fanlar ro'yxatini olish uchun alohida endpointdan foydalanish
     useEffect(() => {
         const fetchSubjects = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/subjects');
-                setSubjects(response.data); // Backenddan kelgan fanlar ro'yxatini yuklaymiz
+                const response = await axios.get('http://localhost:5000/api/subjects'); // Fanlar ro'yxatini olish
+                setSubjects(response.data); // Fanlar ro'yxatini yuklash
             } catch (error) {
                 console.error('Fanlarni olishda xato:', error);
             }
         };
-        fetchSubjects();
+        fetchSubjects(); // useEffect ichida fetch funksiyani chaqirish
     }, []);
+    console.log(subjects);
+    
 
     // Tanlangan fanga ko'ra savollarni olish
     useEffect(() => {
         const fetchQuestions = async () => {
-            if (!selectedSubject) return;
+            if (!selectedSubject) return; // Fanning ID'si bo'lmasa, hech narsa qilmaslik
 
             try {
-                const response = await axios.get(`http://localhost:5000/api/questions/subject/${selectedSubject}`);
-                setQuestions(response.data); // Backenddan savollarni yuklaymiz
+                const response = await axios.get(`http://localhost:5000/api/questions/subject/${selectedSubject}`); // Tanlangan fanga ko'ra savollarni olish
+                setQuestions(response.data); // Savollarni yuklash
             } catch (error) {
                 console.error('Savollarni olishda xato:', error);
             }
         };
-        fetchQuestions();
+        fetchQuestions(); // Fanning ID tanlanganida savollarni olish
     }, [selectedSubject]);
 
-    // Javob tanlash
+    // Javob tanlash funksiyasi
     const handleAnswerSelect = (questionId, selectedOption) => {
         setSelectedAnswers((prevAnswers) => ({
             ...prevAnswers,
@@ -47,14 +49,14 @@ const Quiz = () => {
 
     // Fan tanlash funksiyasi
     const handleSubjectChange = (event) => {
-        setSelectedSubject(event.target.value); // Fan ID si
-        setQuestions([]); // Savollarni tozalaymiz
-        setSelectedAnswers({}); // Belgilangan javoblarni tozalaymiz
-        setSubmissionStatus(''); // Javob yuborish statusini tozalaymiz
-        setResult(null); // Natijani tozalaymiz
+        setSelectedSubject(event.target.value); // Tanlangan fanning ID sini saqlash
+        setQuestions([]); // Savollarni tozalash
+        setSelectedAnswers({}); // Belgilangan javoblarni tozalash
+        setSubmissionStatus(''); // Javob yuborish statusini tozalash
+        setResult(null); // Natijani tozalash
     };
 
-    // Javoblarni backendga yuborish
+    // Javoblarni yuborish funksiyasi
     const submitAnswers = async () => {
         const token = localStorage.getItem('token'); // Tokenni localStorage'dan olish
 
@@ -62,8 +64,8 @@ const Quiz = () => {
             const response = await axios.post(
                 'http://localhost:5000/api/submit-answers',
                 {
-                    subjectId: selectedSubject, // Fan ID
-                    answers: selectedAnswers    // Savollar va variantlar IDlari
+                    subjectId: selectedSubject, // Tanlangan fan ID si
+                    answers: selectedAnswers    // Tanlangan javoblar
                 },
                 {
                     headers: {
@@ -74,8 +76,7 @@ const Quiz = () => {
 
             const { message, correctAnswersCount, totalQuestions, correctPercentage } = response.data;
 
-            // Natijalarni ko'rsatish uchun statusni va resultni yangilash
-            setSubmissionStatus(message);
+            setSubmissionStatus(message); // Yuborish statusini yangilash
             setResult({
                 correctAnswersCount,
                 totalQuestions,
@@ -150,7 +151,7 @@ const Quiz = () => {
                 <div className="mt-6 p-4 bg-white shadow-md rounded-lg">
                     <p className="text-xl font-semibold">Sizning Natijalaringiz:</p>
                     <p className="text-lg">To'g'ri javoblar: {result.correctAnswersCount} / {result.totalQuestions}</p>
-                    <p className="text-lg">To'g'ri javoblar foizi: {result.correctPercentage}</p>
+                    <p className="text-lg">To'g'ri javoblar foizi: {result.correctPercentage}%</p>
                 </div>
             )}
         </div>
