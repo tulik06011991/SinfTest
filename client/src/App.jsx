@@ -19,10 +19,14 @@ import SuperAdmin from './components/admin/SuperAdmin';
 
 const App = () => {
     return (
+        
+
         <AuthProvider>
+           
         <Router>
          
                 <>
+                
 
                 {/* Sahifalar uchun Router */}
                 <NavbarSidebar/>
@@ -43,6 +47,7 @@ const App = () => {
             </>
         </Router>
         </AuthProvider>
+        
     );
 };
 

@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { TailSpin } from 'react-loader-spinner'; // Loader import qilindi
+import { TailSpin } from 'react-loader-spinner';
+import { useNavigate } from 'react-router-dom'; // Router uchun
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]); // Fanlar ro'yxati
   const [loading, setLoading] = useState(false); // Yuklanish holati
   const [error, setError] = useState(''); // Xato xabarlari
   const [selectedSubject, setSelectedSubject] = useState(null); // Tanlangan fanni saqlash
-  const [subjectDetails, setSubjectDetails] = useState(null); // Fan haqida ma'lumotlar
+  const [subjectDetails, setSubjectDetails] = useState(null); // Fan haqida ma'lumot
+  const navigate = useNavigate(); // Login sahifasiga yo'naltirish uchun
+
+  // Token tekshiruvi va yo'naltirish
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login'); // Token topilmasa, login sahifasiga yo'naltirish
+    }
+  }, [navigate]);
 
   // Fanlar ro'yxatini olish
   const fetchSubjects = async () => {
@@ -19,6 +29,7 @@ const Dashboard = () => {
       const fanId = localStorage.getItem('fanId');
 
       if (!token) {
+        navigate('/login');
         setError('Token topilmadi. Iltimos, qayta login qiling.');
         return;
       }
