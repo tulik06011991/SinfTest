@@ -40,9 +40,7 @@ app.use('/admin', hammasi)
 // MongoDB ga ulanish
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URL, {
-            
-        });
+        await mongoose.connect(process.env.MONGO_URL,);
         console.log('MongoDB Atlas bilan ulanish o\'rnatildi');
     } catch (error) {
         console.error('MongoDB Atlas bilan ulanishda xato:', error.message);

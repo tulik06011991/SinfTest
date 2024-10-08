@@ -111,10 +111,10 @@ console.log(questionId)
 
 
 const deleteResult = async (req, res) => {
-    const { resultId } = req.params;
+    const data = req.body;
 
     try {
-        const result = await Results.findByIdAndDelete(resultId);
+        const result = await Results.findByIdAndDelete(data);
         if (!result) {
             return res.status(404).json({ message: 'Natija topilmadi.' });
         }
