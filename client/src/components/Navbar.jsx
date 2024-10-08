@@ -13,6 +13,8 @@ const NavbarSidebar = () => {
 
     const handleLogout = () => {
         logout();
+        localStorage.clear();
+
         navigate('/login');
     };
 

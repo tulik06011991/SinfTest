@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Quiz = () => {
     const [subjects, setSubjects] = useState([]); // Fanlar ro'yxati
@@ -7,7 +8,8 @@ const Quiz = () => {
     const [questions, setQuestions] = useState([]); // Savollar ro'yxati
     const [selectedAnswers, setSelectedAnswers] = useState({}); // Belgilangan javoblar
     const [submissionStatus, setSubmissionStatus] = useState(''); // Javoblarni yuborish statusi
-    const [result, setResult] = useState(null); // Foydalanuvchi natijasi
+    const [result, setResult] = useState(null);
+    const navigate = useNavigate();  // Foydalanuvchi natijasi
 
     // Fanlar ro'yxatini olish uchun alohida endpointdan foydalanish
     useEffect(() => {
@@ -22,6 +24,14 @@ const Quiz = () => {
         fetchSubjects(); // useEffect ichida fetch funksiyani chaqirish
     }, []);
     console.log(subjects);
+
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/login'); // Token topilmasa, login sahifasiga yo'naltirish
+        }
+      }, [navigate]);
     
 
     // Tanlangan fanga ko'ra savollarni olish
