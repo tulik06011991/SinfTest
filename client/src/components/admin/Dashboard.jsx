@@ -96,6 +96,9 @@ const Dashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      console.log(response)
+      
       setSubjectDetails(response.data);
     } catch (err) {
       setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
