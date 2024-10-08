@@ -9,6 +9,7 @@ const Dashboard = () => {
   const [error, setError] = useState(''); // Xato xabarlari
   const [selectedSubject, setSelectedSubject] = useState(null); // Tanlangan fanni saqlash
   const [subjectDetails, setSubjectDetails] = useState(null); // Fan haqida ma'lumot
+  const [password, setPassword] = useState(''); // Kalit so'z uchun state
   const navigate = useNavigate(); // Login sahifasiga yo'naltirish uchun
 
   // Token tekshiruvi va yo'naltirish
@@ -75,10 +76,35 @@ const Dashboard = () => {
     }
   };
 
+  // Kalit so'zni tekshirish funksiyasi
+  const handlePasswordCheck = () => {
+    if (password === 'Muhammad') {
+      navigate('/superadmin'); // Agar kalit so'z to'g'ri bo'lsa, superadmin sahifasiga yo'naltirish
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-2xl">
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Admin Dashboard</h1>
+        
+        {/* Kalit so'zni kiritish uchun input */}
+        <div className="mb-6">
+          <input
+            type="password"
+            placeholder="Kalit so'zni kiriting"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-lg"
+          />
+          <button
+            onClick={handlePasswordCheck}
+            className="mt-2 w-full py-2 px-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300"
+          >
+            Kalit so'zni tekshirish
+          </button>
+        </div>
+
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Biriktirilgan Fanlar</h2>
         
         <button
