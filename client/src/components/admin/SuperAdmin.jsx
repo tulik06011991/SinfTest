@@ -54,7 +54,7 @@ const SuperadminPanel = () => {
             Foydalanuvchilar
           </button>
           
-          <Link to="/admin">
+          <Link to="/quiz">
             <button
               className={`${activeTab === 'admins' ? 'border-b-4 border-white' : ''} py-2 px-4`}
               onClick={() => setActiveTab('admins')}
