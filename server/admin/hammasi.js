@@ -89,9 +89,47 @@ const getSubjectDetails = async (req, res) => {
     }
 };
 
+const deleteQuestion = async (req, res) => {
+    const { questionId } = req.params;
+
+    try {
+        const question = await Question.findByIdAndDelete(questionId);
+        if (!question) {
+            return res.status(404).json({ message: 'Savol topilmadi.' });
+        }
+
+        // Savolga tegishli javoblarni o'chirish (agar kerak bo'lsa)
+        await Answer.deleteMany({ questionId });
+
+        res.status(200).json({ message: 'Savol muvaffaqiyatli o\'chirildi.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Savolni o\'chirishda xatolik yuz berdi.' });
+    }
+}; 
+
+
+const deleteResult = async (req, res) => {
+    const { resultId } = req.params;
+
+    try {
+        const result = await Results.findByIdAndDelete(resultId);
+        if (!result) {
+            return res.status(404).json({ message: 'Natija topilmadi.' });
+        }
+
+        res.status(200).json({ message: 'Natija muvaffaqiyatli o\'chirildi.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Natijani o\'chirishda xatolik yuz berdi.' });
+    }
+};
+
 module.exports = {
     verifyAdminToken,
     getSubjectDetails,
+    deleteQuestion,
+    deleteResult,
 };
 
 

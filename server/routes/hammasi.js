@@ -1,11 +1,15 @@
 const express = require('express');
-const { verifyAdminToken, getSubjectDetails } = require('../admin/hammasi');
+const { verifyAdminToken, getSubjectDetails, deleteQuestion, deleteResult } = require('../admin/hammasi');
 const {downloadUserResultsPDF} = require('../admin/pdf')
 const router = express.Router();
 
 // Admin tomonidan fan bo'yicha ma'lumotlarni olish
 router.get('/subjects/:subjectId', verifyAdminToken, getSubjectDetails);
 router.get('/subjects/:subjectId/results/pdf', verifyAdminToken, downloadUserResultsPDF);
+router.delete('/subjects/:questionId', verifyAdminToken, deleteQuestion);
+
+// Natijani o'chirish yo'li
+router.delete('/subjects/:resultId', verifyAdminToken, deleteResult);
 
 
 module.exports = router;
