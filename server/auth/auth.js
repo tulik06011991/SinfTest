@@ -78,7 +78,7 @@ const loginController = async (req, res) => {
             }
 
             // JWT token yaratish
-            const token = jwt.sign({ userId: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '5h' });
+            const token = jwt.sign({ userId: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
             // Token va topilgan fanlarni front-endga jo'natish
             return res.status(200).json({ 
@@ -101,7 +101,7 @@ const loginController = async (req, res) => {
         }
 
         // JWT token yaratish foydalanuvchi uchun
-        const token = jwt.sign({ userId: user._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '7h' });
+        const token = jwt.sign({ userId: user._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // Agar foydalanuvchi admin emas bo'lsa savollar-javoblar sahifasiga yo'naltirish
         return res.status(200).json({ 
