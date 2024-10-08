@@ -41,7 +41,7 @@ const App = () => {
                     <Route path="/about" element={<About/>} />
                     <Route path="/superadmin" element={<SuperAdmin/>} />
 
-                    <Route path="*" element={<Navigate to="/login" />} />
+                    <Route path="*" element={<Navigate to="/" />} />
                      
                 </Routes>
             </>
