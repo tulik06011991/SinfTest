@@ -16,7 +16,6 @@ const SuperadminPanel = () => {
     fetch('/http://localhost:5000/api/users').then((response) => response.json()).then((data) => setUsers(data));
    
   }, []);
-
   // Foydalanuvchilar CRUD
   const createUser = () => {
     const user = { name: newUser };
