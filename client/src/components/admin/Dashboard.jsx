@@ -170,7 +170,7 @@ const Dashboard = () => {
                         <ul>
                           {question.options.map((option) => (
                             <li key={option._id} className={option.isCorrect ? 'text-green-500' : ''}>
-                              {option._id}
+                              {option.text}
                             </li>
                           ))}
                         </ul>
