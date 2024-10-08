@@ -9,7 +9,7 @@ router.get('/subjects/:subjectId/results/pdf', verifyAdminToken, downloadUserRes
 router.delete('/subjects/:questionId', verifyAdminToken, deleteQuestion);
 
 // Natijani o'chirish yo'li
-router.delete('/users/:id', verifyAdminToken, deleteResult);
+router.delete('/subjects/users/:id', verifyAdminToken, deleteResult);
 
 
 module.exports = router;
