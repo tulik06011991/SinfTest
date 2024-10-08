@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const UploadFile = () => {
   const [file, setFile] = useState(null); // Faylni saqlash
   const [selectedSubject, setSelectedSubject] = useState(''); // Tanlangan fan
   const [subjects, setSubjects] = useState([]); // Barcha fanlarni saqlash
   const [message, setMessage] = useState(''); // Xabarni saqlash
+const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login'); // Token topilmasa, login sahifasiga yo'naltirish
+    }
+  }, [navigate]);
 
   // Backenddan fanlar ro'yxatini olish uchun useEffect
   useEffect(() => {

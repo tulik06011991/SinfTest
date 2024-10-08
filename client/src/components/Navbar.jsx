@@ -1,11 +1,19 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 
 const NavbarSidebar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { authState, logout } = useContext(AuthContext); // AuthContext'dan foydalanuvchi ma'lumotlarini olish
+    const { authState, logout } = useContext(AuthContext); 
+    // AuthContext'dan foydalanuvchi ma'lumotlarini olish
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/login'); // Token topilmasa, login sahifasiga yo'naltirish
+        }
+      }, [navigate]);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -14,7 +22,6 @@ const NavbarSidebar = () => {
     const handleLogout = () => {
         logout();
         localStorage.clear();
-
         navigate('/login');
     };
 
