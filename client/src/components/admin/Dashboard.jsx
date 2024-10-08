@@ -55,7 +55,7 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/admin/${type}/${id}`,  {
+      await axios.delete(`http://localhost:5000/admin/subjects/${type}/${id}`,  {
         headers: {
           Authorization: `Bearer ${token}`,
         },
