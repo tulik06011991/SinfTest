@@ -50,8 +50,8 @@ const NavbarSidebar = () => {
                         authState.role === 'admin' ? (
                             <>
                                 <li><Link to="/faylyuklash" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
-                                <li><Link to="/quiz" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Admin</Link></li>
-                                <li><Link to="/fanlar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Fanlar</Link></li>
+                                {/* <li><Link to="/quiz" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Admin</Link></li>
+                                <li><Link to="/fanlar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Fanlar</Link></li> */}
                             </>
                         ) : (
                             <li><Link to="/savollarjavoblar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Test</Link></li>
@@ -75,8 +75,8 @@ const NavbarSidebar = () => {
                             authState.role === 'admin' ? (
                                 <>
                                     <li><Link to="/faylyuklash" className="hover:text-gray-400">Word</Link></li>
-                                    <li><Link to="/quiz" className="hover:text-gray-400">Admin</Link></li>
-                                    <li><Link to="/fanlar" className="hover:text-gray-400">Fanlar</Link></li>
+                                    {/* <li><Link to="/quiz" className="hover:text-gray-400">Admin</Link></li>
+                                    <li><Link to="/fanlar" className="hover:text-gray-400">Fanlar</Link></li> */}
                                 </>
                             ) : (
                                 <li><Link to="/savollarjavoblar" className="hover:text-gray-400">Test</Link></li>
