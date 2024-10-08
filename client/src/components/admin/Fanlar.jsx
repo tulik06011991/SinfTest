@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // useNavigate ni import qilish
 
 const CreateSubject = () => {
   const [name, setName] = useState(''); // Fan nomini saqlash
   const [adminId, setAdminId] = useState(''); // Tanlangan admin ID sini saqlash
   const [admins, setAdmins] = useState([]); // Barcha adminlarni saqlash
   const [message, setMessage] = useState(''); // Xabarni saqlash
+  const navigate = useNavigate(); // navigate funksiya yaratish
 
   // Backenddan adminlar ro'yxatini olish uchun useEffect
   useEffect(() => {
@@ -69,7 +71,7 @@ const CreateSubject = () => {
             <option value="">Adminni tanlang</option>
             {admins.map((admin) => (
               <option key={admin._id} value={admin._id}>
-                 ({admin.name})
+                ({admin.name})
               </option>
             ))}
           </select>
@@ -84,6 +86,14 @@ const CreateSubject = () => {
 
         {message && <p className="text-center text-red-500 mt-4">{message}</p>}
       </form>
+
+      {/* Superadmin paneliga o'tish uchun tugma */}
+      <button
+        onClick={() => navigate('/superadmin')} // Bu yerda '/superadmin' yo'liga o'tadi
+        className="mt-4 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors duration-300"
+      >
+        Superadmin Paneliga O'tish
+      </button>
     </div>
   );
 };

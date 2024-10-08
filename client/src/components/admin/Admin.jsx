@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const AdminCrud = () => {
   const [admins, setAdmins] = useState([]);
@@ -10,6 +11,7 @@ const AdminCrud = () => {
     subject: ''
   });
   const [editAdmin, setEditAdmin] = useState(null);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Barcha adminlarni olish
   useEffect(() => {
@@ -193,6 +195,11 @@ const AdminCrud = () => {
           <button onClick={() => updateAdmin(editAdmin._id)} style={buttonStyle}>Yangilash</button>
         </div>
       )}
+
+      {/* Dashboardga o'tish uchun tugma */}
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <button onClick={() => navigate('/superadmin')} style={buttonStyle}>Superadminga O'tish</button>
+      </div>
     </div>
   );
 };
