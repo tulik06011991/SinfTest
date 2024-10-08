@@ -22,7 +22,7 @@ const NavbarSidebar = () => {
     const handleLogout = () => {
         logout();
         localStorage.clear();
-        navigate('/login');
+        navigate('/');
     };
 
     // localStorage'dan tokenni olish
