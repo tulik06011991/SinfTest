@@ -68,7 +68,7 @@ const SuperadminPanel = () => {
               className={`${activeTab === 'categories' ? 'border-b-4 border-white' : ''} py-2 px-4`}
               onClick={() => setActiveTab('categories')}
             >
-              Fanlar Kategoriyasi
+              Fanlar
             </button>
           </Link>
         </div>
