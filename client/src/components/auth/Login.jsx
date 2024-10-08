@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom'; // Link import qilish
+import { TailSpin } from 'react-loader-spinner'; // Loader uchun import
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false); // Loading holatini qo'shish
     const navigate = useNavigate();
     const [fanId, setFanId] = useState({});
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true); // Formani yuborishda loading holatini yoqish
         try {
             const response = await axios.post('http://localhost:5000/api/login', { email, password });
 
@@ -35,6 +38,8 @@ const Login = () => {
             }
         } catch (err) {
             setError('Email yoki parol noto\'g\'ri');
+        } finally {
+            setLoading(false); // API so'rovi tugagach loading holatini o'chirish
         }
     };
 
@@ -43,6 +48,11 @@ const Login = () => {
             <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
                 <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Login</h2>
                 {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
+                {loading && (
+                    <div className="flex justify-center mb-4">
+                        <TailSpin height="30" width="30" color="blue" ariaLabel="loading" />
+                    </div>
+                )}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label className="block text-gray-700 font-semibold mb-2" htmlFor="email">Email</label>
@@ -68,7 +78,9 @@ const Login = () => {
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        className={`w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={loading} // Yuklanish holatida tugmani o'chirish
+                    >
                         Kirish
                     </button>
                 </form>

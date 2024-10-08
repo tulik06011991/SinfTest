@@ -70,7 +70,7 @@ const loginController = async (req, res) => {
 
             // Adminning o'ziga tegishli fanlar ro'yxatini olish
             const subjects = await Subject.find({ adminId: admin._id }).select('_id name');
-            console.log(subjects);
+          
 
             // Agar fanlar topilmasa, xabar yuborish
             if (subjects.length === 0) {
