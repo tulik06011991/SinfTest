@@ -30,7 +30,7 @@ const Dashboard = () => {
       const fanId = localStorage.getItem('fanId');
 
       if (!token) {
-        navigate('/login');
+        navigate('/');
         setError('Token topilmadi. Iltimos, qayta login qiling.');
         return;
       }

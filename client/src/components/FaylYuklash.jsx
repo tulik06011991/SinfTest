@@ -13,7 +13,7 @@ const navigate = useNavigate()
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      navigate('/login'); // Token topilmasa, login sahifasiga yo'naltirish
+      navigate('/'); // Token topilmasa, login sahifasiga yo'naltirish
     }
   }, [navigate]);
 
