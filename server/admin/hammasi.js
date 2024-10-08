@@ -113,7 +113,7 @@ console.log(questionId)
 
 const deleteResult = async (req, res) => {
     const {id} = req.params;
-
+console.log(id)
     try {
         const result = await Results.findByIdAndDelete(id);
         if (!result) {
