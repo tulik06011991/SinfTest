@@ -99,7 +99,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
-      <div className="bg-white shadow-2xl rounded-xl p-8 w-full max-w-7xl">
+      <div className="bg-white shadow-2xl rounded-xl p-6 md:p-8 w-full max-w-7xl">
         <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">Admin Dashboard</h1>
 
         <h2 className="text-2xl font-semibold text-gray-700 mb-6">Fanlar ro'yxati</h2>
