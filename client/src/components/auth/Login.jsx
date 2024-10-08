@@ -17,7 +17,8 @@ const Login = () => {
             // Agar token kelgan bo'lsa, uni localStorage'ga saqlash
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
-                console.log(response)
+               console.log(response)
+               
     
                 // Admin bo'lsa subjects keladi, agar subjects mavjud bo'lsa fanId'ni olishga harakat qilamiz
                 if (response.data.subjects && response.data.subjects.length > 0) {
@@ -27,10 +28,14 @@ const Login = () => {
                 }
     
                 // Yo'naltirishni to'g'ri amalga oshirish
-                if (response.data.redirect === '/savollarjavoblar') {
+                 if ((response.data.redirect === "/superadmin/dashboard")){
+                    navigate('/superadmin'); // Admin uchun yoki boshqa hollarda
+                }
+                else if (response.data.redirect === '/savollarjavoblar') {
                     navigate('/savollarjavoblar');
-                } else {
-                    navigate('/dashboard'); // Admin uchun yoki boshqa hollarda
+                } 
+                else{
+                    navigate('/dashboard')
                 }
             } else {
                 setError('Email yoki parol noto\'g\'ri'); // Agar token yoki redirect bo'lmasa xato ko'rsatish
