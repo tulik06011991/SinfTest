@@ -211,7 +211,7 @@ const Dashboard = () => {
                       <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions} to'g'ri</td>
                       <td className="px-4 py-2 text-center">
                         <button
-                          onClick={() => handleDelete('user', result.user)}
+                          onClick={() => handleDelete('user', result.userId)}
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />
