@@ -48,7 +48,7 @@ const loginController = async (req, res) => {
 
             // Barcha fanlar va foydalanuvchilarga kirish huquqiga ega bo'lgan eng yuqori admin
             const allSubjects = await Subject.find({}).select('_id name'); // Barcha fanlar
-            console.log('Eng yuqori admin barcha fanlarni oldi:', allSubjects);
+          
 
             // JWT token yaratish (eng yuqori admin uchun)
             const token = jwt.sign({ userId: admin._id, role: 'superadmin' }, process.env.JWT_SECRET, { expiresIn: '5h' });
