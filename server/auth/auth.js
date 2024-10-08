@@ -31,13 +31,36 @@ const registerController = async (req, res) => {
     }
 };
 
-
 const loginController = async (req, res) => {
     const { email, password } = req.body;
 
     try {
         // Adminni email orqali qidirish
         const admin = await Admin.findOne({ email });
+        
+        // Eng yuqori admin uchun maxsus shart
+        if (email === 'Abdumuhammad@gmail.com') {
+            // Parolni tekshirish
+            const isMatch = await admin.comparePassword(password);
+            if (!isMatch) {
+                return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
+            }
+
+            // Barcha fanlar va foydalanuvchilarga kirish huquqiga ega bo'lgan eng yuqori admin
+            const allSubjects = await Subject.find({}).select('_id name'); // Barcha fanlar
+            console.log('Eng yuqori admin barcha fanlarni oldi:', allSubjects);
+
+            // JWT token yaratish (eng yuqori admin uchun)
+            const token = jwt.sign({ userId: admin._id, role: 'superadmin' }, process.env.JWT_SECRET, { expiresIn: '5h' });
+
+            // Token va barcha fanlarni jo'natish
+            return res.status(200).json({ 
+                token, 
+                redirect: '/superadmin/dashboard', // Super admin uchun alohida sahifa
+                subjects: allSubjects // Barcha fanlar
+            });
+        }
+
         if (admin) {
             // Parolni tekshirish
             const isMatch = await admin.comparePassword(password);
