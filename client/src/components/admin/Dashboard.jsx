@@ -58,7 +58,7 @@ const Dashboard = () => {
       
       if (type === 'user') {
         // Foydalanuvchini o'chirish uchun POST metodidan foydalanish
-        await axios.post(`http://localhost:5000/api/users/delete`, { userId: id }, {
+        await axios.delete(`http://localhost:5000/admin/users/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
