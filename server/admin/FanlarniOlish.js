@@ -4,7 +4,7 @@ const Admin = require('../Model/adminlar'); // Admin modelini import qilamiz
 // Fanlar ro'yxatini olish va adminId bo'yicha filtrlash
 const getSubjects = async (req, res) => {
   const { fanId } = req.body; // Bodydan fanId ni olamiz
-  console.log("Fan ID: ", fanId);
+
 
   try {
     let subjects;
