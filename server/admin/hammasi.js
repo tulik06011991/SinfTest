@@ -112,20 +112,24 @@ console.log(questionId)
 
 
 const deleteResult = async (req, res) => {
-    const {id} = req.params;
-console.log(id)
+    const { id } = req.params;
+    console.log(id);
+
     try {
-        const result = await Results.findByIdAndDelete(id);
-        if (!result) {
-            return res.status(404).json({ message: 'Natija topilmadi.' });
+        // ID orqali natijalarni topish
+        const results = await Results.deleteMany({ userId: id });
+
+        if (results.deletedCount === 0) {
+            return res.status(404).json({ message: 'Natijalar topilmadi.' });
         }
 
-        res.status(200).json({ message: 'Natija muvaffaqiyatli o\'chirildi.' });
+        res.status(200).json({ message: 'Natijalar muvaffaqiyatli o\'chirildi.', deletedCount: results.deletedCount });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Natijani o\'chirishda xatolik yuz berdi.' });
+        res.status(500).json({ message: 'Natijalarni o\'chirishda xatolik yuz berdi.' });
     }
 };
+
 
 module.exports = {
     verifyAdminToken,
