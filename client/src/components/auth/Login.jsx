@@ -13,25 +13,32 @@ const Login = () => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:5000/api/login', { email, password });
-            setFanId(response.data.subjects)
-            console.log(response);
             
-            localStorage.setItem('token', response.data.token);
-            const fanId = response.data.subjects[0]._id; // Birinchi elementning _id sini oladi
-localStorage.setItem('fanId', fanId); // Faqat fanId string holatida saqlanadi
-
- // Tokenni saqlash
-
-            // Agar redirect '/savollarjavoblar' bo'lsa, SavollarJavoblar sahifasiga yo'naltirish
-            if (response.data.redirect === '/savollarjavoblar') {
-                navigate('/savollarjavoblar');
+            // Agar token kelgan bo'lsa, uni localStorage'ga saqlash
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+    
+                // Admin bo'lsa subjects keladi, agar subjects mavjud bo'lsa fanId'ni olishga harakat qilamiz
+                if (response.data.subjects && response.data.subjects.length > 0) {
+                    const fanId = response.data.subjects[0]._id; // Birinchi elementning _id sini oladi
+                    localStorage.setItem('fanId', fanId); // Faqat fanId string holatida saqlanadi
+                    setFanId(response.data.subjects);
+                }
+    
+                // Yo'naltirishni to'g'ri amalga oshirish
+                if (response.data.redirect === '/savollarjavoblar') {
+                    navigate('/savollarjavoblar');
+                } else {
+                    navigate('/dashboard'); // Admin uchun yoki boshqa hollarda
+                }
             } else {
-                navigate('/dashboard'); // Aks holda, dashboard sahifasiga yo'naltirish
+                setError('Email yoki parol noto\'g\'ri'); // Agar token yoki redirect bo'lmasa xato ko'rsatish
             }
         } catch (err) {
-            setError('Email yoki parol noto\'g\'ri');
+            setError('Email yoki parol noto\'g\'ri'); // Errorni ko'rsatish
         }
     };
+    
     console.log(fanId);
     
 
