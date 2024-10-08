@@ -10,6 +10,8 @@ import Login from './components/auth/Login';
 import Dashboard from './components/admin/Dashboard';
 import { AuthProvider } from './components/AuthContext';
 import About from './components/About';
+import SuperAdmin from './components/admin/SuperAdmin';
+
 
 
 
@@ -33,6 +35,8 @@ const App = () => {
                     <Route path="/register" element={<Register />} />
                     <Route path="/dashboard" element={<Dashboard/>} />
                     <Route path="/about" element={<About/>} />
+                    <Route path="/superadmin" element={<SuperAdmin/>} />
+
                     <Route path="*" element={<Navigate to="/login" />} />
                      
                 </Routes>
