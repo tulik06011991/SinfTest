@@ -112,20 +112,32 @@ console.log(questionId)
 
 
 const deleteResult = async (req, res) => {
-    const {id} = req.params;
-console.log(id)
+    const { id } = req.params; // userId ni req.params dan olamiz
+    console.log(id);
+
     try {
-        const result = await Results.findByIdAndDelete(id);
+        // 1. Natijani o'chirish
+        const result = await Results.findOneAndDelete({ userId: id });
         if (!result) {
-            return res.status(404).json({ message: 'Natija topilmadi.' });
+            return res.status(405).json({ message: 'Natija topilmadi.' });
         }
 
-        res.status(200).json({ message: 'Natija muvaffaqiyatli o\'chirildi.' });
+        // 2. correctAnswersCount, totalQuestions va correctPercentage ni o'chirish
+        await Results.findByIdAndUpdate(
+            result._id, // Natijani o'chirgandan keyin qaytarilgan natijaning IDsi
+            { $unset: { correctAnswersCount: "", totalQuestions: "", correctPercentage: "" } }, // o'chirish
+            { new: true } // Yangilangan hujjatni qaytaradi
+        );
+
+        res.status(200).json({ message: 'Natija va Option ma\'lumotlari muvaffaqiyatli o\'chirildi.' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Natijani o\'chirishda xatolik yuz berdi.' });
+        res.status(500).json({ message: 'O\'chirishda xatolik yuz berdi.' });
     }
 };
+
+
+
 
 module.exports = {
     verifyAdminToken,

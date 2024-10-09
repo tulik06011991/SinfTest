@@ -50,37 +50,65 @@ const Dashboard = () => {
     }
   };
 
-  // Savol yoki foydalanuvchini o'chirish
-  const handleDelete = async (type, id) => {
-    setLoading(true);
+  const handleDeleteUsers = async (id) => { 
+    setLoading(true); // Yuklanishni boshqarish uchun
+  
     try {
-      const token = localStorage.getItem('token');
-      
-      if (type === 'user') {
-        // Foydalanuvchini o'chirish uchun POST metodidan foydalanish
-        await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } else {
-        // Savolni o'chirish uchun DELETE metodidan foydalanish
-        await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const token = localStorage.getItem('token'); // Tokenni olish
+  
+      if (!token) {
+        throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
       }
-
-      // O'chirilgandan keyin ma'lumotlarni yangilash
-      fetchSubjects(); // Savollarni va foydalanuvchilarni qayta yuklash
+  
+      // DELETE metodidan foydalanib, foydalanuvchini o'chirish
+      await axios.delete(`http://localhost:5000/admin/users/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Tokenni so'rovga qo'shish
+        },
+      });
+  
+      // O'chirilgandan keyin qaysidir ma'lumotni yangilash yoki ma'lumotlarni qayta yuklash
+      console.log('Foydalanuvchi muvaffaqiyatli o\'chirildi');
+      // Bu yerda boshqa amallarni bajarishingiz mumkin (ma'lumotlarni qayta yuklash kabi)
+      
     } catch (err) {
-      setError('O\'chirishda xatolik yuz berdi.');
-      console.error(err);
+      console.error('Xatolik yuz berdi:', err.message); // Xatolikni konsolga chiqarish
     } finally {
-      setLoading(false);
+      setLoading(false); // Yuklanishni to'xtatish
     }
   };
+  
+
+  const handleDelete = async (id) => {
+    setLoading(true); // Yuklanishni boshqarish uchun
+  
+    try {
+      const token = localStorage.getItem('token'); // Tokenni olish
+  
+      if (!token) {
+        throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
+      }
+  
+      // DELETE metodi orqali savol yoki foydalanuvchini o'chirish
+      await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Tokenni yuborish
+        },
+      });
+  
+      // Ma'lumotlarni yangilash (foydalanuvchilar va savollarni qayta yuklash)
+      // Bu yerda callback yoki yangilash amallarini bajaring
+      console.log('O\'chirish muvaffaqiyatli yakunlandi.');
+      // Masalan, setUsers(yangiFoydalanuvchilar) yoki setQuestions(yangiSavollar) funksiyalaridan foydalanishingiz mumkin.
+  
+    } catch (err) {
+      setError('O\'chirishda xatolik yuz berdi.'); // Xatolikni ko'rsatish
+      console.error(err);
+    } finally {
+      setLoading(false); // Yuklanishni to'xtatish
+    }
+  };
+  
 
   // Tanlangan fan bo'yicha savollarni olish
   const handleSubjectClick = async (subject) => {
@@ -211,7 +239,7 @@ const Dashboard = () => {
                       <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions} to'g'ri</td>
                       <td className="px-4 py-2 text-center">
                         <button
-                          onClick={() => handleDelete('user', result.userId)}
+                          onClick={() => handleDeleteUsers( result.userId)}
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />
