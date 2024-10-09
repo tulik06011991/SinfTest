@@ -6,54 +6,24 @@ const answerSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    questionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Question',
-        required: true,
-    },
-    optionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Option',
-        required: true,
+    userName: { // Yangi maydon qo'shildi
+        type: String,
+        required: true, // Foydalanuvchi nomi zarur
     },
     subjectId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Subject',
         required: true,
     },
-    // To'g'ri javob bo'lsa true, aks holda false
-    isCorrect: {
-        type: Boolean,
-        default: false,
+    answers: {
+        type: Map,
+        of: String, // Savol ID va tanlangan javoblar
     },
-}, { timestamps: true });
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+});
 
 const Answer = mongoose.model('Answer', answerSchema);
 module.exports = Answer;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const mongoose = require('mongoose');
-
-// const answerSchema = new mongoose.Schema({
-//     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-//     subjectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Subject', required: true },
-//     questionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Question', required: true },
-//     optionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Option', required: true }, // Variant ID
-//     isCorrect: { type: Boolean, required: true } // To'g'ri yoki noto'g'ri javob
-// });
-
-// const Answer = mongoose.model('Answer', answerSchema);
-// module.exports = Answer;

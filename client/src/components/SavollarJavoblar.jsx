@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'; // Tokenni dekodlash uchun to'g'ri modul
 
 const Quiz = () => {
     const [subjects, setSubjects] = useState([]); // Fanlar ro'yxati
@@ -8,8 +9,8 @@ const Quiz = () => {
     const [questions, setQuestions] = useState([]); // Savollar ro'yxati
     const [selectedAnswers, setSelectedAnswers] = useState({}); // Belgilangan javoblar
     const [submissionStatus, setSubmissionStatus] = useState(''); // Javoblarni yuborish statusi
-    const [result, setResult] = useState(null);
-    const navigate = useNavigate();  // Foydalanuvchi natijasi
+    const [result, setResult] = useState(null); // Natijalar
+    const navigate = useNavigate(); // Yo'naltirish uchun hook
 
     // Fanlar ro'yxatini olish uchun alohida endpointdan foydalanish
     useEffect(() => {
@@ -23,16 +24,13 @@ const Quiz = () => {
         };
         fetchSubjects(); // useEffect ichida fetch funksiyani chaqirish
     }, []);
-    console.log(subjects);
-
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
-          navigate('/'); // Token topilmasa, login sahifasiga yo'naltirish
+            navigate('/'); // Token topilmasa, login sahifasiga yo'naltirish
         }
-      }, [navigate]);
-    
+    }, [navigate]);
 
     // Tanlangan fanga ko'ra savollarni olish
     useEffect(() => {
@@ -68,14 +66,17 @@ const Quiz = () => {
 
     // Javoblarni yuborish funksiyasi
     const submitAnswers = async () => {
-        const token = localStorage.getItem('token'); // Tokenni localStorage'dan olish
+        const token = localStorage.getItem('token'); // Tokenni olish
+        const decodedToken = jwtDecode(token); // Tokenni dekodlash
+        const userName = decodedToken.userName; // Foydalanuvchi ismini olish token ichidan
 
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/submit-answers',
                 {
                     subjectId: selectedSubject, // Tanlangan fan ID si
-                    answers: selectedAnswers    // Tanlangan javoblar
+                    answers: selectedAnswers,   // Tanlangan javoblar
+                    userName                    // Foydalanuvchi ismini yuborish
                 },
                 {
                     headers: {
@@ -83,7 +84,6 @@ const Quiz = () => {
                     }
                 }
             );
-
             const { message, correctAnswersCount, totalQuestions, correctPercentage } = response.data;
 
             setSubmissionStatus(message); // Yuborish statusini yangilash
@@ -92,6 +92,8 @@ const Quiz = () => {
                 totalQuestions,
                 correctPercentage
             });
+            console.log(userName)
+            
         } catch (error) {
             console.error('Javoblarni yuborishda xato:', error);
             setSubmissionStatus('Javoblarni yuborishda xato yuz berdi.');
@@ -140,7 +142,7 @@ const Quiz = () => {
                                 ))}
                             </ul>
                         </div>
-                    ))}
+                    ))} 
                 </div>
             )}
 

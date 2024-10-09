@@ -193,7 +193,7 @@ const Dashboard = () => {
                 {subjectDetails.questions && subjectDetails.questions.length > 0 ? (
                   subjectDetails.questions.map((question) => (
                     <tr key={question._id} className="border-b border-gray-300">
-                      <td className="px-4 py-2">{question.question}</td>
+                      <td className="px-4 py-2">{question.questionText}</td>
                       <td className="px-4 py-2">
                         <ul>
                           {question.options.map((option) => (
@@ -235,7 +235,7 @@ const Dashboard = () => {
                 {subjectDetails.userResults && subjectDetails.userResults.length > 0 ? (
                   subjectDetails.userResults.map((result) => (
                     <tr key={result.user} className="border-b border-gray-300">
-                      <td className="px-4 py-2">{result.user}</td>
+                      <td className="px-4 py-2">{result.userName}</td>
                       <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions} to'g'ri</td>
                       <td className="px-4 py-2 text-center">
                         <button

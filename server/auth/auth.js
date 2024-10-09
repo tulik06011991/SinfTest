@@ -101,12 +101,13 @@ const loginController = async (req, res) => {
         }
 
         // JWT token yaratish foydalanuvchi uchun
-        const token = jwt.sign({ userId: user._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id,  userName: user.name,   role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // Agar foydalanuvchi admin emas bo'lsa savollar-javoblar sahifasiga yo'naltirish
         return res.status(200).json({ 
             token, 
-            redirect: '/savollarjavoblar' 
+            redirect: '/savollarjavoblar',
+           
         });
 
     } catch (error) {

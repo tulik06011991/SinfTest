@@ -4,7 +4,7 @@
 const jwt = require('jsonwebtoken');
 const Answer = require('../Model/Javoblar'); // Foydalanuvchilar natijalari model
 const Question = require('../Model/questionModel'); // Savollar model
-const User = require('../Model/auth'); // Foydalanuvchilar model
+
 const Subject = require('../Model/Fanlar');
  const Option = require('../Model/hammasi');
  const Results = require('../Model/pdf');
@@ -30,65 +30,68 @@ const verifyAdminToken = (req, res, next) => {
 // Fan bo'yicha ma'lumotlarni olish va natijalarni hisoblash
 const getSubjectDetails = async (req, res) => {
     try {
-        const subjectId = req.params.subjectId;
+        const subjectId = req.params.subjectId;  // URL'dan subjectId olindi
         console.log(subjectId);
-        
-        // Fan ID orqali savollar va variantlarni olish
-        const questions = await Question.find({ subject: subjectId }).populate('options');
 
-        // Foydalanuvchilarning javoblari - subjectId orqali filtrlash
-        const answers = await Answer.find({ subjectId }) // subjectId bo'yicha javoblarni olish
-            .populate('userId', 'name') // Foydalanuvchi ismini olish
-            .populate('questionId') // Savollarni olish
-            .populate('optionId'); // Variantlarni olish
+        // subjectId bo'yicha foydalanuvchilarning javoblarini olish
+        const answers = await Answer.find({ subjectId })  // Faqat subjectId bo'yicha javoblar olindi
+            .populate('userId', 'name');  // Foydalanuvchining ismini olish
 
-        // Har bir foydalanuvchining natijalarini olish
-        const users = await User.find();
+        // Agar javoblar topilmasa
+        if (!answers.length) {
+            return res.status(404).json({ message: 'Subject bo\'yicha javoblar topilmadi.' });
+        }
 
-        // Natijalarni saqlash
+        // Har bir foydalanuvchining natijalarini saqlash uchun array
         const userResults = [];
 
-        for (const user of users) {
-            // Foydalanuvchining bergan javoblari
-            const userAnswers = answers.filter(answer => answer.userId._id.toString() === user._id.toString());
+        // Foydalanuvchilarni takrorlanmas qilib olish (unique)
+        const users = [...new Set(answers.map(answer => answer.userId._id.toString()))]; // Foydalanuvchilarning unique ro'yxati
 
-            // To'g'ri javoblar sonini aniqlash
+        // Savollarni subjectId bo'yicha olish
+        const questions = await Question.find({ subject: subjectId });
+
+        // Har bir foydalanuvchining javoblarini hisoblash
+        for (let userId of users) {
+            // Shu foydalanuvchining subjectId bo'yicha barcha javoblarini olish
+            const userAnswers = answers.filter(answer => answer.userId._id.toString() === userId);
+
+            // To'g'ri javoblar sonini hisoblash
             const correctAnswersCount = userAnswers.filter(answer => answer.isCorrect).length;
 
-            // Umumiy savollar soni va foiz hisoblash
-            const totalQuestions = questions.length;
-            const correctPercentage = totalQuestions > 0 ? (correctAnswersCount / totalQuestions) * 100 : 0;
+            // Foydalanuvchining ismi
+            const user = userAnswers[0]?.userId; // Foydalanuvchining ismi
 
-            // Natijalarni `Results` modeliga yozish
-            const result = new Results({
-                userId: user._id,
-                subjectId: subjectId,
-                correctAnswersCount,
-                totalQuestions,
-                correctPercentage: correctPercentage.toFixed(2) // Foizni yaxlitlash
-            });
-            await result.save(); // Saqlash
-
+            // Foydalanuvchi ma'lumotlarini yig'ish
             userResults.push({
                 userId: user._id,
-                user: user.name,
-                totalQuestions,
-                correctAnswersCount,
-                correctPercentage: correctPercentage.toFixed(2), // Foizni yaxlitlash
+                userName: user.name,
+                totalQuestions: userAnswers.length, // Foydalanuvchi javob bergan savollar soni
+                correctAnswersCount,  // To'g'ri javoblar soni
+                correctPercentage: ((correctAnswersCount / userAnswers.length) * 100).toFixed(2),  // To'g'ri javoblar foizi
             });
         }
 
-        // Natijalar va savollarni qaytarish
+        // Savollarni va variantlarni JSON formatida qaytarish
         res.status(200).json({
-            questions,
-            answers, // subjectId ga mos keladigan javoblar
-            userResults, // Har bir foydalanuvchining natijalari
+            subjectId,
+            userResults,  // Har bir foydalanuvchining natijalari
+            questions: questions.map(question => ({
+                questionText: question.question,
+                options: question.options.map(option => ({
+                    text: option.text,
+                    isCorrect: option.isCorrect
+                })),
+                correctAnswer: question.correctAnswer
+            }))
         });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Ma\'lumotlarni olishda xatolik yuz berdi.' });
     }
 };
+
 
 
 const deleteQuestion = async (req, res) => {
@@ -117,20 +120,14 @@ const deleteResult = async (req, res) => {
     console.log(id);
 
     try {
-        // 1. Natijani o'chirish
-        const result = await Results.findOneAndDelete({ userId: id });
-        if (!result) {
-            return res.status(404).json({ message: 'Natija topilmadi.' }); // 404 - Not Found
+        // Natijani userId bo'yicha o'chirish
+        const result = await Results.deleteMany({ userId: id }); // userId ga tegishli barcha natijalarni o'chiradi
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Natija topilmadi.' }); // 404 - Not Found, agar o'chiriladigan natija topilmasa
         }
 
-        // 2. correctAnswersCount ni o'chirish
-        await Results.findByIdAndUpdate(
-            result._id, // Natijani o'chirgandan keyin qaytarilgan natijaning IDsi
-            { $unset: { correctAnswersCount: "" } }, // correctAnswersCount maydonini o'chirish
-            { new: true } // Yangilangan hujjatni qaytaradi
-        );
-
-        res.status(200).json({ message: 'Natija muvaffaqiyatli o\'chirildi va correctAnswersCount o\'chirildi.' });
+        res.status(200).json({ message: 'Foydalanuvchiga tegishli barcha natijalar muvaffaqiyatli o\'chirildi.' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'O\'chirishda xatolik yuz berdi.' });

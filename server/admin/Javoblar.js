@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
-const Answer = require('../Model/Javoblar');
-const Question = require('../Model/questionModel');
+const Answer = require('../Model/Javoblar'); // Modelga moslashtiring
+const Question = require('../Model/questionModel'); // Modelga moslashtiring
 require('dotenv').config();
 
 // Javoblarni qabul qiladigan funksiya
 const submitAnswers = async (req, res) => {
-    const token = req.headers.authorization.split(' ')[1]; // Bearer tokenni olish
+    const token = req.headers.authorization?.split(' ')[1]; // Bearer tokenni olish
     if (!token) {
         return res.status(401).json({ message: 'Token mavjud emas' });
     }
@@ -15,7 +15,13 @@ const submitAnswers = async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId; // Foydalanuvchi ID'si token ichidan
 
-        const { subjectId, answers } = req.body; // Fan ID va javoblar
+        const { subjectId, answers, userName } = req.body;
+        
+        
+        // Fan ID, javoblar va foydalanuvchi nomi
+
+        console.log(subjectId, answers, userName)
+        
         const savedAnswers = [];
         let correctAnswersCount = 0; // To'g'ri javoblar soni
         const totalQuestions = Object.keys(answers).length; // Umumiy savollar soni
@@ -28,7 +34,7 @@ const submitAnswers = async (req, res) => {
             if (question) {
                 // Tanlangan variantning ID'sini olish
                 const selectedOption = question.options.find(option => option.text === optionText);
-                const isCorrect = selectedOption.isCorrect; // Variant to'g'ri yoki noto'g'ri
+                const isCorrect = selectedOption?.isCorrect; // Variant to'g'ri yoki noto'g'ri
 
                 // Agar javob to'g'ri bo'lsa, hisoblash
                 if (isCorrect) {
@@ -38,10 +44,11 @@ const submitAnswers = async (req, res) => {
                 // Javobni saqlash
                 const answer = new Answer({
                     userId,
+                    userName, // Foydalanuvchi nomini saqlash
                     subjectId,
-                    questionId,
-                    optionId: selectedOption._id,
-                    isCorrect
+                    answers: {
+                        [questionId]: optionText, // Savol ID va tanlangan variant
+                    }
                 });
                 await answer.save();
                 savedAnswers.push(answer);
