@@ -16,7 +16,7 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      navigate('/login'); // Token bo'lmasa login sahifasiga yo'naltirish
+      navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
     }
   }, [navigate]);
 
