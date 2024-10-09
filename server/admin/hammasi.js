@@ -68,7 +68,7 @@ const getSubjectDetails = async (req, res) => {
                 userName: user.name,
                 totalQuestions: userAnswers.length, // Foydalanuvchi javob bergan savollar soni
                 correctAnswersCount,  // To'g'ri javoblar soni
-                correctPercentage: ((correctAnswersCount / userAnswers.length) * 100).toFixed(2),  // To'g'ri javoblar foizi
+                correctPercentage: userAnswers.length > 0 ? ((correctAnswersCount / userAnswers.length) * 100).toFixed(2) : 0,  // To'g'ri javoblar foizi
             });
         }
 

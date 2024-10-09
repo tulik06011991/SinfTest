@@ -92,8 +92,6 @@ const Quiz = () => {
                 totalQuestions,
                 correctPercentage
             });
-            console.log(userName)
-            
         } catch (error) {
             console.error('Javoblarni yuborishda xato:', error);
             setSubmissionStatus('Javoblarni yuborishda xato yuz berdi.');

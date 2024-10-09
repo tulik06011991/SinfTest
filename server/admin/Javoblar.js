@@ -15,13 +15,7 @@ const submitAnswers = async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId; // Foydalanuvchi ID'si token ichidan
 
-        const { subjectId, answers, userName } = req.body;
-        
-        
-        // Fan ID, javoblar va foydalanuvchi nomi
-
-        console.log(subjectId, answers, userName)
-        
+        const { subjectId, answers, userName } = req.body; // Fan ID, javoblar va foydalanuvchi nomi
         const savedAnswers = [];
         let correctAnswersCount = 0; // To'g'ri javoblar soni
         const totalQuestions = Object.keys(answers).length; // Umumiy savollar soni
