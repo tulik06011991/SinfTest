@@ -31,6 +31,8 @@ const verifyAdminToken = (req, res, next) => {
 const getSubjectDetails = async (req, res) => {
     try {
         const subjectId = req.params.subjectId;
+        console.log(subjectId);
+        
       
         
 
@@ -119,17 +121,17 @@ const deleteResult = async (req, res) => {
         // 1. Natijani o'chirish
         const result = await Results.findOneAndDelete({ userId: id });
         if (!result) {
-            return res.status(405).json({ message: 'Natija topilmadi.' });
+            return res.status(404).json({ message: 'Natija topilmadi.' }); // 404 - Not Found
         }
 
-        // 2. correctAnswersCount, totalQuestions va correctPercentage ni o'chirish
+        // 2. correctAnswersCount ni o'chirish
         await Results.findByIdAndUpdate(
             result._id, // Natijani o'chirgandan keyin qaytarilgan natijaning IDsi
-            { $unset: { correctAnswersCount: "", totalQuestions: "", correctPercentage: "" } }, // o'chirish
+            { $unset: { correctAnswersCount: "" } }, // correctAnswersCount maydonini o'chirish
             { new: true } // Yangilangan hujjatni qaytaradi
         );
 
-        res.status(200).json({ message: 'Natija va Option ma\'lumotlari muvaffaqiyatli o\'chirildi.' });
+        res.status(200).json({ message: 'Natija muvaffaqiyatli o\'chirildi va correctAnswersCount o\'chirildi.' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'O\'chirishda xatolik yuz berdi.' });
