@@ -33,14 +33,11 @@ const getSubjectDetails = async (req, res) => {
         const subjectId = req.params.subjectId;
         console.log(subjectId);
         
-      
-        
-
         // Fan ID orqali savollar va variantlarni olish
         const questions = await Question.find({ subject: subjectId }).populate('options');
 
-        // Foydalanuvchilarning javoblari
-        const answers = await Answer.find({ subjectId })
+        // Foydalanuvchilarning javoblari - subjectId orqali filtrlash
+        const answers = await Answer.find({ subjectId }) // subjectId bo'yicha javoblarni olish
             .populate('userId', 'name') // Foydalanuvchi ismini olish
             .populate('questionId') // Savollarni olish
             .populate('optionId'); // Variantlarni olish
@@ -84,6 +81,7 @@ const getSubjectDetails = async (req, res) => {
         // Natijalar va savollarni qaytarish
         res.status(200).json({
             questions,
+            answers, // subjectId ga mos keladigan javoblar
             userResults, // Har bir foydalanuvchining natijalari
         });
     } catch (error) {
@@ -91,6 +89,7 @@ const getSubjectDetails = async (req, res) => {
         res.status(500).json({ message: 'Ma\'lumotlarni olishda xatolik yuz berdi.' });
     }
 };
+
 
 const deleteQuestion = async (req, res) => {
     const  {questionId}  = req.params;
