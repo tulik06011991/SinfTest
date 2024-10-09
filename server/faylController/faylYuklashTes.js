@@ -14,7 +14,7 @@ const parseWordFile = async (filePath, subjectId) => {
             const newQuestion = new Question({
                 question: questionData.question,
                 options: questionData.options.map(option => ({
-                    text: option.text,
+                    text: option.text.replace(/^\./, ''), // Nuqtani olib tashlaymiz
                     isCorrect: option.isCorrect
                 })),
                 correctAnswer: questionData.correctAnswer,
@@ -74,7 +74,7 @@ const extractQuestions = (content) => {
 
             // Agar to'g'ri variant bo'lsa, uni currentQuestion.correctAnswer ga o'rnatamiz
             if (isCorrect) {
-                currentQuestion.correctAnswer = optionText;
+                currentQuestion.correctAnswer = optionText; // To'g'ri javobni saqlaymiz
             }
         }
     });
