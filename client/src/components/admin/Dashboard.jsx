@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [subjectDetails, setSubjectDetails] = useState(null);
+  const [savollar, setsavollar] = useState({})
   const navigate = useNavigate();
 
   // Token tekshiruvi va yo'naltirish
@@ -125,7 +126,10 @@ const Dashboard = () => {
         },
       });
 
-      console.log(response.data)
+      setsavollar(response.data.questionsWithOptions
+      )
+      console.log(response.data.questionsWithOptions)
+      
       
       setSubjectDetails(response.data);
     } catch (err) {
@@ -190,9 +194,9 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {subjectDetails.userResults.questionsWithOptions
- && subjectDetails.questions.length > 0 ? (
-                  subjectDetails.userResults.questionsWithOptions.map((question) => (
+                {savollar
+ && savollar.length > 0 ? (
+                  savollar.map((question) => (
                     <tr key={question._id} className="border-b border-gray-300">
                       <td className="px-4 py-2">{question.questionText}</td>
                       <td className="px-4 py-2">
