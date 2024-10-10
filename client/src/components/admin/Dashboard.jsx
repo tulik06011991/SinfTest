@@ -192,6 +192,7 @@ const Dashboard = () => {
                   <th className="px-4 py-2">Variantlar</th>
                   <th className="px-4 py-2">Amallar</th>
                 </tr>
+                
               </thead>
               <tbody>
                 {savollar
