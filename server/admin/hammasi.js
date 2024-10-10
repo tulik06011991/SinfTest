@@ -146,7 +146,7 @@ const deleteResult = async (req, res) => {
 
     try {
         // Natijani userId bo'yicha o'chirish
-        const result = await Results.deleteMany({ userId: id }); // userId ga tegishli barcha natijalarni o'chiradi
+        const result = await Answer.deleteMany({ userId: id }); // userId ga tegishli barcha natijalarni o'chiradi
 
         if (result.deletedCount === 0) {
             return res.status(404).json({ message: 'Natija topilmadi.' }); // 404 - Not Found, agar o'chiriladigan natija topilmasa
