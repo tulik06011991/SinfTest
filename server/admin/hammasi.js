@@ -124,7 +124,7 @@ const deleteQuestion = async (req, res) => {
 console.log(questionId)
 
     try {
-        const question = await Answer.findByIdAndDelete(questionId);
+        const question = await Question.findByIdAndDelete(questionId);
         if (!question) {
             return res.status(404).json({ message: 'Savol topilmadi.' });
         }
