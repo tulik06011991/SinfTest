@@ -126,9 +126,8 @@ const Dashboard = () => {
         },
       });
 
-      setsavollar(response.data.questionsWithOptions
-      )
-      console.log(response.data.questionsWithOptions)
+      setsavollar(response.data.questionsWithOptions)
+      console.log(response.data.questionsWithOptions._questionId)
 
 
       setSubjectDetails(response.data);
@@ -211,7 +210,7 @@ const Dashboard = () => {
                       </td>
                       <td className="px-4 py-2 text-center">
                         <button
-                          onClick={() => handleDelete('question', question._id)}
+                          onClick={() => handleDelete( question._id)}
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />

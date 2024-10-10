@@ -142,7 +142,7 @@ console.log(questionId)
 
 const deleteResult = async (req, res) => {
     const { id } = req.params; // userId ni req.params dan olamiz
-    console.log(id);
+   
 
     try {
         // Natijani userId bo'yicha o'chirish
