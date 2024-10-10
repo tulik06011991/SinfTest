@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const Answer = require('../Model/Javoblar'); // To'g'ri model
-const Question = require('../Model/questionModel'); // To'g'ri model
+const Answer = require('../Model/Javoblar');
+const Question = require('../Model/questionModel');
 require('dotenv').config();
 
 const submitAnswers = async (req, res) => {
@@ -19,11 +19,13 @@ const submitAnswers = async (req, res) => {
         let correctAnswersCount = 0;
         const totalQuestions = answers.length;
 
+        // Har bir savol uchun ma'lumotlarni saqlash
         for (let i = 0; i < answers.length; i++) {
             const { questionId, selectedOption } = answers[i];
             const question = await Question.findById(questionId);
 
             if (question) {
+                // Tanlangan variantni tekshirish
                 const selectedOptionObj = question.options.find(option => option.text === selectedOption);
                 const isCorrect = selectedOptionObj?.isCorrect;
 
@@ -31,29 +33,30 @@ const submitAnswers = async (req, res) => {
                     correctAnswersCount++;
                 }
 
+                // Yangi javobni saqlash
                 const answer = new Answer({
                     userId,
                     userName,
                     subjectId,
-                    answers: [
-                        {
-                            questionId,
-                            selectedOption
-                        }
-                    ]
+                    questionId,
+                    selectedOption
                 });
-                await answer.save();
-                savedAnswers.push(answer);
+
+                await answer.save(); // Ma'lumotlar bazasiga saqlash
+                savedAnswers.push(answer); // Saqlangan javoblarni massivga qo'shish
             }
         }
 
+        // To'g'ri javoblarning foizini hisoblash
         const correctPercentage = (correctAnswersCount / totalQuestions) * 100;
 
+        // Javoblar saqlandi deb qaytish
         return res.status(200).json({
             message: 'Javoblar saqlandi',
             correctAnswersCount,
             totalQuestions,
-            correctPercentage
+            correctPercentage,
+            savedAnswers // Saqlangan javoblar qaytariladi
         });
     } catch (error) {
         console.error('Javoblarni yuborishda xato:', error);

@@ -28,14 +28,20 @@ const verifyAdminToken = (req, res, next) => {
 };
 
 // Fan bo'yicha ma'lumotlarni olish va natijalarni hisoblash
-const getSubjectDetails = async (req, res) => {
+const getSubjectDetails   = async (req, res) => {
     try {
-        const subjectId = req.params.subjectId;  // URL'dan subjectId olindi
-        console.log(subjectId);
+        const subjectId = req.params.subjectId; // URL'dan subjectId olindi
 
         // subjectId bo'yicha foydalanuvchilarning javoblarini olish
-        const answers = await Answer.find({ subjectId })  // Faqat subjectId bo'yicha javoblar olindi
-            .populate('userId', 'name');  // Foydalanuvchining ismini olish
+        const answers = await Answer.find({ subjectId }) // Faqat subjectId bo'yicha javoblar olindi
+            .populate('userId', 'name') // Foydalanuvchining ismi
+            .populate({
+                path: 'questionId', 
+                populate: {
+                    path: 'subject', // Savolning fani haqida ham ma'lumot olamiz
+                    model: 'Subject'
+                }
+            }); // Javoblar bilan bog'liq savollarni olish va populate qilish
 
         // Agar javoblar topilmasa
         if (!answers.length) {
@@ -48,42 +54,54 @@ const getSubjectDetails = async (req, res) => {
         // Foydalanuvchilarni takrorlanmas qilib olish (unique)
         const users = [...new Set(answers.map(answer => answer.userId._id.toString()))]; // Foydalanuvchilarning unique ro'yxati
 
-        // Savollarni subjectId bo'yicha olish
-        const questions = await Question.find({ subject: subjectId });
-
         // Har bir foydalanuvchining javoblarini hisoblash
         for (let userId of users) {
             // Shu foydalanuvchining subjectId bo'yicha barcha javoblarini olish
             const userAnswers = answers.filter(answer => answer.userId._id.toString() === userId);
 
-            // To'g'ri javoblar sonini hisoblash
-            const correctAnswersCount = userAnswers.filter(answer => answer.isCorrect).length;
+            let correctAnswersCount = 0;
+            let questionsWithOptions = [];
 
-            // Foydalanuvchining ismi
-            const user = userAnswers[0]?.userId; // Foydalanuvchining ismi
+            // Har bir foydalanuvchi javobini to'g'ri javob bilan solishtiramiz
+            for (let userAnswer of userAnswers) {
+                const question = userAnswer.questionId; // Savolni olamiz
+                const selectedOption = userAnswer.selectedOption; // Foydalanuvchining tanlagan varianti
+                const correctAnswer = question.correctAnswer; // To'g'ri javob
+
+                // Savollar va ularning variantlarini yig'amiz
+                questionsWithOptions.push({
+                    questionId: question._id,
+                    questionText: question.question, // questionModel'dagi savol
+                    options: question.options, // Variantlar (text va isCorrect)
+                    selectedOption: selectedOption,
+                    correctAnswer: correctAnswer,
+                    subject: question.subject // Savolning fani
+                });
+
+                // Agar tanlangan variant to'g'ri javobga mos kelsa, ball qo'shamiz
+                if (selectedOption === correctAnswer) {
+                    correctAnswersCount++;
+                }
+            }
 
             // Foydalanuvchi ma'lumotlarini yig'ish
+            const totalQuestions = userAnswers.length; // Foydalanuvchi javob bergan savollar soni
+            const correctPercentage = totalQuestions > 0 ? ((correctAnswersCount / totalQuestions) * 100).toFixed(2) : 0; // To'g'ri javoblar foizi
+
             userResults.push({
-                userId: user._id,
-                userName: user.name,
-                totalQuestions: userAnswers.length, // Foydalanuvchi javob bergan savollar soni
-                correctAnswersCount,  // To'g'ri javoblar soni
-                correctPercentage: userAnswers.length > 0 ? ((correctAnswersCount / userAnswers.length) * 100).toFixed(2) : 0,  // To'g'ri javoblar foizi
+                userId: userAnswers[0].userId._id,
+                userName: userAnswers[0].userId.name,
+                totalQuestions,
+                correctAnswersCount,
+                correctPercentage,
+                questionsWithOptions // Foydalanuvchi tanlagan savollar va variantlar
             });
         }
 
-        // Savollarni va variantlarni JSON formatida qaytarish
+        // Foydalanuvchilarning natijalarini va savollar bilan qaytarish
         res.status(200).json({
             subjectId,
-            userResults,  // Har bir foydalanuvchining natijalari
-            questions: questions.map(question => ({
-                questionText: question.question,
-                options: question.options.map(option => ({
-                    text: option.text,
-                    isCorrect: option.isCorrect
-                })),
-                correctAnswer: question.correctAnswer
-            }))
+            userResults
         });
 
     } catch (error) {
@@ -91,7 +109,6 @@ const getSubjectDetails = async (req, res) => {
         res.status(500).json({ message: 'Ma\'lumotlarni olishda xatolik yuz berdi.' });
     }
 };
-
 
 
 const deleteQuestion = async (req, res) => {

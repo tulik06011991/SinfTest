@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode'; // Tokenni dekodlash uchun to'g'ri modul
+import {jwtDecode} from 'jwt-decode'; // To'g'ri modul
 
 const Quiz = () => {
     const [subjects, setSubjects] = useState([]); // Fanlar ro'yxati

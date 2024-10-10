@@ -6,28 +6,24 @@ const answerSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    userName: { // Foydalanuvchi nomi
+    userName: {
         type: String,
-        required: true, // Foydalanuvchi nomi zarur
+        required: true,
     },
     subjectId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Subject',
         required: true,
     },
-    answers: [
-        {
-            questionId: { // Savol ID sini qo'shish
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Question',
-                required: true
-            },
-            selectedOption: { // Tanlangan variant textini kiritish
-                type: String,
-                required: true
-            }
-        }
-    ],
+    questionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Question',
+        required: true
+    },
+    selectedOption: {
+        type: String,
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -36,6 +32,3 @@ const answerSchema = new mongoose.Schema({
 
 const Answer = mongoose.model('Answer', answerSchema);
 module.exports = Answer;
-
-
-
