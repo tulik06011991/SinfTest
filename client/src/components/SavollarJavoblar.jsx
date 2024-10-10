@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // Tokenni dekodlash uchun to'g'ri modul
+import {jwtDecode} from 'jwt-decode'; // Tokenni dekodlash uchun to'g'ri modul
 
 const Quiz = () => {
     const [subjects, setSubjects] = useState([]); // Fanlar ro'yxati
     const [selectedSubject, setSelectedSubject] = useState(''); // Tanlangan fanning ID'si
     const [questions, setQuestions] = useState([]); // Savollar ro'yxati
-    const [selectedAnswers, setSelectedAnswers] = useState({}); // Belgilangan javoblar
+    const [selectedAnswers, setSelectedAnswers] = useState([]); // Belgilangan javoblar (savol ID bilan)
     const [submissionStatus, setSubmissionStatus] = useState(''); // Javoblarni yuborish statusi
     const [result, setResult] = useState(null); // Natijalar
     const navigate = useNavigate(); // Yo'naltirish uchun hook
 
-    // Fanlar ro'yxatini olish uchun alohida endpointdan foydalanish
+    // Fanlar ro'yxatini olish uchun endpoint
     useEffect(() => {
         const fetchSubjects = async () => {
             try {
@@ -22,9 +22,10 @@ const Quiz = () => {
                 console.error('Fanlarni olishda xato:', error);
             }
         };
-        fetchSubjects(); // useEffect ichida fetch funksiyani chaqirish
+        fetchSubjects();
     }, []);
 
+    // Token mavjudligini tekshirish
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -49,38 +50,38 @@ const Quiz = () => {
 
     // Javob tanlash funksiyasi
     const handleAnswerSelect = (questionId, selectedOption) => {
-        setSelectedAnswers((prevAnswers) => ({
-            ...prevAnswers,
-            [questionId]: selectedOption
-        }));
+        setSelectedAnswers((prevAnswers) => {
+            const newAnswers = prevAnswers.filter(answer => answer.questionId !== questionId);
+            return [...newAnswers, { questionId, selectedOption }];
+        });
     };
 
     // Fan tanlash funksiyasi
     const handleSubjectChange = (event) => {
-        setSelectedSubject(event.target.value); // Tanlangan fanning ID sini saqlash
-        setQuestions([]); // Savollarni tozalash
-        setSelectedAnswers({}); // Belgilangan javoblarni tozalash
-        setSubmissionStatus(''); // Javob yuborish statusini tozalash
-        setResult(null); // Natijani tozalash
+        setSelectedSubject(event.target.value);
+        setQuestions([]);
+        setSelectedAnswers([]);
+        setSubmissionStatus('');
+        setResult(null);
     };
 
     // Javoblarni yuborish funksiyasi
     const submitAnswers = async () => {
         const token = localStorage.getItem('token'); // Tokenni olish
         const decodedToken = jwtDecode(token); // Tokenni dekodlash
-        const userName = decodedToken.userName; // Foydalanuvchi ismini olish token ichidan
+        const userName = decodedToken.userName; // Foydalanuvchi ismi
 
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/submit-answers',
                 {
-                    subjectId: selectedSubject, // Tanlangan fan ID si
-                    answers: selectedAnswers,   // Tanlangan javoblar
-                    userName                    // Foydalanuvchi ismini yuborish
+                    subjectId: selectedSubject,
+                    answers: selectedAnswers,
+                    userName
                 },
                 {
                     headers: {
-                        'Authorization': `Bearer ${token}` // Tokenni Authorization header orqali yuborish
+                        Authorization: `Bearer ${token}`
                     }
                 }
             );
@@ -102,11 +103,10 @@ const Quiz = () => {
         <div className="quiz-container bg-gray-100 min-h-screen flex flex-col items-center py-8">
             <h2 className="text-4xl font-bold text-blue-600 mb-6">Quiz Test</h2>
 
-            {/* Fan tanlash dropdown */}
             <label htmlFor="subject-select" className="text-xl font-medium mb-4">Kerakli fan tanlang:</label>
-            <select 
-                id="subject-select" 
-                onChange={handleSubjectChange} 
+            <select
+                id="subject-select"
+                onChange={handleSubjectChange}
                 className="p-2 mb-6 bg-white border border-gray-300 rounded shadow-lg w-60 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">-- Fan tanlang --</option>
                 {subjects.map((subject) => (
@@ -114,7 +114,6 @@ const Quiz = () => {
                 ))}
             </select>
 
-            {/* Savollarni ko'rsatish */}
             {questions.length === 0 ? (
                 <p className="text-lg font-medium text-gray-700">{selectedSubject ? 'Savollar yo\'q' : 'Iltimos, fan tanlang'}</p>
             ) : (
@@ -130,7 +129,7 @@ const Quiz = () => {
                                                 type="radio"
                                                 name={`question-${question._id}`}
                                                 value={option.text}
-                                                checked={selectedAnswers[question._id] === option.text}
+                                                checked={selectedAnswers.find(answer => answer.questionId === question._id)?.selectedOption === option.text}
                                                 onChange={() => handleAnswerSelect(question._id, option.text)}
                                                 className="h-5 w-5 text-blue-500 focus:ring-blue-400"
                                             />
@@ -140,23 +139,20 @@ const Quiz = () => {
                                 ))}
                             </ul>
                         </div>
-                    ))} 
+                    ))}
                 </div>
             )}
 
-            {/* Natijalarni yuborish tugmasi */}
-            <button 
+            <button
                 onClick={submitAnswers}
                 className="mt-6 px-6 py-2 bg-blue-600 text-white text-lg font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
                 Natijalarni Yuborish
             </button>
 
-            {/* Yuborish natijasini ko'rsatish */}
             {submissionStatus && (
                 <p className="mt-4 text-lg font-medium text-green-600">{submissionStatus}</p>
             )}
 
-            {/* Foydalanuvchi natijalarini ko'rsatish */}
             {result && (
                 <div className="mt-6 p-4 bg-white shadow-md rounded-lg">
                     <p className="text-xl font-semibold">Sizning Natijalaringiz:</p>

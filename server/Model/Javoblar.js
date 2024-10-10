@@ -6,7 +6,7 @@ const answerSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    userName: { // Yangi maydon qo'shildi
+    userName: { // Foydalanuvchi nomi
         type: String,
         required: true, // Foydalanuvchi nomi zarur
     },
@@ -15,10 +15,19 @@ const answerSchema = new mongoose.Schema({
         ref: 'Subject',
         required: true,
     },
-    answers: {
-        type: Map,
-        of: String, // Savol ID va tanlangan javoblar
-    },
+    answers: [
+        {
+            questionId: { // Savol ID sini qo'shish
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Question',
+                required: true
+            },
+            selectedOption: { // Tanlangan variant textini kiritish
+                type: String,
+                required: true
+            }
+        }
+    ],
     createdAt: {
         type: Date,
         default: Date.now,
