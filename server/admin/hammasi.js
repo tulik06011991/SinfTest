@@ -1,14 +1,9 @@
-
-
-
 const jwt = require('jsonwebtoken');
 const Answer = require('../Model/Javoblar'); // Foydalanuvchilar natijalari model
 const Question = require('../Model/questionModel'); // Savollar model
-
 const Subject = require('../Model/Fanlar');
- const Option = require('../Model/hammasi');
- const Results = require('../Model/pdf');
-
+const Option = require('../Model/hammasi');
+const Results = require('../Model/pdf');
 
 // Admin tokenini tekshirish funksiyasi
 const verifyAdminToken = (req, res, next) => {
@@ -69,13 +64,14 @@ const getSubjectDetails = async (req, res) => {
                 totalQuestions: userAnswers.length, // Foydalanuvchi javob bergan savollar soni
                 correctAnswersCount,  // To'g'ri javoblar soni
                 correctPercentage: userAnswers.length > 0 ? ((correctAnswersCount / userAnswers.length) * 100).toFixed(2) : 0,  // To'g'ri javoblar foizi
+                userAnswers  // Foydalanuvchining barcha javoblari (to'liq ma'lumotlar)
             });
         }
 
         // Savollarni va variantlarni JSON formatida qaytarish
         res.status(200).json({
             subjectId,
-            userResults,  // Har bir foydalanuvchining natijalari
+            userResults,  // Har bir foydalanuvchining natijalari va to'liq javoblar ma'lumotlari
             questions: questions.map(question => ({
                 questionText: question.question,
                 options: question.options.map(option => ({
@@ -92,11 +88,10 @@ const getSubjectDetails = async (req, res) => {
     }
 };
 
-
-
+// Savolni o'chirish
 const deleteQuestion = async (req, res) => {
-    const  {questionId}  = req.params;
-console.log(questionId)
+    const { questionId } = req.params;
+    console.log(questionId);
 
     try {
         const question = await Question.findByIdAndDelete(questionId);
@@ -112,9 +107,9 @@ console.log(questionId)
         console.error(error);
         res.status(500).json({ message: 'Savolni o\'chirishda xatolik yuz berdi.' });
     }
-}; 
+};
 
-
+// Natijalarni o'chirish
 const deleteResult = async (req, res) => {
     const { id } = req.params; // userId ni req.params dan olamiz
     console.log(id);
@@ -134,37 +129,9 @@ const deleteResult = async (req, res) => {
     }
 };
 
-
-
-
 module.exports = {
     verifyAdminToken,
     getSubjectDetails,
     deleteQuestion,
     deleteResult,
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
