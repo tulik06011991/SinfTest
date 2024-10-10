@@ -28,7 +28,7 @@ const verifyAdminToken = (req, res, next) => {
 };
 
 // Fan bo'yicha ma'lumotlarni olish va natijalarni hisoblash
-const getSubjectDetails   = async (req, res) => {
+const getSubjectDetails = async (req, res) => {
     try {
         const subjectId = req.params.subjectId; // URL'dan subjectId olindi
 
@@ -36,7 +36,7 @@ const getSubjectDetails   = async (req, res) => {
         const answers = await Answer.find({ subjectId }) // Faqat subjectId bo'yicha javoblar olindi
             .populate('userId', 'name') // Foydalanuvchining ismi
             .populate({
-                path: 'questionId', 
+                path: 'questionId',
                 populate: {
                     path: 'subject', // Savolning fani haqida ham ma'lumot olamiz
                     model: 'Subject'
@@ -50,6 +50,8 @@ const getSubjectDetails   = async (req, res) => {
 
         // Har bir foydalanuvchining natijalarini saqlash uchun array
         const userResults = [];
+        const allQuestionsWithOptions = []; // Barcha savollar va variantlar
+        const addedQuestionIds = new Set(); // Takrorlanishni oldini olish uchun savol ID'larni saqlash
 
         // Foydalanuvchilarni takrorlanmas qilib olish (unique)
         const users = [...new Set(answers.map(answer => answer.userId._id.toString()))]; // Foydalanuvchilarning unique ro'yxati
@@ -60,7 +62,6 @@ const getSubjectDetails   = async (req, res) => {
             const userAnswers = answers.filter(answer => answer.userId._id.toString() === userId);
 
             let correctAnswersCount = 0;
-            let questionsWithOptions = [];
 
             // Har bir foydalanuvchi javobini to'g'ri javob bilan solishtiramiz
             for (let userAnswer of userAnswers) {
@@ -68,15 +69,21 @@ const getSubjectDetails   = async (req, res) => {
                 const selectedOption = userAnswer.selectedOption; // Foydalanuvchining tanlagan varianti
                 const correctAnswer = question.correctAnswer; // To'g'ri javob
 
-                // Savollar va ularning variantlarini yig'amiz
-                questionsWithOptions.push({
-                    questionId: question._id,
-                    questionText: question.question, // questionModel'dagi savol
-                    options: question.options, // Variantlar (text va isCorrect)
-                    selectedOption: selectedOption,
-                    correctAnswer: correctAnswer,
-                    subject: question.subject // Savolning fani
-                });
+                // Agar savol ID allaqachon to'plamga qo'shilmagan bo'lsa, uni qo'shamiz
+                if (!addedQuestionIds.has(question._id.toString())) {
+                    allQuestionsWithOptions.push({
+                        questionId: question._id,
+                        questionText: question.question, // questionModel'dagi savol
+                        options: question.options, // Variantlar (text va isCorrect)
+                        selectedOption: selectedOption,
+                        correctAnswer: correctAnswer,
+                        subject: question.subject, // Savolning fani
+                        userId: userAnswer.userId._id, // Savolga javob bergan foydalanuvchi ID'si
+                        userName: userAnswer.userId.name // Foydalanuvchi nomi
+                    });
+                    // Takrorlanmasligini ta'minlash uchun savol ID'sini to'plamga qo'shamiz
+                    addedQuestionIds.add(question._id.toString());
+                }
 
                 // Agar tanlangan variant to'g'ri javobga mos kelsa, ball qo'shamiz
                 if (selectedOption === correctAnswer) {
@@ -93,15 +100,15 @@ const getSubjectDetails   = async (req, res) => {
                 userName: userAnswers[0].userId.name,
                 totalQuestions,
                 correctAnswersCount,
-                correctPercentage,
-                questionsWithOptions // Foydalanuvchi tanlagan savollar va variantlar
+                correctPercentage
             });
         }
 
-        // Foydalanuvchilarning natijalarini va savollar bilan qaytarish
+        // Foydalanuvchilarning natijalarini va savollarni alohida qaytarish
         res.status(200).json({
             subjectId,
-            userResults
+            userResults, // Foydalanuvchilar natijalari
+            questionsWithOptions: allQuestionsWithOptions // Savollar va ularning variantlari
         });
 
     } catch (error) {
@@ -109,6 +116,7 @@ const getSubjectDetails   = async (req, res) => {
         res.status(500).json({ message: 'Ma\'lumotlarni olishda xatolik yuz berdi.' });
     }
 };
+
 
 
 const deleteQuestion = async (req, res) => {

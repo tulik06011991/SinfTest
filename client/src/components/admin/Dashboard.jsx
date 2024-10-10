@@ -125,7 +125,7 @@ const Dashboard = () => {
         },
       });
 
-      console.log(response)
+      console.log(response.data)
       
       setSubjectDetails(response.data);
     } catch (err) {
@@ -190,8 +190,9 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {subjectDetails.questions && subjectDetails.questions.length > 0 ? (
-                  subjectDetails.questions.map((question) => (
+                {subjectDetails.userResults.questionsWithOptions
+ && subjectDetails.questions.length > 0 ? (
+                  subjectDetails.userResults.questionsWithOptions.map((question) => (
                     <tr key={question._id} className="border-b border-gray-300">
                       <td className="px-4 py-2">{question.questionText}</td>
                       <td className="px-4 py-2">
