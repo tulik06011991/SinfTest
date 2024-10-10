@@ -127,7 +127,9 @@ const Dashboard = () => {
       });
 
       setsavollar(response.data.questionsWithOptions)
-      console.log(response.data.questionsWithOptions._questionId)
+      response.data.questionsWithOptions.forEach(question => {
+        console.log(question._questionId); // Har bir savolning _questionId sini chiqarish
+      });
 
 
       setSubjectDetails(response.data);

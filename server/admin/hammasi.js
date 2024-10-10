@@ -130,7 +130,7 @@ console.log(questionId)
         }
 
         // Savolga tegishli javoblarni o'chirish (agar kerak bo'lsa)
-        await Answer.deleteMany({ questionId });
+        await Question.deleteMany({ questionId });
 
         res.status(200).json({ message: 'Savol muvaffaqiyatli o\'chirildi.' });
     } catch (error) {
