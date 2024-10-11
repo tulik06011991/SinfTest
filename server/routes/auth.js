@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { registerController, loginController, getUsers,
     createUser,
-    updateUser,
+    
     deleteUser } = require('../auth/auth');
 const middleware = require('../middleware/middleware')
 
@@ -17,8 +17,8 @@ router.post('/login',  loginController);
 // Foydalanuvchilar uchun marshrutlar
 router.get('/dashboard',  getUsers); // Barcha foydalanuvchilarni olish
 router.post('/dashboard', createUser); // Foydalanuvchini yaratish
-router.put('/users/:id', updateUser); // Foydalanuvchini yangilash
-router.delete('/dashboard/:id', deleteUser); // Foydalanuvchini o'chirish
+ // Foydalanuvchini yangilash
+router.delete('/users/:id', deleteUser); // Foydalanuvchini o'chirish
 
 
 

@@ -8,52 +8,41 @@ const SuperadminPanel = () => {
   const [newUser, setNewUser] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    // Backend API orqali ma'lumotlarni olish
-    const response  = axios.get('http://localhost:5000/api/dashboard',
-      {headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((response) => {
-      setUsers(response.data);
-    })
-    .catch((error) => {
-      console.error('Xatolik:', error);
-    });
+    const fetchUsers = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await axios.get('http://localhost:5000/api/dashboard', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Xatolik:', error);
+      }
+    };
+    fetchUsers();
   }, []);
-  
-  console.log(users);
 
   // Foydalanuvchilar CRUD
-  const createUser = () => {
+  const createUser = async () => {
     const user = { name: newUser };
-    axios.post('/http://localhost:5000/api/dashboard', user)
-      .then((response) => {
-        setUsers([...users, response.data]); // Yangi foydalanuvchini ro'yxatga qo'shish
-        setNewUser('');
-      })
-      .catch((error) => {
-        console.error('Xatolik:', error);
-      });
+    try {
+      const response = await axios.post('http://localhost:5000/api/dashboard', user);
+      setUsers([...users, response.data]); // Yangi foydalanuvchini ro'yxatga qo'shish
+      setNewUser(''); // Inputni tozalash
+    } catch (error) {
+      console.error('Xatolik:', error);
+    }
   };
 
-  const deleteUser = (id) => {
-    const token = localStorage.getItem('token');
-    console.log(id, token);
-    
-    axios.delete(`/http://localhost:5000/api/users/${id}`,
-      {headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  const deleteUser = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/users/${id}`); // Foydalanuvchini o'chirish
+      setUsers(users.filter((user) => user._id !== id)); // O'chirilgan foydalanuvchini ro'yxatdan olib tashlash
+    } catch (error) {
+      console.error('Xatolik:', error);
     }
-    )
-      .then(() => {
-        setUsers(users.filter((user) => user.id !== id));
-      })
-      .catch((error) => {
-        console.error('Xatolik:', error);
-      });
   };
 
   return (
@@ -115,8 +104,8 @@ const SuperadminPanel = () => {
                 </thead>
                 <tbody>
                   {users.length > 0 ? (
-                    users.map((user, index) => (
-                      <tr key={index} className="border-b border-gray-300">
+                    users.map((user) => (
+                      <tr key={user._id} className="border-b border-gray-300">
                         <td className="px-4 py-2 text-center">{user.email}</td>
                         <td className="px-4 py-2">{user.name}</td>
                         <td className="px-4 py-2 text-center">
