@@ -39,7 +39,15 @@ const SuperadminPanel = () => {
   };
 
   const deleteUser = (id) => {
-    axios.delete(`/http://localhost:5000/api/dashboard/${id}`)
+    const token = localStorage.getItem('token');
+    console.log(id, token);
+    
+    axios.delete(`/http://localhost:5000/api/users/${id}`,
+      {headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+    )
       .then(() => {
         setUsers(users.filter((user) => user.id !== id));
       })
@@ -107,13 +115,13 @@ const SuperadminPanel = () => {
                 </thead>
                 <tbody>
                   {users.length > 0 ? (
-                    users.map((user) => (
-                      <tr key={user.id} className="border-b border-gray-300">
+                    users.map((user, index) => (
+                      <tr key={index} className="border-b border-gray-300">
                         <td className="px-4 py-2 text-center">{user.id}</td>
                         <td className="px-4 py-2">{user.name}</td>
                         <td className="px-4 py-2 text-center">
                           <button
-                            onClick={() => deleteUser(user.id)}
+                            onClick={() => deleteUser(user._id)}
                             className="text-red-600 hover:text-red-800"
                           >
                             O'chirish

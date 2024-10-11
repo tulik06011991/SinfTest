@@ -163,7 +163,9 @@ const updateUser = async (req, res) => {
 
 // Foydalanuvchini o'chirish
 const deleteUser = async (req, res) => {
-    const { id } = req.params; // URL parametridan ID ni olish
+    const { id } = req.params; 
+    console.log(id);
+    // URL parametridan ID ni olish
 
     try {
         const deletedUser = await User.findByIdAndDelete(id); // Foydalanuvchini o'chirish
