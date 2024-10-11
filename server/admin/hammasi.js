@@ -109,18 +109,19 @@ const getSubjectDetails = async (req, res) => {
 };
 
 // Barcha savollarni o'chirish controlleri
-const deleteQuestion = async (req, res) => {
+const deleteQuestion =async (req, res) => {
     try {
-        const result = await Question.deleteMany();
-        
-        if (result.deletedCount === 0) {
-            return res.status(404).json({ message: 'Savollar topilmadi.' });
+        const { id } = req.params; // URL'dan ID ni olish
+        const deletedQuestion = await Question.findByIdAndDelete(id); // ID bo'yicha savolni o'chirish
+
+        if (!deletedQuestion) {
+            return res.status(404).json({ message: 'Question not found' }); // Agar savol topilmasa
         }
 
-        res.status(200).json({ message: 'All questions have been deleted successfully' });
+        res.status(200).json({ message: 'Question deleted successfully' });
     } catch (error) {
-        // console.error('Error deleting all questions:', error);
-        res.status(500).json({ message: 'Failed to delete all questions' });
+        console.error('Error deleting question:', error);
+        res.status(500).json({ message: 'Failed to delete the question' });
     }
 };
 
