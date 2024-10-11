@@ -89,8 +89,12 @@ const Dashboard = () => {
   };
 
   // Savollarni o'chirish va interfeysdan yangilash
-  const handleDelete = async (id) => {
+  const handleDelete = async () => {
     setLoading(true);
+    savollar.forEach((question, index) => {
+      console.log(`Question ${index} ID: ${question._id}`);
+    });
+  
 
     try {
       const token = localStorage.getItem('token');
@@ -108,6 +112,7 @@ const Dashboard = () => {
       // O'chirilgan savolni interfeysdan olib tashlash
       const updatedQuestions = savollar.filter((question) => question._id !== id);
       setsavollar(updatedQuestions);
+      
     } catch (err) {
       setError("O'chirishda xatolik yuz berdi.");
       console.error(err);
@@ -135,6 +140,7 @@ const Dashboard = () => {
       );
 console.log(response);
 
+
       setsavollar(response.data.questionsWithOptions);
       setSubjectDetails(response.data);
     } catch (err) {
@@ -145,6 +151,8 @@ console.log(response);
     }
   };
 
+
+  
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-2xl rounded-xl p-6 md:p-8 w-full max-w-7xl">
@@ -212,7 +220,7 @@ console.log(response);
                       </td>
                       <td className="px-4 py-2 text-center">
                         <button
-                          onClick={() => handleDelete(question._id)}
+                          onClick={() => handleDelete()}
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />
