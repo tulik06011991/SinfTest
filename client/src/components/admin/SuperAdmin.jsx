@@ -108,7 +108,7 @@ const SuperadminPanel = () => {
               <table className="min-w-full bg-white border border-gray-300">
                 <thead>
                   <tr>
-                    <th className="px-4 py-2 border">ID</th>
+                    <th className="px-4 py-2 border">Emaili</th>
                     <th className="px-4 py-2 border">Foydalanuvchi Ismi</th>
                     <th className="px-4 py-2 border">Amallar</th>
                   </tr>
@@ -117,7 +117,7 @@ const SuperadminPanel = () => {
                   {users.length > 0 ? (
                     users.map((user, index) => (
                       <tr key={index} className="border-b border-gray-300">
-                        <td className="px-4 py-2 text-center">{user.id}</td>
+                        <td className="px-4 py-2 text-center">{user.email}</td>
                         <td className="px-4 py-2">{user.name}</td>
                         <td className="px-4 py-2 text-center">
                           <button
