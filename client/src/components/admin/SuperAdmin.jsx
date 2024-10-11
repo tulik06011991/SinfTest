@@ -1,46 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Link import qilish
+import { Link } from 'react-router-dom';
+import axios from 'axios'; // axios import qilish
 
 const SuperadminPanel = () => {
-  const [activeTab, setActiveTab] = useState('users'); // Foydalanuvchilar default tanlanadi
+  const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
-  const [admins, setAdmins] = useState([]);
-  const [categories, setCategories] = useState([]);
-
   const [newUser, setNewUser] = useState('');
-  const [newAdmin, setNewAdmin] = useState('');
-  const [newCategory, setNewCategory] = useState('');
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
     // Backend API orqali ma'lumotlarni olish
-    fetch('/http://localhost:5000/api/users').then((response) => response.json()).then((data) => setUsers(data));
-   
+    const response  = axios.get('http://localhost:5000/api/admin/dashboard',
+      {headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      setUsers(response.data);
+    })
+    .catch((error) => {
+      console.error('Xatolik:', error);
+    });
   }, []);
+  
+  console.log(users);
+
   // Foydalanuvchilar CRUD
   const createUser = () => {
     const user = { name: newUser };
-    fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(user),
-    }).then(() => {
-      setUsers([...users, user]);
-      setNewUser('');
-    });
+    axios.post('/api/users', user)
+      .then((response) => {
+        setUsers([...users, response.data]); // Yangi foydalanuvchini ro'yxatga qo'shish
+        setNewUser('');
+      })
+      .catch((error) => {
+        console.error('Xatolik:', error);
+      });
   };
 
   const deleteUser = (id) => {
-    fetch(`/api/users/${id}`, { method: 'DELETE' }).then(() => {
-      setUsers(users.filter((user) => user.id !== id));
-    });
+    axios.delete(`/api/users/${id}`)
+      .then(() => {
+        setUsers(users.filter((user) => user.id !== id));
+      })
+      .catch((error) => {
+        console.error('Xatolik:', error);
+      });
   };
-
-  // Adminlar CRUD
-  
-
-
-  // Kategoriyalar CRUD
-  
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -53,7 +59,7 @@ const SuperadminPanel = () => {
           >
             Foydalanuvchilar
           </button>
-          
+
           <Link to="/quiz">
             <button
               className={`${activeTab === 'admins' ? 'border-b-4 border-white' : ''} py-2 px-4`}
@@ -90,19 +96,41 @@ const SuperadminPanel = () => {
               Yaratish
             </button>
 
-            <ul className="mt-4 space-y-2">
-              {users.map((user) => (
-                <li key={user.id} className="flex justify-between p-2 bg-white shadow">
-                  {user.name}
-                  <button
-                    onClick={() => deleteUser(user.id)}
-                    className="text-red-600 hover:underline"
-                  >
-                    O'chirish
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <div className="overflow-x-auto mt-4">
+              <table className="min-w-full bg-white border border-gray-300">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 border">ID</th>
+                    <th className="px-4 py-2 border">Foydalanuvchi Ismi</th>
+                    <th className="px-4 py-2 border">Amallar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.length > 0 ? (
+                    users.map((user) => (
+                      <tr key={user.id} className="border-b border-gray-300">
+                        <td className="px-4 py-2 text-center">{user.id}</td>
+                        <td className="px-4 py-2">{user.name}</td>
+                        <td className="px-4 py-2 text-center">
+                          <button
+                            onClick={() => deleteUser(user.id)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            O'chirish
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3" className="text-gray-500 italic text-center py-4">
+                        Foydalanuvchilar topilmadi.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
