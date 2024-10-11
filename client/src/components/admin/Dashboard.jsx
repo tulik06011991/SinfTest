@@ -241,7 +241,8 @@ const Dashboard = () => {
             <table className="table-auto w-full bg-white shadow-lg rounded-lg">
               <thead className="bg-indigo-600 text-white">
                 <tr>
-                  <th className="px-4 py-2">Foydalanuvchi ID</th>
+                  <th className="px-4 py-2">Foydalanuvchi</th>
+                  <th className="px-4 py-2">Natija</th>
                   <th className="px-4 py-2">Amallar</th>
                 </tr>
               </thead>
@@ -249,7 +250,8 @@ const Dashboard = () => {
                 {subjectDetails.userResults.length > 0 ? (
                   subjectDetails.userResults.map((result) => (
                     <tr key={result.userId} className="border-b border-gray-300">
-                      <td className="px-4 py-2">{result.userId}</td>
+                      <td className="px-4 py-2">{result.userName}</td>
+                      <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions}</td>
                       <td className="px-4 py-2 text-center">
                         <button
                           onClick={() => handleDeleteUsers(result.userId)}
@@ -262,7 +264,7 @@ const Dashboard = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="2" className="text-gray-500 italic text-center py-4">
+                    <td colSpan="3" className="text-gray-500 italic text-center py-4">
                       Foydalanuvchilar topilmadi.
                     </td>
                   </tr>
