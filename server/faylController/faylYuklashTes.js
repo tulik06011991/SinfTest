@@ -9,6 +9,11 @@ const parseWordFile = async (filePath, subjectId) => {
         const content = data.value;
         const questions = extractQuestions(content);
 
+        // Savollar ro'yxati bo'sh yoki noto'g'ri formatda bo'lsa, xatolikni qaytarish
+        if (!questions || questions.length === 0) {
+            throw new Error('No valid questions found in the Word file.');
+        }
+
         // MongoDB ga savollarni saqlash
         for (let questionData of questions) {
             const newQuestion = new Question({
@@ -25,8 +30,8 @@ const parseWordFile = async (filePath, subjectId) => {
 
         return questions;
     } catch (error) {
-        console.error('Error parsing Word file:', error);
-        throw error;
+        // console.error('Error parsing Word file:', error);
+        throw new Error('Failed to process the Word file. Please check the format and try again.');
     }
 };
 
@@ -98,7 +103,8 @@ const uploadQuestions = async (req, res) => {
         const questions = await parseWordFile(filePath, subjectId);
         res.json({ questions });
     } catch (error) {
-        res.status(500).json({ message: 'Error extracting questions' });
+        // console.error('Error extracting questions:', error.message);
+        res.status(400).json({ message: 'Failed to extract questions from the file. Please check the file format.' });
     }
 };
 
