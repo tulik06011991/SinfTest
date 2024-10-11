@@ -47,6 +47,9 @@ const Dashboard = () => {
       );
 
       setSubjects(response.data.subjects);
+      if (response.data.subjects.length === 0) {
+        setError("Fanlar topilmadi.");
+      }
     } catch (err) {
       setError("Ma'lumotlarni olishda xatolik yuz berdi.");
       console.error(err);
@@ -134,11 +137,13 @@ const Dashboard = () => {
           },
         }
       );
-console.log(response);
-
 
       setsavollar(response.data.questionsWithOptions);
       setSubjectDetails(response.data);
+      
+      if (response.data.questionsWithOptions.length === 0) {
+        setError("Savollar topilmadi.");
+      }
     } catch (err) {
       setError("Ma'lumotlarni olishda xatolik yuz berdi.");
       console.error(err);
@@ -146,7 +151,6 @@ console.log(response);
       setLoading(false);
     }
   };
-  console.log(savollar)
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
@@ -182,7 +186,7 @@ console.log(response);
               </li>
             ))
           ) : (
-            <li className="text-gray-500 italic text-center col-span-full">Fanlar topilmadi.</li>
+            <li className="text-gray-500 italic text-center col-span-full">{error || "Fanlar topilmadi."}</li>
           )}
         </ul>
 
@@ -237,8 +241,7 @@ console.log(response);
             <table className="table-auto w-full bg-white shadow-lg rounded-lg">
               <thead className="bg-indigo-600 text-white">
                 <tr>
-                  <th className="px-4 py-2">Foydalanuvchi</th>
-                  <th className="px-4 py-2">Natija</th>
+                  <th className="px-4 py-2">Foydalanuvchi ID</th>
                   <th className="px-4 py-2">Amallar</th>
                 </tr>
               </thead>
@@ -246,8 +249,7 @@ console.log(response);
                 {subjectDetails.userResults.length > 0 ? (
                   subjectDetails.userResults.map((result) => (
                     <tr key={result.userId} className="border-b border-gray-300">
-                      <td className="px-4 py-2">{result.userName}</td>
-                      <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions}</td>
+                      <td className="px-4 py-2">{result.userId}</td>
                       <td className="px-4 py-2 text-center">
                         <button
                           onClick={() => handleDeleteUsers(result.userId)}
@@ -260,7 +262,7 @@ console.log(response);
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-gray-500 italic text-center py-4">
+                    <td colSpan="2" className="text-gray-500 italic text-center py-4">
                       Foydalanuvchilar topilmadi.
                     </td>
                   </tr>
