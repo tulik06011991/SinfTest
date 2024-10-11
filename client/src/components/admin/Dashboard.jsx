@@ -10,10 +10,9 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [subjectDetails, setSubjectDetails] = useState(null);
-  const [savollar, setsavollar] = useState({});
+  const [savollar, setsavollar] = useState([]);
   const navigate = useNavigate();
 
-  // Token tekshiruvi va yo'naltirish
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -21,7 +20,6 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
-  // Fanlar ro'yxatini olish
   const fetchSubjects = async () => {
     setLoading(true);
     setError('');
@@ -55,7 +53,6 @@ const Dashboard = () => {
     }
   };
 
-  // Foydalanuvchini o'chirish va interfeysdan yangilash
   const handleDeleteUsers = async (id) => {
     setLoading(true);
 
@@ -66,14 +63,12 @@ const Dashboard = () => {
         throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
       }
 
-      // Foydalanuvchini o'chirish so'rovi
       await axios.delete(`http://localhost:5000/admin/users/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      // O'chirilgan foydalanuvchini interfeysdan olib tashlash
       const updatedResults = subjectDetails.userResults.filter(
         (result) => result.userId !== id
       );
@@ -88,10 +83,8 @@ const Dashboard = () => {
     }
   };
 
-  // Savollarni o'chirish va interfeysdan yangilash
   const handleDelete = async (id) => {
     setLoading(true);
-
     try {
       const token = localStorage.getItem('token');
 
@@ -105,10 +98,8 @@ const Dashboard = () => {
         },
       });
 
-      // O'chirilgan savolni interfeysdan olib tashlash
-      const updatedQuestions = savollar.filter((question) => question._id !== id);
-      setsavollar(updatedQuestions);
-      
+      // O'chirilgan savoldan keyin fan bo'yicha savollarni qayta yuklash
+      await fetchSubjects();
     } catch (err) {
       setError("O'chirishda xatolik yuz berdi.");
       console.error(err);
@@ -117,7 +108,6 @@ const Dashboard = () => {
     }
   };
 
-  // Tanlangan fan bo'yicha savollarni olish
   const handleSubjectClick = async (subject) => {
     setLoading(true);
     setSelectedSubject(subject);
@@ -134,8 +124,6 @@ const Dashboard = () => {
           },
         }
       );
-console.log(response);
-
 
       setsavollar(response.data.questionsWithOptions);
       setSubjectDetails(response.data);
@@ -146,13 +134,11 @@ console.log(response);
       setLoading(false);
     }
   };
-  console.log(savollar)
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-2xl rounded-xl p-6 md:p-8 w-full max-w-7xl">
         <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">Admin Dashboard</h1>
-
         <h2 className="text-2xl font-semibold text-gray-700 mb-6">Fanlar ro'yxati</h2>
 
         <button
@@ -206,17 +192,15 @@ console.log(response);
                       <td className="px-4 py-2">{question.questionText}</td>
                       <td className="px-4 py-2">
                         <ul>
-                          {question.options.map((option, index) => (
-                            <li key={option._id} className={option.isCorrect ? 'text-green-500' : ''}>
-                              {option.text}
-                            </li>
+                          {question.options.map((option) => (
+                            <li key={option} className="text-gray-600">{option}</li>
                           ))}
                         </ul>
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-4 py-2">
                         <button
-                          onClick={() => handleDelete(question.questionId)}
-                          className="text-red-600 hover:text-red-800"
+                          onClick={() => handleDelete(question._id)}
+                          className="text-red-500 hover:text-red-700"
                         >
                           <FaTrash />
                         </button>
@@ -225,33 +209,31 @@ console.log(response);
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-gray-500 italic text-center py-4">
-                      Savollar topilmadi.
-                    </td>
+                    <td colSpan="3" className="text-center text-gray-500">Savollar topilmadi.</td>
                   </tr>
                 )}
               </tbody>
             </table>
 
             <h4 className="text-lg font-bold mt-6">Foydalanuvchilar:</h4>
-            <table className="table-auto w-full bg-white shadow-lg rounded-lg">
+            <table className="table-auto w-full bg-white shadow-lg rounded-lg mt-4">
               <thead className="bg-indigo-600 text-white">
                 <tr>
-                  <th className="px-4 py-2">Foydalanuvchi</th>
-                  <th className="px-4 py-2">Natija</th>
-                  <th className="px-4 py-2">Amallar</th>
+                  <th className="px-4 py-2">Foydalanuvchi ID</th>
+                  <th className="px-4 py-2">Natijalar</th>
+                  <th className="px-4 py-2">O'chirish</th>
                 </tr>
               </thead>
               <tbody>
-                {subjectDetails.userResults.length > 0 ? (
-                  subjectDetails.userResults.map((result) => (
-                    <tr key={result.userId} className="border-b border-gray-300">
-                      <td className="px-4 py-2">{result.userName}</td>
-                      <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions}</td>
-                      <td className="px-4 py-2 text-center">
+                {subjectDetails.userResults && subjectDetails.userResults.length > 0 ? (
+                  subjectDetails.userResults.map((user) => (
+                    <tr key={user.userId} className="border-b border-gray-300">
+                      <td className="px-4 py-2">{user.userId}</td>
+                      <td className="px-4 py-2">{user.result}</td>
+                      <td className="px-4 py-2">
                         <button
-                          onClick={() => handleDeleteUsers(result.userId)}
-                          className="text-red-600 hover:text-red-800"
+                          onClick={() => handleDeleteUsers(user.userId)}
+                          className="text-red-500 hover:text-red-700"
                         >
                           <FaTrash />
                         </button>
@@ -260,9 +242,7 @@ console.log(response);
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-gray-500 italic text-center py-4">
-                      Foydalanuvchilar topilmadi.
-                    </td>
+                    <td colSpan="3" className="text-center text-gray-500">Foydalanuvchilar topilmadi.</td>
                   </tr>
                 )}
               </tbody>
