@@ -145,7 +145,7 @@ const Dashboard = () => {
         setError("Savollar topilmadi.");
       }
     } catch (err) {
-      setError("Ma'lumotlarni olishda xatolik yuz berdi.");
+      setError("Ma'lumotlarni o'chirgansiz .");
       console.error(err);
     } finally {
       setLoading(false);
