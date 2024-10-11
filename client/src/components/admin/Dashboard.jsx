@@ -125,6 +125,7 @@ const Dashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+console.log(response);
 
       setsavollar(response.data.questionsWithOptions)
       response.data.questionsWithOptions.forEach(question => {
@@ -229,38 +230,42 @@ const Dashboard = () => {
             </table>
 
             {/* Foydalanuvchilar jadvali */}
-            <h4 className="text-lg font-bold mt-6">Foydalanuvchilar:</h4>
-            <table className="table-auto w-full bg-white shadow-lg rounded-lg">
-              <thead className="bg-indigo-600 text-white">
-                <tr>
-                  <th className="px-4 py-2">Foydalanuvchi</th>
-                  <th className="px-4 py-2">Natija</th>
-                  <th className="px-4 py-2">Amallar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {subjectDetails.userResults && subjectDetails.userResults.length > 0 ? (
-                  subjectDetails.userResults.map((result) => (
-                    <tr key={result.user} className="border-b border-gray-300">
-                      <td className="px-4 py-2">{result.userName}</td>
-                      <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions} to'g'ri</td>
-                      <td className="px-4 py-2 text-center">
-                        <button
-                          onClick={() => handleDeleteUsers(result.userId)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="3" className="text-gray-500 italic text-center py-4">Foydalanuvchilar natijalari topilmadi.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+            // Foydalanuvchilar jadvali
+<h4 className="text-lg font-bold mt-6">Foydalanuvchilar:</h4>
+<table className="table-auto w-full bg-white shadow-lg rounded-lg">
+  <thead className="bg-indigo-600 text-white">
+    <tr>
+      <th className="px-4 py-2">Foydalanuvchi</th>
+      <th className="px-4 py-2">Natija</th>
+      <th className="px-4 py-2">Amallar</th>
+    </tr>
+  </thead>
+  <tbody>
+    {subjectDetails.userResults && subjectDetails.userResults.length > 0 ? (
+      subjectDetails.userResults.map((result) => (
+        <tr key={result.user} className="border-b border-gray-300">
+          <td className="px-4 py-2">{result.userName}</td>
+          <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions} to'g'ri</td>
+          <td className="px-4 py-2 text-center">
+            <button
+              onClick={() => handleDeleteUsers(result.userId)}
+              className="text-red-600 hover:text-red-800"
+            >
+              <FaTrash />
+            </button>
+          </td>
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan="3" className="text-gray-500 italic text-center py-4">
+          Foydalanuvchilarning ma'lumotlari yo'q.
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
+
 
           </div>
         )}
