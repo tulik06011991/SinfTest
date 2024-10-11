@@ -12,6 +12,8 @@ const Dashboard = () => {
   const [subjectDetails, setSubjectDetails] = useState(null);
   const [savollar, setsavollar] = useState({})
   const navigate = useNavigate();
+  const fanId = localStorage.getItem('fanId');
+console.log(fanId)
 
   // Token tekshiruvi va yo'naltirish
   useEffect(() => {
@@ -20,15 +22,14 @@ const Dashboard = () => {
       navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
     }
   }, [navigate]);
-
+  
   // Fanlar ro'yxatini olish
   const fetchSubjects = async () => {
     setLoading(true);
     setError('');
-
+    
     try {
       const token = localStorage.getItem('token');
-      const fanId = localStorage.getItem('fanId');
 
       if (!token) {
         navigate('/');
@@ -84,14 +85,15 @@ const Dashboard = () => {
     setLoading(true); // Yuklanishni boshqarish uchun
 
     try {
-      const token = localStorage.getItem('token'); // Tokenni olish
+      const token = localStorage.getItem('token');
+      // Tokenni olish
 
       if (!token) {
         throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
       }
 
       // DELETE metodi orqali savol yoki foydalanuvchini o'chirish
-      await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
+      await axios.delete(`http://localhost:5000/admin/subject/${fanId}`, {
         headers: {
           Authorization: `Bearer ${token}`, // Tokenni yuborish
         },
@@ -212,7 +214,7 @@ const Dashboard = () => {
                       </td>
                       <td className="px-4 py-2 text-center">
                         <button
-                          onClick={() => handleDelete( question._id)}
+                          onClick={() => handleDelete()}
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />

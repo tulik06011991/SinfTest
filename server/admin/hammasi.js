@@ -120,24 +120,37 @@ const getSubjectDetails = async (req, res) => {
 
 
 const deleteQuestion = async (req, res) => {
-    const  {questionId}  = req.params;
-console.log(questionId)
+    const subjectId = req.params.fanId;
+    
+    console.log(subjectId)
+    // URL dan subjectId ni olish
 
-    try {
-        const question = await Question.findByIdAndDelete(questionId);
-        if (!question) {
-            return res.status(404).json({ message: 'Savol topilmadi.' });
-        }
+  try {
+    // `subject` maydoni bo'yicha barcha savollarni o'chirish
+    const result = await Question.deleteMany({ subject: subjectId });
 
-        // Savolga tegishli javoblarni o'chirish (agar kerak bo'lsa)
-        await Question.deleteMany({ questionId });
-
-        res.status(200).json({ message: 'Savol muvaffaqiyatli o\'chirildi.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Savolni o\'chirishda xatolik yuz berdi.' });
+    if (result.deletedCount > 0) {
+      // Agar savollar o'chirilgan bo'lsa
+      console.log(`${result.deletedCount} ta savol o'chirildi.`);
+      return res.status(200).json({
+        message: `${result.deletedCount} ta savol muvaffaqiyatli o'chirildi.`,
+      });
+    } else {
+      // O'chiriladigan savollar topilmasa
+      console.log(`Savollar topilmadi.`);
+      return res.status(404).json({
+        message: 'O\'chiriladigan savollar topilmadi.',
+      });
     }
-}; 
+  } catch (error) {
+    // Xatolik yuz berganda
+    console.error("Xatolik:", error);
+    return res.status(500).json({
+      message: 'Serverda xatolik yuz berdi.',
+      error: error.message,
+    });
+  }
+  };
 
 
 const deleteResult = async (req, res) => {
