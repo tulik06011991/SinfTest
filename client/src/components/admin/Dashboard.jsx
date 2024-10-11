@@ -89,12 +89,8 @@ const Dashboard = () => {
   };
 
   // Savollarni o'chirish va interfeysdan yangilash
-  const handleDelete = async () => {
+  const handleDelete = async (id) => {
     setLoading(true);
-    savollar.forEach((question, index) => {
-      console.log(`Question ${index} ID: ${question._id}`);
-    });
-  
 
     try {
       const token = localStorage.getItem('token');
@@ -150,9 +146,8 @@ console.log(response);
       setLoading(false);
     }
   };
+  console.log(savollar)
 
-
-  
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-2xl rounded-xl p-6 md:p-8 w-full max-w-7xl">
@@ -220,7 +215,7 @@ console.log(response);
                       </td>
                       <td className="px-4 py-2 text-center">
                         <button
-                          onClick={() => handleDelete()}
+                          onClick={() => handleDelete(question._id)}
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />
