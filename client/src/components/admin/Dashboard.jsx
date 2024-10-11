@@ -128,7 +128,7 @@ const Dashboard = () => {
       setsavollar(response.data.questionsWithOptions);
       setSubjectDetails(response.data);
     } catch (err) {
-      setError("Ma'lumotlartopilmadi .");
+      setError("Ma'lumotlarni siz o'chirgansiz .");
       console.error(err);
     } finally {
       setLoading(false);
