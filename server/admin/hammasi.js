@@ -1,12 +1,9 @@
-
 const jwt = require('jsonwebtoken');
 const Answer = require('../Model/Javoblar'); // Foydalanuvchilar natijalari model
 const Question = require('../Model/questionModel'); // Savollar model
-
 const Subject = require('../Model/Fanlar');
- const Option = require('../Model/hammasi');
- const Results = require('../Model/pdf');
-
+const Option = require('../Model/hammasi');
+const Results = require('../Model/pdf');
 
 // Admin tokenini tekshirish funksiyasi
 const verifyAdminToken = (req, res, next) => {
@@ -39,122 +36,111 @@ const getSubjectDetails = async (req, res) => {
                     path: 'subject', // Savolning fani haqida ham ma'lumot olamiz
                     model: 'Subject'
                 }
-            }); // Javoblar bilan bog'liq savollarni olish va populate qilish
+            });
 
         // Agar javoblar topilmasa
-        if (!answers.length) {
+        if (!answers || answers.length === 0) {
             return res.status(404).json({ message: 'Subject bo\'yicha javoblar topilmadi.' });
         }
 
-        // Har bir foydalanuvchining natijalarini saqlash uchun array
         const userResults = [];
-        const allQuestionsWithOptions = []; // Barcha savollar va variantlar
-        const addedQuestionIds = new Set(); // Takrorlanishni oldini olish uchun savol ID'larni saqlash
+        const allQuestionsWithOptions = [];
+        const addedQuestionIds = new Set();
 
-        // Foydalanuvchilarni takrorlanmas qilib olish (unique)
-        const users = [...new Set(answers.map(answer => answer.userId._id.toString()))]; // Foydalanuvchilarning unique ro'yxati
+        const users = [...new Set(answers.map(answer => answer.userId._id.toString()))];
 
-        // Har bir foydalanuvchining javoblarini hisoblash
         for (let userId of users) {
-            // Shu foydalanuvchining subjectId bo'yicha barcha javoblarini olish
             const userAnswers = answers.filter(answer => answer.userId._id.toString() === userId);
 
             let correctAnswersCount = 0;
 
-            // Har bir foydalanuvchi javobini to'g'ri javob bilan solishtiramiz
             for (let userAnswer of userAnswers) {
-                const question = userAnswer.questionId; // Savolni olamiz
-                const selectedOption = userAnswer.selectedOption; // Foydalanuvchining tanlagan varianti
-                const correctAnswer = question.correctAnswer; // To'g'ri javob
+                const question = userAnswer.questionId;
+                const selectedOption = userAnswer.selectedOption;
+                const correctAnswer = question.correctAnswer;
 
-                // Agar savol ID allaqachon to'plamga qo'shilmagan bo'lsa, uni qo'shamiz
+                // Tekshirish: agar savol bo'lmasa xatolikni qaytarmaslik uchun
+                if (!question) {
+                    console.warn('Savol topilmadi:', userAnswer.questionId);
+                    continue; // Savol topilmasa, davomini bajaramiz
+                }
+
                 if (!addedQuestionIds.has(question._id.toString())) {
                     allQuestionsWithOptions.push({
                         questionId: question._id,
-                        questionText: question.question, // questionModel'dagi savol
-                        options: question.options, // Variantlar (text va isCorrect)
+                        questionText: question.question,
+                        options: question.options,
                         selectedOption: selectedOption,
                         correctAnswer: correctAnswer,
-                        subject: question.subject, // Savolning fani
-                        userId: userAnswer.userId._id, // Savolga javob bergan foydalanuvchi ID'si
-                        userName: userAnswer.userId.name // Foydalanuvchi nomi
+                        subject: question.subject,
+                        userId: userAnswer.userId._id,
+                        userName: userAnswer.userId.name
                     });
-                    // Takrorlanmasligini ta'minlash uchun savol ID'sini to'plamga qo'shamiz
                     addedQuestionIds.add(question._id.toString());
                 }
 
-                // Agar tanlangan variant to'g'ri javobga mos kelsa, ball qo'shamiz
                 if (selectedOption === correctAnswer) {
                     correctAnswersCount++;
                 }
             }
 
-            // Foydalanuvchi ma'lumotlarini yig'ish
-            const totalQuestions = userAnswers.length; // Foydalanuvchi javob bergan savollar soni
-            const correctPercentage = totalQuestions > 0 ? ((correctAnswersCount / totalQuestions) * 100).toFixed(2) : 0; // To'g'ri javoblar foizi
+            const totalQuestions = userAnswers.length;
+            const correctPercentage = totalQuestions > 0 ? ((correctAnswersCount / totalQuestions) * 100).toFixed(2) : 0;
 
             userResults.push({
-                userId: userAnswers[0].userId._id,
-                userName: userAnswers[0].userId.name,
+                userId: userAnswers[0]?.userId._id,
+                userName: userAnswers[0]?.userId.name,
                 totalQuestions,
                 correctAnswersCount,
                 correctPercentage
             });
         }
 
-        // Foydalanuvchilarning natijalarini va savollarni alohida qaytarish
         res.status(200).json({
             subjectId,
-            userResults, // Foydalanuvchilar natijalari
-            questionsWithOptions: allQuestionsWithOptions // Savollar va ularning variantlari
+            userResults,
+            questionsWithOptions: allQuestionsWithOptions
         });
 
     } catch (error) {
-        console.error(error);
+        // console.error(error);
         res.status(500).json({ message: 'Ma\'lumotlarni olishda xatolik yuz berdi.' });
     }
 };
 
-
-
-
-
-
 // Barcha savollarni o'chirish controlleri
 const deleteQuestion = async (req, res) => {
     try {
-        await Question.deleteMany(); // Hamma savollarni o'chirish
+        const result = await Question.deleteMany();
+        
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Savollar topilmadi.' });
+        }
+
         res.status(200).json({ message: 'All questions have been deleted successfully' });
     } catch (error) {
-        console.error('Error deleting all questions:', error);
+        // console.error('Error deleting all questions:', error);
         res.status(500).json({ message: 'Failed to delete all questions' });
     }
 };
 
-
-
-
+// Foydalanuvchiga tegishli natijalarni o'chirish
 const deleteResult = async (req, res) => {
-    const { id } = req.params; // userId ni req.params dan olamiz
-   
+    const { id } = req.params;
 
     try {
-        // Natijani userId bo'yicha o'chirish
-        const result = await Answer.deleteMany({ userId: id }); // userId ga tegishli barcha natijalarni o'chiradi
+        const result = await Answer.deleteMany({ userId: id });
 
         if (result.deletedCount === 0) {
-            return res.status(404).json({ message: 'Natija topilmadi.' }); // 404 - Not Found, agar o'chiriladigan natija topilmasa
+            return res.status(404).json({ message: 'Natija topilmadi.' });
         }
 
         res.status(200).json({ message: 'Foydalanuvchiga tegishli barcha natijalar muvaffaqiyatli o\'chirildi.' });
     } catch (error) {
-        console.error(error);
+        // console.error(error);
         res.status(500).json({ message: 'O\'chirishda xatolik yuz berdi.' });
     }
 };
-
-
-
 
 module.exports = {
     verifyAdminToken,
