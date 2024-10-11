@@ -6,7 +6,7 @@ const router = express.Router();
 // Admin tomonidan fan bo'yicha ma'lumotlarni olish
 router.get('/subjects/:subjectId', verifyAdminToken, getSubjectDetails);
 router.get('/subjects/:subjectId/results/pdf', verifyAdminToken, downloadUserResultsPDF);
-router.delete('/subjects', verifyAdminToken, deleteQuestion);
+router.delete('/subjects/:questionId', verifyAdminToken, deleteQuestion);
 
 // Natijani o'chirish yo'li
 router.delete('/users/:id', verifyAdminToken, deleteResult);
