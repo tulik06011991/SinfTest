@@ -1,5 +1,6 @@
 const Admin = require('../Model/adminlar'); // Admin modelini chaqiramiz
 const bcrypt = require('bcryptjs');
+
 require('dotenv').config()
 
 // Adminlarni yaratish
