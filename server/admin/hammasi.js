@@ -117,25 +117,21 @@ const getSubjectDetails = async (req, res) => {
 
 
 
+
+
+
+// Barcha savollarni o'chirish controlleri
 const deleteQuestion = async (req, res) => {
-    const  {questionId}  = req.params;
-console.log(questionId)
-
     try {
-        const question = await Question.findByIdAndDelete(questionId);
-        if (!question) {
-            return res.status(404).json({ message: 'Savol topilmadi.' });
-        }
-
-        // Savolga tegishli javoblarni o'chirish (agar kerak bo'lsa)
-        await Question.deleteMany({ questionId });
-
-        res.status(200).json({ message: 'Savol muvaffaqiyatli o\'chirildi.' });
+        await Question.deleteMany(); // Hamma savollarni o'chirish
+        res.status(200).json({ message: 'All questions have been deleted successfully' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Savolni o\'chirishda xatolik yuz berdi.' });
+        console.error('Error deleting all questions:', error);
+        res.status(500).json({ message: 'Failed to delete all questions' });
     }
-}; 
+};
+
+
 
 
 const deleteResult = async (req, res) => {
