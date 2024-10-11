@@ -28,7 +28,7 @@ const SuperadminPanel = () => {
   // Foydalanuvchilar CRUD
   const createUser = () => {
     const user = { name: newUser };
-    axios.post('/api/users', user)
+    axios.post('/http://localhost:5000/api/dashboard', user)
       .then((response) => {
         setUsers([...users, response.data]); // Yangi foydalanuvchini ro'yxatga qo'shish
         setNewUser('');
@@ -39,7 +39,7 @@ const SuperadminPanel = () => {
   };
 
   const deleteUser = (id) => {
-    axios.delete(`/api/users/${id}`)
+    axios.delete(`/http://localhost:5000/api/dashboard/${id}`)
       .then(() => {
         setUsers(users.filter((user) => user.id !== id));
       })
