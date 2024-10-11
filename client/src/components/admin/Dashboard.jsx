@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
-import { useNavigate } from 'react-router-dom'; // Router uchun
-import { FaTrash } from 'react-icons/fa'; // Ikonlar uchun
+import { useNavigate } from 'react-router-dom';
+import { FaTrash } from 'react-icons/fa';
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -10,7 +10,7 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [subjectDetails, setSubjectDetails] = useState(null);
-  const [savollar, setsavollar] = useState({})
+  const [savollar, setsavollar] = useState({});
   const navigate = useNavigate();
 
   // Token tekshiruvi va yo'naltirish
@@ -36,80 +36,85 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await axios.post(`http://localhost:5000/api/subjects`, { fanId }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.post(
+        `http://localhost:5000/api/subjects`,
+        { fanId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setSubjects(response.data.subjects);
     } catch (err) {
-      setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
+      setError("Ma'lumotlarni olishda xatolik yuz berdi.");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
+  // Foydalanuvchini o'chirish va interfeysdan yangilash
   const handleDeleteUsers = async (id) => {
-    setLoading(true); // Yuklanishni boshqarish uchun
+    setLoading(true);
 
     try {
-      const token = localStorage.getItem('token'); // Tokenni olish
+      const token = localStorage.getItem('token');
 
       if (!token) {
         throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
       }
 
-      // DELETE metodidan foydalanib, foydalanuvchini o'chirish
+      // Foydalanuvchini o'chirish so'rovi
       await axios.delete(`http://localhost:5000/admin/users/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Tokenni so'rovga qo'shish
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      // O'chirilgandan keyin qaysidir ma'lumotni yangilash yoki ma'lumotlarni qayta yuklash
-      console.log('Foydalanuvchi muvaffaqiyatli o\'chirildi');
-      // Bu yerda boshqa amallarni bajarishingiz mumkin (ma'lumotlarni qayta yuklash kabi)
-
+      // O'chirilgan foydalanuvchini interfeysdan olib tashlash
+      const updatedResults = subjectDetails.userResults.filter(
+        (result) => result.userId !== id
+      );
+      setSubjectDetails((prev) => ({
+        ...prev,
+        userResults: updatedResults,
+      }));
     } catch (err) {
-      console.error('Xatolik yuz berdi:', err.message); // Xatolikni konsolga chiqarish
+      console.error('Xatolik yuz berdi:', err.message);
     } finally {
-      setLoading(false); // Yuklanishni to'xtatish
+      setLoading(false);
     }
   };
 
-
+  // Savollarni o'chirish va interfeysdan yangilash
   const handleDelete = async (id) => {
-    setLoading(true); // Yuklanishni boshqarish uchun
+    setLoading(true);
 
     try {
-      const token = localStorage.getItem('token'); // Tokenni olish
+      const token = localStorage.getItem('token');
 
       if (!token) {
         throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
       }
 
-      // DELETE metodi orqali savol yoki foydalanuvchini o'chirish
       await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Tokenni yuborish
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      // Ma'lumotlarni yangilash (foydalanuvchilar va savollarni qayta yuklash)
-      // Bu yerda callback yoki yangilash amallarini bajaring
-      console.log('O\'chirish muvaffaqiyatli yakunlandi.');
-      // Masalan, setUsers(yangiFoydalanuvchilar) yoki setQuestions(yangiSavollar) funksiyalaridan foydalanishingiz mumkin.
-
+      // O'chirilgan savolni interfeysdan olib tashlash
+      const updatedQuestions = savollar.filter((question) => question._id !== id);
+      setsavollar(updatedQuestions);
     } catch (err) {
-      setError('O\'chirishda xatolik yuz berdi.'); // Xatolikni ko'rsatish
+      setError("O'chirishda xatolik yuz berdi.");
       console.error(err);
     } finally {
-      setLoading(false); // Yuklanishni to'xtatish
+      setLoading(false);
     }
   };
-
 
   // Tanlangan fan bo'yicha savollarni olish
   const handleSubjectClick = async (subject) => {
@@ -120,22 +125,20 @@ const Dashboard = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/admin/subjects/${subject._id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `http://localhost:5000/admin/subjects/${subject._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 console.log(response);
 
-      setsavollar(response.data.questionsWithOptions)
-      response.data.questionsWithOptions.forEach(question => {
-        console.log(question._questionId); // Har bir savolning _questionId sini chiqarish
-      });
-
-
+      setsavollar(response.data.questionsWithOptions);
       setSubjectDetails(response.data);
     } catch (err) {
-      setError('Ma\'lumotlarni olishda xatolik yuz berdi.');
+      setError("Ma'lumotlarni olishda xatolik yuz berdi.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -164,7 +167,6 @@ console.log(response);
 
         {error && <div className="text-red-600 text-center mb-6">{error}</div>}
 
-        {/* Fanlar ro'yxati */}
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {subjects.length > 0 ? (
             subjects.map((subject) => (
@@ -185,7 +187,6 @@ console.log(response);
           <div className="mt-8 bg-gray-100 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold text-gray-700 mb-6">Savollar va Foydalanuvchilar</h3>
 
-            {/* Savollar jadvali */}
             <h4 className="text-lg font-bold mt-6">Savollar:</h4>
             <table className="table-auto w-full bg-white shadow-lg rounded-lg">
               <thead className="bg-indigo-600 text-white">
@@ -194,11 +195,9 @@ console.log(response);
                   <th className="px-4 py-2">Variantlar</th>
                   <th className="px-4 py-2">Amallar</th>
                 </tr>
-
               </thead>
               <tbody>
-                {savollar
-                  && savollar.length > 0 ? (
+                {savollar && savollar.length > 0 ? (
                   savollar.map((question) => (
                     <tr key={question._id} className="border-b border-gray-300">
                       <td className="px-4 py-2">{question.questionText}</td>
@@ -213,7 +212,7 @@ console.log(response);
                       </td>
                       <td className="px-4 py-2 text-center">
                         <button
-                          onClick={() => handleDelete( question._id)}
+                          onClick={() => handleDelete(question._id)}
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />
@@ -223,57 +222,48 @@ console.log(response);
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-gray-500 italic text-center py-4">Savollar topilmadi.</td>
+                    <td colSpan="3" className="text-gray-500 italic text-center py-4">
+                      Savollar topilmadi.
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
 
-            {/* Foydalanuvchilar jadvali */}
-            // Foydalanuvchilar jadvali
-<h4 className="text-lg font-bold mt-6">Foydalanuvchilar:</h4>
-<table className="table-auto w-full bg-white shadow-lg rounded-lg">
-  <thead className="bg-indigo-600 text-white">
-    <tr>
-      <th className="px-4 py-2">Foydalanuvchi</th>
-      <th className="px-4 py-2">Natija</th>
-      <th className="px-4 py-2">Amallar</th>
-    </tr>
-  </thead>
-  <tbody>
-    {subjectDetails.userResults && subjectDetails.userResults.length > 0 ? (
-      subjectDetails.userResults.map((result) => (
-        <tr key={result.user} className="border-b border-gray-300">
-          <td className="px-4 py-2">{result.userName}</td>
-          <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions} to'g'ri</td>
-          <td className="px-4 py-2 text-center">
-            <button
-              onClick={() => handleDeleteUsers(result.userId)}
-              className="text-red-600 hover:text-red-800"
-            >
-              <FaTrash />
-            </button>
-          </td>
-        </tr>
-      ))
-    ) : (
-      <tr>
-        <td colSpan="3" className="text-gray-500 italic text-center py-4">
-          Foydalanuvchilarning ma'lumotlari yo'q.
-        </td>
-      </tr>
-    )}
-  </tbody>
-</table>
-
-
-          </div>
-        )}
-
-        {/* Tanlangan fan haqida ma'lumot bo'lmasa */}
-        {!selectedSubject && !loading && (
-          <div className="mt-8 text-center text-gray-600">
-            Iltimos, fanlardan birini tanlang yoki yangi fanlar qo'shish uchun yuqoridagi tugmani bosing.
+            <h4 className="text-lg font-bold mt-6">Foydalanuvchilar:</h4>
+            <table className="table-auto w-full bg-white shadow-lg rounded-lg">
+              <thead className="bg-indigo-600 text-white">
+                <tr>
+                  <th className="px-4 py-2">Foydalanuvchi</th>
+                  <th className="px-4 py-2">Natija</th>
+                  <th className="px-4 py-2">Amallar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subjectDetails.userResults.length > 0 ? (
+                  subjectDetails.userResults.map((result) => (
+                    <tr key={result.userId} className="border-b border-gray-300">
+                      <td className="px-4 py-2">{result.userName}</td>
+                      <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions}</td>
+                      <td className="px-4 py-2 text-center">
+                        <button
+                          onClick={() => handleDeleteUsers(result.userId)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <FaTrash />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="text-gray-500 italic text-center py-4">
+                      Foydalanuvchilar topilmadi.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
@@ -281,4 +271,4 @@ console.log(response);
   );
 };
 
-export default Dashboard
+export default Dashboard;
