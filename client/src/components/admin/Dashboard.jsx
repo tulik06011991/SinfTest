@@ -201,12 +201,12 @@ console.log(response);
               </thead>
               <tbody>
                 {savollar && savollar.length > 0 ? (
-                  savollar.map((question) => (
-                    <tr key={question._id} className="border-b border-gray-300">
+                  savollar.map((question, index) => (
+                    <tr key={index} className="border-b border-gray-300">
                       <td className="px-4 py-2">{question.questionText}</td>
                       <td className="px-4 py-2">
                         <ul>
-                          {question.options.map((option) => (
+                          {question.options.map((option, index) => (
                             <li key={option._id} className={option.isCorrect ? 'text-green-500' : ''}>
                               {option.text}
                             </li>
@@ -215,7 +215,7 @@ console.log(response);
                       </td>
                       <td className="px-4 py-2 text-center">
                         <button
-                          onClick={() => handleDelete(question._id)}
+                          onClick={() => handleDelete(question.questionId)}
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />
