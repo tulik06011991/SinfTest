@@ -128,7 +128,7 @@ const Dashboard = () => {
       setsavollar(response.data.questionsWithOptions);
       setSubjectDetails(response.data);
     } catch (err) {
-      setError("Ma'lumotlarni olishda xatolik yuz berdi.");
+      setError("Ma'lumotlartopilmadi .");
       console.error(err);
     } finally {
       setLoading(false);
