@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios'; // axios import qilish
 
 const SuperadminPanel = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState('');
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchUsers = async () => {
