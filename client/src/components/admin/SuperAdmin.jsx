@@ -10,7 +10,7 @@ const SuperadminPanel = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     // Backend API orqali ma'lumotlarni olish
-    const response  = axios.get('http://localhost:5000/api/admin/dashboard',
+    const response  = axios.get('http://localhost:5000/api/dashboard',
       {headers: {
         Authorization: `Bearer ${token}`,
       },
