@@ -92,33 +92,38 @@ const Dashboard = () => {
   };
 
   // Savollarni o'chirish va interfeysdan yangilash
-  const handleDelete = async (id) => {
-    setLoading(true);
+  // Savollarni o'chirish va interfeysdan yangilash
+const handleDelete = async (id) => {
+  setLoading(true);
 
-    try {
-      const token = localStorage.getItem('token');
+  try {
+    const token = localStorage.getItem('token');
 
-      if (!token) {
-        throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
-      }
-
-      await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // O'chirilgan savolni interfeysdan olib tashlash
-      const updatedQuestions = savollar.filter((question) => question._id !== id);
-      setsavollar(updatedQuestions);
-      
-    } catch (err) {
-      setError("O'chirishda xatolik yuz berdi.");
-      console.error(err);
-    } finally {
-      setLoading(false);
+    if (!token) {
+      throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
     }
-  };
+
+    await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // O'chirilgan savolni interfeysdan olib tashlash
+    const updatedQuestions = savollar.filter((question) => question._id !== id);
+    setsavollar(updatedQuestions);
+
+    // Tanlangan fan bo'yicha savollarni qayta yuklash
+    handleSubjectClick(selectedSubject);
+    
+  } catch (err) {
+    setError("O'chirishda xatolik yuz berdi.");
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Tanlangan fan bo'yicha savollarni olish
   const handleSubjectClick = async (subject) => {

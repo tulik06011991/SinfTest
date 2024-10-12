@@ -23,7 +23,14 @@ const CreateSubject = () => {
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/admins'); // Adminlarni olish
+        const token = localStorage.getItem('token')
+        const response = await axios.get('http://localhost:5000/api/admins',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        ); // Adminlarni olish
         setAdmins(response.data); // Adminlarni state ga o'rnatamiz
       } catch (error) {
         console.error('Adminlarni olishda xato:', error);
@@ -35,21 +42,30 @@ const CreateSubject = () => {
   // Formani submit qilganda fan yaratish funksiyasi
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const token = localStorage.getItem('token');
+    
     try {
-      const response = await axios.post('http://localhost:5000/api/create', { name, adminId }); // Fan yaratish uchun so'rov yuborish
-      setMessage(response.data.message); // Xabarni o'rnatamiz
+        const response = await axios.post('http://localhost:5000/api/create',
+            { name, adminId }, // Ma'lumotlarni birinchi parametr sifatida yuboramiz
+            {
+                headers: {
+                    Authorization: `Bearer ${token}` // Tokenni headers'ga qo'shamiz
+                },
+            }
+        );
+        setMessage(response.data.message); // Xabarni o'rnatamiz
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-        // Agar status kodi 400 bo'lsa, bu fan allaqachon mavjud deb xabar chiqaramiz
-        setMessage('Bu fan allaqachon mavjud!');
-      } else {
-        // Boshqa xatoliklar uchun umumiy xabar
-        console.error('Fan yaratishda xato:', error);
-        setMessage('Fan yaratishda xato yuz berdi!');
-      }
+        if (error.response && error.response.status === 400) {
+            // Agar status kodi 400 bo'lsa, bu fan allaqachon mavjud deb xabar chiqaramiz
+            setMessage('Bu fan allaqachon mavjud!');
+        } else {
+            // Boshqa xatoliklar uchun umumiy xabar
+            console.error('Fan yaratishda xato:', error);
+            setMessage('Fan yaratishda xato yuz berdi!');
+        }
     }
-  };
+};
+
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-10">

@@ -1,7 +1,12 @@
 const Admin = require('../Model/adminlar'); // Admin modelini chaqiramiz
 const bcrypt = require('bcryptjs');
 
+require('dotenv').config()
+
 // Adminlarni yaratish
+const jwt = require('jsonwebtoken');
+ // Admin modelini import qilamiz
+
 exports.createAdmin = async (req, res) => {
     try {
         const { name, email, password, subject } = req.body;
@@ -15,12 +20,31 @@ exports.createAdmin = async (req, res) => {
             role: 'admin' // Admin roli
         });
 
+        // Adminni saqlash
         await newAdmin.save();
-        res.status(201).json({ message: 'Admin muvaffaqiyatli yaratildi!', newAdmin });
+
+        // Token yaratish
+        const token = jwt.sign(
+            {
+                id: newAdmin._id,
+                role: newAdmin.role
+            },
+            process.env.JWT_SECRET, // JWT kaliti
+            { expiresIn: '1h' } // Tokenning amal qilish muddati 1 soat
+        );
+
+        // Javobda tokenni qaytarish
+        res.status(201).json({ 
+            message: 'Admin muvaffaqiyatli yaratildi!', 
+            newAdmin,
+            token // Tokenni qaytaramiz
+        });
     } catch (error) {
+        console.error(error);
         res.status(400).json({ error: 'Admin yaratishda xato yuz berdi!' });
     }
 };
+
 
 // Barcha adminlarni olish
 exports.getAllAdmins = async (req, res) => {

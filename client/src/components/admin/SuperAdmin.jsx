@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios'; // axios import qilish
 
 const SuperadminPanel = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState('');
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -28,7 +36,12 @@ const SuperadminPanel = () => {
   const createUser = async () => {
     const user = { name: newUser };
     try {
-      const response = await axios.post('http://localhost:5000/api/dashboard', user);
+      const response = await axios.post('http://localhost:5000/api/dashboard',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }, user);
       setUsers([...users, response.data]); // Yangi foydalanuvchini ro'yxatga qo'shish
       setNewUser(''); // Inputni tozalash
     } catch (error) {
@@ -38,7 +51,15 @@ const SuperadminPanel = () => {
 
   const deleteUser = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/users/${id}`); // Foydalanuvchini o'chirish
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/users/${id}`,
+
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      ); // Foydalanuvchini o'chirish
       setUsers(users.filter((user) => user._id !== id)); // O'chirilgan foydalanuvchini ro'yxatdan olib tashlash
     } catch (error) {
       console.error('Xatolik:', error);

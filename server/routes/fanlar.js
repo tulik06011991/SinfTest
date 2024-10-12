@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getAllQuestions, getAllSubjects, getQuestionsBySubject } = require('../faylController/fanlarBazasi'); // Controllerga mos ravishda yo'lni o'zgartiring
+const { getAllQuestions, getAllSubjects, getQuestionsBySubject } = require('../faylController/fanlarBazasi');
+
+ // Controllerga mos ravishda yo'lni o'zgartiring
 
 // Fanlarni olish
 router.get('/subjects', getAllSubjects);
