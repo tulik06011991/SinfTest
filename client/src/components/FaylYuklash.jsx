@@ -65,9 +65,12 @@ const navigate = useNavigate()
     try {
       const response = await axios.post('http://localhost:5000/api/upload', formData, {
         headers: {
+        
           'Content-Type': 'multipart/form-data',
         },
       });
+      console.log(response)
+      
       setMessage('Fayl muvaffaqiyatli yuklandi!');
     } catch (error) {
       console.error('Faylni yuklashda xato:', error);
