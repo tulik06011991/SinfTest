@@ -7,11 +7,15 @@ const UploadFile = () => {
   const [file, setFile] = useState(null); // Faylni saqlash
   const [selectedSubject, setSelectedSubject] = useState(''); // Tanlangan fan
   const [subjects, setSubjects] = useState([]); // Barcha fanlarni saqlash
-  const [message, setMessage] = useState(''); // Xabarni saqlash
+  const [message, setMessage] = useState('');
+  const [fanId , setfanId] = useState('') // Xabarni saqlash
 const navigate = useNavigate()
+
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const fan = localStorage.getItem('fanId')
+    setfanId(fan)
     if (!token) {
       navigate('/'); // Token topilmasa, login sahifasiga yo'naltirish
     }
@@ -21,7 +25,17 @@ const navigate = useNavigate()
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/subjects'); // Fanlarni olish
+        const token = localStorage.getItem('token');
+        
+        const response = await axios.get(`http://localhost:5000/api/subjects${fanId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response)
+         // Fanlarni olish
         setSubjects(response.data); // Fanlarni state ga o'rnatamiz
       } catch (error) {
         console.error('Fanlarni olishda xato:', error);
