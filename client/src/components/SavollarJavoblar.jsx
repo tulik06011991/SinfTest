@@ -16,14 +16,22 @@ const Quiz = () => {
     useEffect(() => {
         const fetchSubjects = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/subjects'); // Fanlar ro'yxatini olish
-                setSubjects(response.data); // Fanlar ro'yxatini yuklash
+                const response = await axios.get('http://localhost:5000/api/subjectlar');
+                console.log(response);
+    
+                // Tekshiramiz, response.data obyekt bo'lsa, subjects ro'yxatini olamiz
+                if (response.data && Array.isArray(response.data.subjects)) {
+                    setSubjects(response.data.subjects); // Fanlar ro'yxatini yuklash
+                } else {
+                    console.error('Ma\'lumotlar noto\'g\'ri formatda keldi:', response.data);
+                }
             } catch (error) {
                 console.error('Fanlarni olishda xato:', error);
             }
         };
         fetchSubjects();
     }, []);
+    
 
     // Token mavjudligini tekshirish
     useEffect(() => {

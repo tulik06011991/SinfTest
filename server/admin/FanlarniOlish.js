@@ -45,7 +45,25 @@ const getSubjectId = async (req, res) => {
 };
 
 
+// Subject modelini import qilish
+
+// Barcha fanlar ID va nomlarini qaytaradigan funksiya
+const getAllSubjects = async (req, res) => {
+  try {
+    // Fanlarni ID va nomi bilan olish
+    const subjects = await Subject.find().select('_id name');
+
+    res.status(200).json({ subjects }); // Fanlarni muvaffaqiyatli qaytarish
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Fanlarni olishda xato yuz berdi!' });
+  }
+};
+
+
+
 module.exports = {
   getSubjects,
+  getAllSubjects,
   getSubjectId
 };
