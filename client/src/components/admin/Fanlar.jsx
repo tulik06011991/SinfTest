@@ -10,6 +10,16 @@ const CreateSubject = () => {
   const navigate = useNavigate(); // navigate funksiya yaratish
 
   // Backenddan adminlar ro'yxatini olish uchun useEffect
+
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
+    }
+  }, [navigate]);
+  
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
