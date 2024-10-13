@@ -10,14 +10,13 @@ const Login = () => {
     const [loading, setLoading] = useState(false); // Loading holatini qo'shish
     const navigate = useNavigate();
     const [fanId, setFanId] = useState({});
-    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true); // Formani yuborishda loading holatini yoqish
         try {
             const response = await axios.post('http://localhost:5000/api/login', { email, password });
-              localStorage.setItem('userName', response.data.name)
+            localStorage.setItem('userName', response.data.name);
 
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
@@ -46,8 +45,8 @@ const Login = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 to-purple-600">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 to-purple-600 px-4">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md sm:w-auto sm:max-w-sm">
                 <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Login</h2>
                 {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
                 {loading && (

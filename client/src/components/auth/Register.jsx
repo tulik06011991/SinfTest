@@ -20,8 +20,8 @@ const Register = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 to-purple-600">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 to-purple-600 px-4">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md sm:w-auto sm:max-w-sm">
                 <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Ro'yxatdan o'tish</h2>
                 {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
                 <form onSubmit={handleSubmit}>
