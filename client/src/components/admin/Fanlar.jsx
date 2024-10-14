@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const CreateSubject = () => {
-  const [subjectId, setSubjectId] = useState(''); // Tanlangan fan ID sini saqlash
+  const [subjectName, setSubjectName] = useState(''); // Tanlangan fan nomini saqlash
   const [adminId, setAdminId] = useState(''); // Tanlangan admin ID sini saqlash
   const [admins, setAdmins] = useState([]); // Barcha adminlarni saqlash
   const [subjects, setSubjects] = useState([]); // Barcha fanlarni saqlash
@@ -56,13 +56,15 @@ const CreateSubject = () => {
     try {
       const response = await axios.post(
         'http://localhost:5000/api/create',
-        { subjectId, adminId },
+        { name: subjectName, adminId }, // subjectName ni post qilamiz
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+      console.log(response);
+      
       setMessage(response.data.message);
       navigate('/superadmin'); // Fan yaratgandan keyin superadmin paneliga o'tkazish
     } catch (error) {
@@ -92,14 +94,14 @@ const CreateSubject = () => {
             <label htmlFor="subject" className="mb-1 text-gray-600">Fan Nomi:</label>
             <select
               id="subject"
-              value={subjectId}
-              onChange={(e) => setSubjectId(e.target.value)}
+              value={subjectName} // subjectName ni ishlatamiz
+              onChange={(e) => setSubjectName(e.target.value)} // subjectName ni yangilaymiz
               required
               className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Fan nomini tanlang</option>
               {subjects.map((subject) => (
-                <option key={subject._id} value={subject._id}>
+                <option key={subject._id} value={subject.name}>
                   {subject.name}
                 </option>
               ))}

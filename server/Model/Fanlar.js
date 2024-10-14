@@ -5,7 +5,7 @@ const subjectSchema = new mongoose.Schema({
     name: { 
         type: String, 
         required: true, 
-        unique: true // Fan nomi yagona bo'lishi kerak
+      
     },
     adminId: { 
         type: mongoose.Schema.Types.ObjectId, // Adminning ID si
