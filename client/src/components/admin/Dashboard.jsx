@@ -259,7 +259,7 @@ const Dashboard = () => {
                       <td className="px-2 py-2 md:px-4 md:py-2">{result.userName}</td>
                       <td className="px-2 py-2 md:px-4 md:py-2">{result.correctAnswersCount}/{result.totalQuestions}to'g'ri</td>
                       <td className="px-2 py-2 md:px-4 md:py-2 text-center">
-                        <td className='"px-2 py-2 md:px-4 md:py-2"'>{new Date(result.answeredAt).toLocaleDateString()}</td>
+                        <td className='"px-2 py-2 md:px-4 md:py-2"'>Imtihon vaqti{new Date(result.answeredAt).toLocaleDateString()}</td>
                         <button
                           onClick={() => handleDeleteUsers(result.userId)}
                           className="text-red-600 hover:text-red-800"
