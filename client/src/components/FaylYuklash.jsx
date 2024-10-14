@@ -27,7 +27,7 @@ const navigate = useNavigate()
       try {
         const token = localStorage.getItem('token');
         
-        const response = await axios.get(`http://localhost:5000/api/subjects${fanId}`,
+        const response = await axios.get(`https://sinftest.onrender.com/api/subjects${fanId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -63,7 +63,7 @@ const navigate = useNavigate()
     formData.append('subjectId', selectedSubject); // Tanlangan fan ID'sini qo'shamiz
 
     try {
-      const response = await axios.post('http://localhost:5000/api/upload', formData, {
+      const response = await axios.post('https://sinftest.onrender.com/api/upload', formData, {
         headers: {
         
           'Content-Type': 'multipart/form-data',
