@@ -92,38 +92,36 @@ const Dashboard = () => {
   };
 
   // Savollarni o'chirish va interfeysdan yangilash
-  // Savollarni o'chirish va interfeysdan yangilash
-const handleDelete = async (id) => {
-  setLoading(true);
+  const handleDelete = async (id) => {
+    setLoading(true);
 
-  try {
-    const token = localStorage.getItem('token');
+    try {
+      const token = localStorage.getItem('token');
 
-    if (!token) {
-      throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
+      if (!token) {
+        throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
+      }
+
+      await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // O'chirilgan savolni interfeysdan olib tashlash
+      const updatedQuestions = savollar.filter((question) => question._id !== id);
+      setsavollar(updatedQuestions);
+
+      // Tanlangan fan bo'yicha savollarni qayta yuklash
+      handleSubjectClick(selectedSubject);
+      
+    } catch (err) {
+      setError("O'chirishda xatolik yuz berdi.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-
-    await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    // O'chirilgan savolni interfeysdan olib tashlash
-    const updatedQuestions = savollar.filter((question) => question._id !== id);
-    setsavollar(updatedQuestions);
-
-    // Tanlangan fan bo'yicha savollarni qayta yuklash
-    handleSubjectClick(selectedSubject);
-    
-  } catch (err) {
-    setError("O'chirishda xatolik yuz berdi.");
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   // Tanlangan fan bo'yicha savollarni olish
   const handleSubjectClick = async (subject) => {
@@ -150,7 +148,7 @@ const handleDelete = async (id) => {
         setError("Savollar topilmadi.");
       }
     } catch (err) {
-      setError("Ma'lumotlarni o'chirgansiz .");
+      setError("Ma'lumotlarni o'chirgansiz.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -160,7 +158,7 @@ const handleDelete = async (id) => {
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-2xl rounded-xl p-6 md:p-8 w-full max-w-7xl">
-        <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">Admin Dashboard</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">Admin Dashboard</h1>
 
         <h2 className="text-2xl font-semibold text-gray-700 mb-6">Fanlar ro'yxati</h2>
 
@@ -179,7 +177,7 @@ const handleDelete = async (id) => {
 
         {error && <div className="text-red-600 text-center mb-6">{error}</div>}
 
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {subjects.length > 0 ? (
             subjects.map((subject) => (
               <li
@@ -196,24 +194,24 @@ const handleDelete = async (id) => {
         </ul>
 
         {selectedSubject && subjectDetails && (
-          <div className="mt-8 bg-gray-100 p-6 rounded-lg shadow-lg">
+          <div className="mt-8 bg-gray-100 p-4 md:p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold text-gray-700 mb-6">Savollar va Foydalanuvchilar</h3>
 
             <h4 className="text-lg font-bold mt-6">Savollar:</h4>
             <table className="table-auto w-full bg-white shadow-lg rounded-lg">
               <thead className="bg-indigo-600 text-white">
                 <tr>
-                  <th className="px-4 py-2">Savol</th>
-                  <th className="px-4 py-2">Variantlar</th>
-                  <th className="px-4 py-2">Amallar</th>
+                  <th className="px-2 py-2 md:px-4 md:py-2">Savol</th>
+                  <th className="px-2 py-2 md:px-4 md:py-2">Variantlar</th>
+                  <th className="px-2 py-2 md:px-4 md:py-2">Amallar</th>
                 </tr>
               </thead>
               <tbody>
                 {savollar && savollar.length > 0 ? (
                   savollar.map((question, index) => (
                     <tr key={index} className="border-b border-gray-300">
-                      <td className="px-4 py-2">{question.questionText}</td>
-                      <td className="px-4 py-2">
+                      <td className="px-2 py-2 md:px-4 md:py-2">{question.questionText}</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2">
                         <ul>
                           {question.options.map((option) => (
                             <li key={option._id} className={option.isCorrect ? 'text-green-500' : ''}>
@@ -222,7 +220,7 @@ const handleDelete = async (id) => {
                           ))}
                         </ul>
                       </td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-2 py-2 md:px-4 md:py-2 text-center">
                         <button
                           onClick={() => handleDelete(question.questionId)}
                           className="text-red-600 hover:text-red-800"
@@ -246,18 +244,18 @@ const handleDelete = async (id) => {
             <table className="table-auto w-full bg-white shadow-lg rounded-lg">
               <thead className="bg-indigo-600 text-white">
                 <tr>
-                  <th className="px-4 py-2">Foydalanuvchi</th>
-                  <th className="px-4 py-2">Natija</th>
-                  <th className="px-4 py-2">Amallar</th>
+                  <th className="px-2 py-2 md:px-4 md:py-2">Foydalanuvchi ID</th>
+                  <th className="px-2 py-2 md:px-4 md:py-2">Ismi</th>
+                  <th className="px-2 py-2 md:px-4 md:py-2">Amallar</th>
                 </tr>
               </thead>
               <tbody>
                 {subjectDetails.userResults.length > 0 ? (
                   subjectDetails.userResults.map((result) => (
                     <tr key={result.userId} className="border-b border-gray-300">
-                      <td className="px-4 py-2">{result.userName}</td>
-                      <td className="px-4 py-2">{result.correctAnswersCount}/{result.totalQuestions}</td>
-                      <td className="px-4 py-2 text-center">
+                      <td className="px-2 py-2 md:px-4 md:py-2">{result.userId}</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2">{result.username}</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2 text-center">
                         <button
                           onClick={() => handleDeleteUsers(result.userId)}
                           className="text-red-600 hover:text-red-800"
