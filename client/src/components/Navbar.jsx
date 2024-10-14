@@ -1,14 +1,11 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 
 const NavbarSidebar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { authState, logout } = useContext(AuthContext); 
-    // AuthContext'dan foydalanuvchi ma'lumotlarini olish
+    const { authState, logout } = useContext(AuthContext);
     const navigate = useNavigate();
-
-   
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -45,19 +42,15 @@ const NavbarSidebar = () => {
                         authState.role === 'admin' ? (
                             <>
                                 <li><Link to="/faylyuklash" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
-                                {/* <li><Link to="/quiz" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Admin</Link></li>
-                                <li><Link to="/fanlar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Fanlar</Link></li> */}
                             </>
                         ) : (
                             <li><Link to="/savollarjavoblar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Test</Link></li>
                         )
-                    ) : (
-                        <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
-                    )}
+                    ) : null}
+                    <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
                     <li>
                         <button onClick={handleLogout} className="block w-full p-4 hover:bg-gray-700 text-left">Logout</button>
                     </li>
-                    
                 </ul>
             </div>
 
@@ -71,15 +64,12 @@ const NavbarSidebar = () => {
                             authState.role === 'admin' ? (
                                 <>
                                     <li><Link to="/faylyuklash" className="hover:text-gray-400">Word</Link></li>
-                                    {/* <li><Link to="/quiz" className="hover:text-gray-400">Admin</Link></li>
-                                    <li><Link to="/fanlar" className="hover:text-gray-400">Fanlar</Link></li> */}
                                 </>
                             ) : (
                                 <li><Link to="/savollarjavoblar" className="hover:text-gray-400">Test</Link></li>
                             )
-                        ) : (
-                            <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
-                        )}
+                        ) : null}
+                        <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
                         <li>
                             <button onClick={handleLogout} className="hover:text-gray-400">Logout</button>
                         </li>
