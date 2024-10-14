@@ -9,26 +9,27 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false); // Loading holatini qo'shish
     const navigate = useNavigate();
-    const [fanId, setFanId] = useState({});
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true); // Formani yuborishda loading holatini yoqish
         try {
             const response = await axios.post('http://localhost:5000/api/login', { email, password });
-            console.log(response)
+            console.log(response);
             
             localStorage.setItem('userName', response.data.name);
 
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
+                localStorage.setItem('role', response.data.redirect);
+                 // Foydalanuvchi rolini saqlash
 
                 if (response.data.subjects && response.data.subjects.length > 0) {
                     const fanId = response.data.subjects[0]._id; // Birinchi elementning _id sini oladi
                     localStorage.setItem('fanId', fanId);
-                    setFanId(response.data.subjects);
                 }
 
+                // Redirect qilish
                 if (response.data.redirect === "/superadmin/dashboard") {
                     navigate('/superadmin');
                 } else if (response.data.redirect === '/savollarjavoblar') {
