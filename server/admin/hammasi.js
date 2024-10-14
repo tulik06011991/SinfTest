@@ -67,34 +67,34 @@ const getSubjectDetails = async (req, res) => {
 
         // Har bir foydalanuvchining natijalarini saqlash uchun array
         const userResults = [];
-        const allQuestionsWithOptions = []; // Barcha savollar va variantlar
-        const addedQuestionIds = new Set(); // Takrorlanishni oldini olish uchun savol ID'larni saqlash
+        const allQuestionsWithOptions = {}; // Barcha savollarni unique qilish uchun object ko'rinishida saqlaymiz
 
         // Foydalanuvchilarni takrorlanmas qilib olish (unique)
-        const users = [...new Set(answers.map(answer => answer.userId._id.toString()))]; // Foydalanuvchilarning unique ro'yxati
+        const users = [...new Set(answers.map(answer => answer.userId?._id.toString()))]; // Foydalanuvchilarning unique ro'yxati
 
         // Har bir foydalanuvchining javoblarini hisoblash
         for (let userId of users) {
-            const userAnswers = answers.filter(answer => answer.userId._id.toString() === userId);
+            const userAnswers = answers.filter(answer => answer.userId?._id.toString() === userId);
 
             let correctAnswersCount = 0;
 
             for (let userAnswer of userAnswers) {
                 const question = userAnswer.questionId;
                 const selectedOption = userAnswer.selectedOption;
+
+                // Null qiymatlar uchun tekshirish
+                if (!question || !userAnswer.userId) continue; // Savol yoki foydalanuvchi mavjud bo'lmasa, davomini o'tkazib yuborish
+
                 const correctAnswer = question.correctAnswer;
 
-                // Agar savol ID allaqachon to'plamga qo'shilmagan bo'lsa, uni qo'shamiz
-                if (!addedQuestionIds.has(question._id.toString())) {
-                    allQuestionsWithOptions.push({
+                // Agar savol ID allaqachon objectga qo'shilmagan bo'lsa, uni qo'shamiz
+                if (!allQuestionsWithOptions[question._id]) {
+                    allQuestionsWithOptions[question._id] = {
                         questionId: question._id,
                         questionText: question.question,
                         options: question.options,
-                        selectedOption: selectedOption,
-                        correctAnswer: correctAnswer,
                         subject: question.subject
-                    });
-                    addedQuestionIds.add(question._id.toString());
+                    };
                 }
 
                 // Agar tanlangan variant to'g'ri javobga mos kelsa, ball qo'shamiz
@@ -107,8 +107,8 @@ const getSubjectDetails = async (req, res) => {
             const correctPercentage = totalQuestions > 0 ? ((correctAnswersCount / totalQuestions) * 100).toFixed(2) : 0;
 
             userResults.push({
-                userId: userAnswers[0].userId._id,
-                userName: userAnswers[0].userId.name,
+                userId: userAnswers[0]?.userId?._id, // Tekshiruv qo'shildi
+                userName: userAnswers[0]?.userId?.name, // Tekshiruv qo'shildi
                 totalQuestions,
                 correctAnswersCount,
                 correctPercentage
@@ -119,7 +119,7 @@ const getSubjectDetails = async (req, res) => {
         res.status(200).json({
             subjectId,
             userResults, // Foydalanuvchilar natijalari
-            questionsWithOptions: allQuestionsWithOptions // Savollar va ularning variantlari
+            questionsWithOptions: Object.values(allQuestionsWithOptions) // Savollar va ularning variantlari unique ko'rinishda
         });
 
     } catch (error) {
