@@ -36,6 +36,7 @@ const SuperadminPanel = () => {
   const createUser = async () => {
     const user = { name: newUser };
     try {
+      const token = localStorage.getItem('token');
       const response = await axios.post('https://sinftest-backend.onrender.com/api/dashboard',
         {
           headers: {
@@ -53,7 +54,6 @@ const SuperadminPanel = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`https://sinftest-backend.onrender.com/api/users/${id}`,
-
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -69,7 +69,7 @@ const SuperadminPanel = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navbar */}
-      <nav className="bg-blue-600 p-4 text-white flex justify-between">
+      <nav className="bg-blue-600 p-4 text-white flex flex-col sm:flex-row justify-between items-center">
         <div className="flex space-x-4">
           <button
             className={`${activeTab === 'users' ? 'border-b-4 border-white' : ''} py-2 px-4`}
@@ -99,22 +99,24 @@ const SuperadminPanel = () => {
       </nav>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-6 max-w-6xl mx-auto">
         {activeTab === 'users' && (
           <div>
             <h2 className="text-2xl font-bold mb-4">Foydalanuvchilar</h2>
-            <input
-              type="text"
-              value={newUser}
-              onChange={(e) => setNewUser(e.target.value)}
-              className="border p-2 mb-4"
-              placeholder="Yangi foydalanuvchi ismi"
-            />
-            <button onClick={createUser} className="bg-blue-500 text-white px-4 py-2 rounded">
-              Yaratish
-            </button>
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
+              <input
+                type="text"
+                value={newUser}
+                onChange={(e) => setNewUser(e.target.value)}
+                className="border p-2 flex-1"
+                placeholder="Yangi foydalanuvchi ismi"
+              />
+              <button onClick={createUser} className="bg-blue-500 text-white px-4 py-2 rounded">
+                Yaratish
+              </button>
+            </div>
 
-            <div className="overflow-x-auto mt-4">
+            <div className="overflow-x-auto">
               <table className="min-w-full bg-white border border-gray-300">
                 <thead>
                   <tr>
