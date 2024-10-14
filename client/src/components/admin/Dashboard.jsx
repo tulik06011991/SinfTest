@@ -254,7 +254,7 @@ const Dashboard = () => {
                   subjectDetails.userResults.map((result) => (
                     <tr key={result.userId} className="border-b border-gray-300">
                       <td className="px-2 py-2 md:px-4 md:py-2">{result.userName}</td>
-                      <td className="px-2 py-2 md:px-4 md:py-2">tt</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2">{result.correctAnswersCount}/{result.totalQuestions}to'g'ri</td>
                       <td className="px-2 py-2 md:px-4 md:py-2 text-center">
                         <button
                           onClick={() => handleDeleteUsers(result.userId)}

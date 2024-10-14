@@ -16,7 +16,7 @@ const questionSchema = new mongoose.Schema({
         ref: 'Subject', // Fanlar modeliga havola qilamiz
         required: true
     }
-});
+}, { timestamps: true }); // timestamps: true bilan createdAt va updatedAt maydonlarini avtomatik qo'shamiz
 
 // Savollar modelini yaratish
 const Question = mongoose.model('Question', questionSchema);
