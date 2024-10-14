@@ -1,6 +1,5 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from './AuthContext';
 
 const NavbarSidebar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,8 +18,17 @@ const NavbarSidebar = () => {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
 
-    // Token mavjud bo'lsa Sidebar ni ko'rsatish
-    if (!token) return null;
+    // Token mavjud bo'lmasa, faqat "About" sahifasini ko'rsatadi
+    if (!token) return (
+        <nav className="bg-gray-800 text-white p-4">
+            <div className="container mx-auto flex justify-between items-center text-3xl bold">
+                60-maktab
+                <ul className="flex space-x-8 text-xl">
+                    <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
+                </ul>
+            </div>
+        </nav>
+    );
 
     return (
         <>
@@ -41,11 +49,13 @@ const NavbarSidebar = () => {
                             <li><Link to="/faylyuklash" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
                             <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
                         </>
-                    ) : (
+                    ) : role === '/savoljavoblar' ? (
                         <>
                             <li><Link to="/savollarjavoblar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Test</Link></li>
                             <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
                         </>
+                    ) : (
+                        <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
                     )}
                     <li>
                         <button onClick={handleLogout} className="block w-full p-4 hover:bg-gray-700 text-left">Logout</button>
@@ -63,11 +73,13 @@ const NavbarSidebar = () => {
                                 <li><Link to="/faylyuklash" className="hover:text-gray-400">Word</Link></li>
                                 <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
                             </>
-                        ) : (
+                        ) : role === '/savollarjavoblar' ? (
                             <>
                                 <li><Link to="/savollarjavoblar" className="hover:text-gray-400">Test</Link></li>
                                 <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
                             </>
+                        ) : (
+                            <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
                         )}
                         <li>
                             <button onClick={handleLogout} className="hover:text-gray-400">Logout</button>

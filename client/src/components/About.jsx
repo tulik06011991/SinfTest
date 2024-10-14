@@ -23,9 +23,9 @@ const About = () => {
                 </div>
                 
                 {/* Rasm qismi */}
-                <div className="lg:w-1/3 flex justify-center lg:justify-end">
+                <div className="lg:w-2/3 flex justify-center min-screen lg:justify-end">
                     <img
-                        src="https://via.placeholder.com/300" // Bu yerda o'zingiz xohlagan rasm URL'ni kiriting
+                        src="https://images.pexels.com/photos/6804068/pexels-photo-6804068.jpeg?auto=compress&cs=tinysrgb&w=600" // Bu yerda o'zingiz xohlagan rasm URL'ni kiriting
                         alt="Biz haqimizda"
                         className="w-full h-auto rounded-lg shadow-lg"
                     />
