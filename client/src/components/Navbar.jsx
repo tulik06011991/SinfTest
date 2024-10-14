@@ -62,6 +62,7 @@ const NavbarSidebar = () => {
                     <li>
                         <button onClick={handleLogout} className="block w-full p-4 hover:bg-gray-700 text-left">Logout</button>
                     </li>
+                    <li><Link to="/quiz" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Admin</Link></li>
                 </ul>
             </div>
 

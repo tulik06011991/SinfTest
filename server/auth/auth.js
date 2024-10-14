@@ -4,6 +4,8 @@ const Subject = require('../Model/Fanlar'); // Fanlar modelini import qilish
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+
+
 // Register Controller
 const registerController = async (req, res) => {
     const { name, email, password, role } = req.body;
@@ -14,11 +16,10 @@ const registerController = async (req, res) => {
             return res.status(400).json({ message: 'Bu email bilan foydalanuvchi mavjud!' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 12); // Parolni xesh qilish
         const user = new User({
             name,
             email,
-            password: hashedPassword, // Xeshlangan parolni saqlash
+            password,
             role // Admin yoki user
         });
 
@@ -30,7 +31,6 @@ const registerController = async (req, res) => {
     }
 };
 
-// Login Controller
 const loginController = async (req, res) => {
     const { email, password } = req.body;
 
@@ -39,43 +39,52 @@ const loginController = async (req, res) => {
         const admin = await Admin.findOne({ email });
         
         // Eng yuqori admin uchun maxsus shart
-        if (email === 'Abdumuhammad@gmail.com' && admin) {
+        if (email === 'Abdumuhammad@gmail.com') {
             // Parolni tekshirish
-            const isMatch = await bcrypt.compare(password, admin.password);
+            const isMatch = await admin.comparePassword(password);
             if (!isMatch) {
                 return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
             }
 
             // Barcha fanlar va foydalanuvchilarga kirish huquqiga ega bo'lgan eng yuqori admin
-            const allSubjects = await Subject.find({}).select('_id name');
+            const allSubjects = await Subject.find({}).select('_id name'); // Barcha fanlar
+          
 
             // JWT token yaratish (eng yuqori admin uchun)
             const token = jwt.sign({ userId: admin._id, role: 'superadmin' }, process.env.JWT_SECRET, { expiresIn: '5h' });
 
+            // Token va barcha fanlarni jo'natish
             return res.status(200).json({ 
                 token, 
-                redirect: '/superadmin/dashboard', 
-                subjects: allSubjects 
+                redirect: '/superadmin/dashboard', // Super admin uchun alohida sahifa
+                subjects: allSubjects // Barcha fanlar
             });
         }
 
         if (admin) {
-            const isMatch = await bcrypt.compare(password, admin.password);
+            // Parolni tekshirish
+            const isMatch = await admin.comparePassword(password);
             if (!isMatch) {
                 return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
             }
 
+            // Adminning o'ziga tegishli fanlar ro'yxatini olish
             const subjects = await Subject.find({ adminId: admin._id }).select('_id name');
+          
+
+            // Agar fanlar topilmasa, xabar yuborish
             if (subjects.length === 0) {
                 return res.status(404).json({ message: 'Bu admin uchun fanlar topilmadi!' });
             }
 
+            // JWT token yaratish
             const token = jwt.sign({ userId: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+            // Token va topilgan fanlarni front-endga jo'natish
             return res.status(200).json({ 
                 token, 
                 redirect: '/admin/dashboard',
-                subjects 
+                subjects // Adminning o'ziga tegishli fanlar
             });
         }
 
@@ -85,16 +94,20 @@ const loginController = async (req, res) => {
             return res.status(400).json({ message: 'Foydalanuvchi topilmadi!' });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        // Foydalanuvchi parolini tekshirish
+        const isMatch = await user.matchPassword(password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
         }
 
-        const token = jwt.sign({ userId: user._id, userName: user.name, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // JWT token yaratish foydalanuvchi uchun
+        const token = jwt.sign({ userId: user._id,  userName: user.name,   role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+        // Agar foydalanuvchi admin emas bo'lsa savollar-javoblar sahifasiga yo'naltirish
         return res.status(200).json({ 
             token, 
             redirect: '/savollarjavoblar',
+           
         });
 
     } catch (error) {
@@ -102,6 +115,9 @@ const loginController = async (req, res) => {
         return res.status(500).json({ message: 'Serverda xato yuz berdi!' });
     }
 };
+
+
+
 
 // Foydalanuvchilarni olish
 const getUsers = async (req, res) => {

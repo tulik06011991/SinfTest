@@ -47,7 +47,7 @@ const Quiz = () => {
             if (!selectedSubject) return; // Fanning ID'si bo'lmasa, hech narsa qilmaslik
 
             try {
-                const response = await axios.get(`https://sinftest-backend.onrender.com/api/questions/subject/${selectedSubject}`); // Tanlangan fanga ko'ra savollarni olish
+                const response = await axios.get(`http://localhost:5000/api/questions/subject/${selectedSubject}`); // Tanlangan fanga ko'ra savollarni olish
                 setQuestions(response.data); // Savollarni yuklash
             } catch (error) {
                 console.error('Savollarni olishda xato:', error);
@@ -81,7 +81,7 @@ const Quiz = () => {
 
         try {
             const response = await axios.post(
-                'https://sinftest-backend.onrender.com/api/submit-answers',
+                'http://localhost:5000/api/submit-answers',
                 {
                     subjectId: selectedSubject,
                     answers: selectedAnswers,

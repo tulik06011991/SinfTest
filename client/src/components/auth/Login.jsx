@@ -16,6 +16,8 @@ const Login = () => {
         setLoading(true); // Formani yuborishda loading holatini yoqish
         try {
             const response = await axios.post('http://localhost:5000/api/login', { email, password });
+            console.log(response)
+            
             localStorage.setItem('userName', response.data.name);
 
             if (response.data.token) {
