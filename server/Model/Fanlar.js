@@ -4,8 +4,7 @@ const mongoose = require('mongoose');
 const subjectSchema = new mongoose.Schema({
     name: { 
         type: String, 
-        required: true, 
-      
+        required: true
     },
     adminId: { 
         type: mongoose.Schema.Types.ObjectId, // Adminning ID si

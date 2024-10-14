@@ -4,7 +4,7 @@ const subjectController = require('../admin/Fanlar');
 const middleware = require('../middleware/middleware') // Fan controllerini chaqiramiz
 
 // Fan yaratish marshruti (faqat admin uchun)
-router.post('/create', middleware, subjectController.createSubject);
+router.post('/create',  subjectController.createSubject);
 
 // Barcha fanlarni olish
 router.get('/subjects', middleware,  subjectController.getAllSubjects);

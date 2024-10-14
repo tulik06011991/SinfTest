@@ -3,10 +3,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const CreateSubject = () => {
-  const [subjectName, setSubjectName] = useState(''); // Tanlangan fan nomini saqlash
+  const [subjectName, setSubjectName] = useState(''); // Kirtilgan fan nomini saqlash
   const [adminId, setAdminId] = useState(''); // Tanlangan admin ID sini saqlash
   const [admins, setAdmins] = useState([]); // Barcha adminlarni saqlash
-  const [subjects, setSubjects] = useState([]); // Barcha fanlarni saqlash
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ const CreateSubject = () => {
     }
   }, [navigate]);
 
-  // Adminlar va fanlar ro'yxatini olish
+  // Adminlar ro'yxatini olish
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -31,12 +30,6 @@ const CreateSubject = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAdmins(adminsResponse.data);
-
-        // Fanlarni olish
-        const subjectsResponse = await axios.get('http://localhost:5000/api/subjects', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setSubjects(subjectsResponse.data);
       } catch (error) {
         console.error('Ma\'lumotlarni olishda xato:', error);
         setMessage('Ma\'lumotlarni olishda xato yuz berdi.');
@@ -56,7 +49,7 @@ const CreateSubject = () => {
     try {
       const response = await axios.post(
         'http://localhost:5000/api/create',
-        { name: subjectName, adminId }, // subjectName ni post qilamiz
+        { name: subjectName, adminId }, // Fan nomi va adminId ni post qilamiz
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -89,23 +82,18 @@ const CreateSubject = () => {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Fanlar ro'yxatidan tanlash */}
+          {/* Fan nomini qo'lda kiritish */}
           <div className="flex flex-col">
             <label htmlFor="subject" className="mb-1 text-gray-600">Fan Nomi:</label>
-            <select
+            <input
+              type="text"
               id="subject"
               value={subjectName} // subjectName ni ishlatamiz
               onChange={(e) => setSubjectName(e.target.value)} // subjectName ni yangilaymiz
               required
+              placeholder="Fan nomini kiriting"
               className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Fan nomini tanlang</option>
-              {subjects.map((subject) => (
-                <option key={subject._id} value={subject.name}>
-                  {subject.name}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           {/* Admin tanlash */}
