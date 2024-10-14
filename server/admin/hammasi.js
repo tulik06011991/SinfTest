@@ -109,7 +109,7 @@ const getSubjectDetails = async (req, res) => {
                 totalQuestions,
                 correctAnswersCount,
                 correctPercentage,
-                answeredAt: userAnswers[0]?.answeredAt // Foydalanuvchining javob bergan vaqti
+                answeredAt: userAnswers[0]?.createdAt // Foydalanuvchining javob bergan vaqti
             });
         }
 

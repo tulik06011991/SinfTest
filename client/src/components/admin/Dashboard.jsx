@@ -114,7 +114,7 @@ const Dashboard = () => {
 
       // Tanlangan fan bo'yicha savollarni qayta yuklash
       handleSubjectClick(selectedSubject);
-      
+
     } catch (err) {
       setError("O'chirishda xatolik yuz berdi.");
       console.error(err);
@@ -143,7 +143,7 @@ const Dashboard = () => {
 
       setsavollar(response.data.questionsWithOptions);
       setSubjectDetails(response.data);
-      
+
       if (response.data.questionsWithOptions.length === 0) {
         setError("Savollar topilmadi.");
       }
@@ -154,6 +154,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+  console.log(subjectDetails)
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
@@ -220,6 +221,7 @@ const Dashboard = () => {
                           ))}
                         </ul>
                       </td>
+                      <span className='"px-2 py-2 md:px-4 md:py-2"'> savollar yuklangan vaqt: {new Date(question.createdAt).toLocaleDateString()}</span>
                       <td className="px-2 py-2 md:px-4 md:py-2 text-center">
                         <button
                           onClick={() => handleDelete(question.questionId)}
@@ -244,8 +246,9 @@ const Dashboard = () => {
             <table className="table-auto w-full bg-white shadow-lg rounded-lg">
               <thead className="bg-indigo-600 text-white">
                 <tr>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Foydalanuvchi ID</th>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Ismi</th>
+                  <th className="px-2 py-2 md:px-4 md:py-2">Foydalanuvchi ismi</th>
+                  <th className="px-2 py-2 md:px-4 md:py-2"> Natijasi</th>
+                  {/* <th className="px-2 py-2 md:px-4 md:py-2">Imtihon vaqti </th> */}
                   <th className="px-2 py-2 md:px-4 md:py-2">Amallar</th>
                 </tr>
               </thead>
@@ -256,6 +259,7 @@ const Dashboard = () => {
                       <td className="px-2 py-2 md:px-4 md:py-2">{result.userName}</td>
                       <td className="px-2 py-2 md:px-4 md:py-2">{result.correctAnswersCount}/{result.totalQuestions}to'g'ri</td>
                       <td className="px-2 py-2 md:px-4 md:py-2 text-center">
+                        <td className='"px-2 py-2 md:px-4 md:py-2"'>{new Date(result.answeredAt).toLocaleDateString()}</td>
                         <button
                           onClick={() => handleDeleteUsers(result.userId)}
                           className="text-red-600 hover:text-red-800"
