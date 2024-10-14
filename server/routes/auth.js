@@ -16,7 +16,7 @@ router.post('/login',  loginController);
 
 // Foydalanuvchilar uchun marshrutlar
 router.get('/dashboard', middleware,  getUsers); // Barcha foydalanuvchilarni olish
-router.post('/dashboard', createUser); // Foydalanuvchini yaratish
+
  // Foydalanuvchini yangilash
 router.delete('/users/:id', middleware, deleteUser); // Foydalanuvchini o'chirish
 

@@ -37,6 +37,8 @@ app.use('/api', auth)
 app.use('/api', javob)
 app.use('/admin', adminFan)
 app.use('/admin', hammasi)
+
+
 // MongoDB ga ulanish
 const connectDB = async () => {
     try {
