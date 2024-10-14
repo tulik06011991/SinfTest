@@ -16,7 +16,7 @@ const Quiz = () => {
     useEffect(() => {
         const fetchSubjects = async () => {
             try {
-                const response = await axios.get('https://sinftest-backend.onrender.com/api/subjectlar');
+                const response = await axios.get('http://localhost:5000/api/subjectlar');
                 console.log(response);
     
                 // Tekshiramiz, response.data obyekt bo'lsa, subjects ro'yxatini olamiz
