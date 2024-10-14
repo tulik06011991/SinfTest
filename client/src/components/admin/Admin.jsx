@@ -29,7 +29,7 @@ const AdminCrud = () => {
   const fetchAdmins = async () => {
     const token  = localStorage.getItem('token') 
     try {
-      const response = await axios.get('http://localhost:5000/api/admins',
+      const response = await axios.get('https://sinftest-backend.onrender.com/api/admins',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,7 +46,7 @@ const AdminCrud = () => {
   const createAdmin = async () => {
     const token = localStorage.getItem('token'); 
     try {
-        const response = await axios.post('http://localhost:5000/api/admin',
+        const response = await axios.post('https://sinftest-backend.onrender.com/api/admin',
             newAdmin, // Bu yerda ma'lumotlar
             {
                 headers: {
@@ -64,7 +64,7 @@ const AdminCrud = () => {
   const updateAdmin = async (id) => {
     const token  = localStorage.getItem('token') 
     try {
-      const response = await axios.put(`http://localhost:5000/api/admin/${id}`,
+      const response = await axios.put(`https://sinftest-backend.onrender.com/api/admin/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -84,7 +84,7 @@ const AdminCrud = () => {
   const deleteAdmin = async (id) => {
     const token  = localStorage.getItem('token') 
     try {
-      await axios.delete(`http://localhost:5000/api/admin/${id}`,
+      await axios.delete(`https://sinftest-backend.onrender.com/api/admin/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

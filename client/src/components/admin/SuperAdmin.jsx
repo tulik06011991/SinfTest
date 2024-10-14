@@ -19,7 +19,7 @@ const SuperadminPanel = () => {
     const fetchUsers = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get('http://localhost:5000/api/dashboard', {
+        const response = await axios.get('https://sinftest-backend.onrender.com/api/dashboard', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -36,7 +36,7 @@ const SuperadminPanel = () => {
   const createUser = async () => {
     const user = { name: newUser };
     try {
-      const response = await axios.post('http://localhost:5000/api/dashboard',
+      const response = await axios.post('https://sinftest-backend.onrender.com/api/dashboard',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,7 +52,7 @@ const SuperadminPanel = () => {
   const deleteUser = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/users/${id}`,
+      await axios.delete(`https://sinftest-backend.onrender.com/api/users/${id}`,
 
         {
           headers: {

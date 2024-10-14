@@ -24,7 +24,7 @@ const CreateSubject = () => {
     const fetchAdmins = async () => {
       try {
         const token = localStorage.getItem('token')
-        const response = await axios.get('http://localhost:5000/api/admins',
+        const response = await axios.get('https://sinftest-backend.onrender.com/api/admins',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -45,7 +45,7 @@ const CreateSubject = () => {
     const token = localStorage.getItem('token');
     
     try {
-        const response = await axios.post('http://localhost:5000/api/create',
+        const response = await axios.post('https://sinftest-backend.onrender.com/api/create',
             { name, adminId }, // Ma'lumotlarni birinchi parametr sifatida yuboramiz
             {
                 headers: {
