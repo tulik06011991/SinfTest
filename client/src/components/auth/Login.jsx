@@ -14,7 +14,7 @@ const Login = () => {
         e.preventDefault();
         setLoading(true); // Formani yuborishda loading holatini yoqish
         try {
-            const response = await axios.post('https://sinftest2.onrender.com/api/login', { email, password });
+            const response = await axios.post('http://localhost:5000/api/login', { email, password });
             console.log(response);
             
             localStorage.setItem('userName', response.data.name);

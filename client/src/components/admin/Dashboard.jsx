@@ -37,7 +37,7 @@ const Dashboard = () => {
       }
 
       const response = await axios.post(
-        `https://sinftest2.onrender.com/api/subjects`,
+        `http://localhost:5000/api/subjects`,
         { fanId },
         {
           headers: {
@@ -70,7 +70,7 @@ const Dashboard = () => {
       }
 
       // Foydalanuvchini o'chirish so'rovi
-      await axios.delete(`https://sinftest2.onrender.com/admin/users/${id}`, {
+      await axios.delete(`http://localhost:5000/admin/users/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -102,7 +102,7 @@ const Dashboard = () => {
         throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
       }
 
-      await axios.delete(`https://sinftest2.onrender.com/admin/subjects/${id}`, {
+      await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -133,7 +133,7 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `https://sinftest2.onrender.com/admin/subjects/${subject._id}`,
+        `http://localhost:5000/admin/subjects/${subject._id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
