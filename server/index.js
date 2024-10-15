@@ -35,7 +35,7 @@ app.use('/api', fanlar2)
 app.use('/api', fanOlish)
 app.use('/api', auth)
 app.use('/api', javob)
-app.use('/admin', adminFan)
+app.use('/admin', adminFan);
 app.use('/admin', hammasi)
 
 
