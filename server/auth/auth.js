@@ -31,36 +31,41 @@ const registerController = async (req, res) => {
     }
 };
 
+
+
+
 const loginController = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Adminni email orqali qidirish
-        const admin = await Admin.findOne({ email });
-        
-        // Eng yuqori admin uchun maxsus shart
+        // Superadmin emailini tekshirish
         if (email === 'Abdumuhammad@gmail.com') {
+            const admin = await Admin.findOne({ email });
+            if (!admin) {
+                return res.status(400).json({ message: 'Admin topilmadi!' });
+            }
+
             // Parolni tekshirish
             const isMatch = await admin.comparePassword(password);
             if (!isMatch) {
                 return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
             }
 
-            // Barcha fanlar va foydalanuvchilarga kirish huquqiga ega bo'lgan eng yuqori admin
-            const allSubjects = await Subject.find({}).select('_id name'); // Barcha fanlar
-          
+            // Barcha fanlar
+            const allSubjects = await Subject.find({}).select('_id name');
 
-            // JWT token yaratish (eng yuqori admin uchun)
+            // JWT token yaratish
             const token = jwt.sign({ userId: admin._id, role: 'superadmin' }, process.env.JWT_SECRET, { expiresIn: '5h' });
 
-            // Token va barcha fanlarni jo'natish
-            return res.status(200).json({ 
-                token, 
-                redirect: '/superadmin/dashboard', // Super admin uchun alohida sahifa
-                subjects: allSubjects // Barcha fanlar
+            return res.status(200).json({
+                token,
+                redirect: '/superadmin/dashboard',
+                subjects: allSubjects
             });
         }
 
+        // Oddiy admin uchun login
+        const admin = await Admin.findOne({ email });
         if (admin) {
             // Parolni tekshirish
             const isMatch = await admin.comparePassword(password);
@@ -68,11 +73,8 @@ const loginController = async (req, res) => {
                 return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
             }
 
-            // Adminning o'ziga tegishli fanlar ro'yxatini olish
+            // Adminning o'ziga tegishli fanlar ro'yxati
             const subjects = await Subject.find({ adminId: admin._id }).select('_id name');
-          
-
-            // Agar fanlar topilmasa, xabar yuborish
             if (subjects.length === 0) {
                 return res.status(404).json({ message: 'Bu admin uchun fanlar topilmadi!' });
             }
@@ -80,15 +82,14 @@ const loginController = async (req, res) => {
             // JWT token yaratish
             const token = jwt.sign({ userId: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-            // Token va topilgan fanlarni front-endga jo'natish
-            return res.status(200).json({ 
-                token, 
+            return res.status(200).json({
+                token,
                 redirect: '/admin/dashboard',
-                subjects // Adminning o'ziga tegishli fanlar
+                subjects
             });
         }
 
-        // Agar admin topilmasa, foydalanuvchini qidirish
+        // Foydalanuvchini tekshirish
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: 'Foydalanuvchi topilmadi!' });
@@ -100,14 +101,12 @@ const loginController = async (req, res) => {
             return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
         }
 
-        // JWT token yaratish foydalanuvchi uchun
-        const token = jwt.sign({ userId: user._id,  userName: user.name,   role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // JWT token yaratish
+        const token = jwt.sign({ userId: user._id, userName: user.name, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        // Agar foydalanuvchi admin emas bo'lsa savollar-javoblar sahifasiga yo'naltirish
-        return res.status(200).json({ 
-            token, 
-            redirect: '/savollarjavoblar',
-           
+        return res.status(200).json({
+            token,
+            redirect: '/savollarjavoblar'
         });
 
     } catch (error) {
@@ -115,6 +114,9 @@ const loginController = async (req, res) => {
         return res.status(500).json({ message: 'Serverda xato yuz berdi!' });
     }
 };
+
+
+
 
 
 
