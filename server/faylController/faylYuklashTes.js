@@ -30,7 +30,6 @@ const parseWordFile = async (filePath, subjectId) => {
 
         return questions;
     } catch (error) {
-        // console.error('Error parsing Word file:', error);
         throw new Error('Failed to process the Word file. Please check the format and try again.');
     }
 };
@@ -40,6 +39,8 @@ const extractQuestions = (content) => {
     const lines = content.split('\n'); // Faylni qatorlar bo'yicha bo'lamiz
     let questions = [];
     let currentQuestion = {}; // Hozirgi savol
+
+    const optionRegex = /(\.?[A-Da-d])[).]\s*([^A-Da-d]*)/g; // Variantlar uchun regex
 
     lines.forEach((line) => {
         // Savolni olish: savol raqami bilan boshlanadi, masalan "1."
@@ -61,8 +62,7 @@ const extractQuestions = (content) => {
             };
         }
 
-        // Bir qator ichida bir nechta variantlar mavjud bo'lsa, ularni ajratib olish
-        let optionRegex = /(\.?[A-D])[).]\s*([^A-D]*)/g; // "A)" yoki ".A)" ko'rinishdagi variantlarni qidirish
+        // Variantlarni ajratib olish
         let match;
         while ((match = optionRegex.exec(line)) !== null) {
             let optionLabel = match[1]; // A, B, C, D va ularning oldidagi nuqta
@@ -103,7 +103,6 @@ const uploadQuestions = async (req, res) => {
         const questions = await parseWordFile(filePath, subjectId);
         res.json({ questions });
     } catch (error) {
-        // console.error('Error extracting questions:', error.message);
         res.status(400).json({ message: 'Failed to extract questions from the file. Please check the file format.' });
     }
 };
