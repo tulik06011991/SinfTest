@@ -44,7 +44,7 @@ const NavbarSidebar = () => {
             <div className={`fixed top-0 left-0 w-64 h-full bg-gray-800 shadow text-white z-20 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 lg:hidden`}>
                 <button className="text-4xl p-4" onClick={toggleSidebar}>&times;</button>
                 <ul className="mt-10 space-y-4 text-xl">
-                    {role === '/admin/dashboard' ? (
+                    {role === '/superadmin/dashboard' ? (
                         <>
                             <li><Link to="/faylyuklash" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
                             <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>

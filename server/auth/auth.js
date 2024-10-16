@@ -36,6 +36,8 @@ const registerController = async (req, res) => {
 
 const loginController = async (req, res) => {
     const { email, password } = req.body;
+    console.log(email, password)
+    
 
     try {
         // Superadmin emailini tekshirish
@@ -74,18 +76,15 @@ const loginController = async (req, res) => {
             }
 
             // Adminning o'ziga tegishli fanlar ro'yxati
-            const subjects = await Subject.find({ adminId: admin._id }).select('_id name');
-            if (subjects.length === 0) {
-                return res.status(404).json({ message: 'Bu admin uchun fanlar topilmadi!' });
-            }
+            
 
             // JWT token yaratish
-            const token = jwt.sign({ userId: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ userId: admin._id,  }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
             return res.status(200).json({
                 token,
                 redirect: '/admin/dashboard',
-                subjects
+              
             });
         }
 
