@@ -15,8 +15,8 @@ exports.createAdmin = async (req, res) => {
 
         // Email mavjudligini tekshirish
         const existingAdmin = await Admin.findOne({ email });
-        if (existingAdmin) {
-            return res.status(400).json({ error: 'Bu email bilan admin allaqachon mavjud!' });
+        if (!existingAdmin) {
+            return res.status(400).json({ error: 'Bu email mavjud emas' });
         }
 
         // Parolni shifrlash
