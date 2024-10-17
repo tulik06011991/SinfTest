@@ -8,53 +8,28 @@ exports.createAdmin = async (req, res) => {
     try {
         const { name, email, password, subject } = req.body;
 
-        // Validatsiya
-        if (!name || !email || !password || !subject) {
-            return res.status(400).json({ error: 'Barcha maydonlarni to\'ldiring!' });
-        }
-
-        // Email mavjudligini tekshirish
+        // Email bo'yicha admin bor-yo'qligini tekshirish
         const existingAdmin = await Admin.findOne({ email });
         if (existingAdmin) {
-            return res.status(400).json({ error: 'Bu email bilan admin allaqachon mavjud!' });
+            return res.status(400).json({ message: 'Bu email bilan admin allaqachon mavjud!' });
         }
-
-        // Parolni shifrlash
-        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Yangi admin yaratish
         const newAdmin = new Admin({
             name,
             email,
-            password: hashedPassword, // Shifrlangan parolni saqlash
+            password,
             subject,
-            role: 'admin' // Admin roli
+            role: 'admin'
         });
 
-        // Adminni saqlash
         await newAdmin.save();
-
-        // Token yaratish
-        const token = jwt.sign(
-            {
-                id: newAdmin._id,
-                role: newAdmin.role
-            },
-            process.env.JWT_SECRET, // JWT kaliti
-            { expiresIn: '1h' } // Tokenning amal qilish muddati 1 soat
-        );
-
-        // Javobda tokenni qaytarish
-        res.status(201).json({ 
-            message: 'Admin muvaffaqiyatli yaratildi!', 
-            newAdmin,
-            token // Tokenni qaytaramiz
-        });
+        res.status(201).json({ message: 'Admin muvaffaqiyatli yaratildi!', newAdmin });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Serverda xato yuz berdi!' });
+        res.status(400).json({ error: 'Admin yaratishda xato yuz berdi!' });
     }
 };
+
 
 // Barcha adminlarni olish
 exports.getAllAdmins = async (req, res) => {

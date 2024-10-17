@@ -1,40 +1,45 @@
-const Subject = require('../Model/Fanlar'); // Fan modelini chaqiramiz
+const Subject = require('../Model/Fanlar');
+const Admin = require('../Model/adminlar');
+ // Fan modelini chaqiramiz
 
-// Fanlar ro'yxatini olish
-exports.getAllSubjects = async (req, res) => {
-    try {
-        // Admin ma'lumotlari bilan birga fanlarni olish
-        const subjects = await Subject.find().populate('adminId', 'name');
-        res.status(200).json(subjects);
-    } catch (error) {
-        console.error('Fanlar ro\'yxatini olishda xato:', error);
-        res.status(500).json({ error: 'Fanlar ro\'yxatini olishda xato yuz berdi!' });
-    }
-};
+// Fan yaratish
+ // Fan modelini chaqiramiz
 
 // Fan yaratish
 exports.createSubject = async (req, res) => {
     try {
-        const { name, adminId } = req.body;
+        const { name, adminId } = req.body; // Fanning nomi va adminId ni olish
 
-        // Validatsiya: fan nomi va adminId tekshirish
-        if (!name || !adminId) {
-            return res.status(400).json({ message: 'Fan nomi va admin ID majburiy!' });
+        // Admin mavjudligini tekshirish
+        const admin = await Admin.findById(adminId);
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin topilmadi!' });
         }
 
-        // Fan mavjudligini tekshirish
-        const existingSubject = await Subject.findOne({ name });
-        if (existingSubject) {
-            return res.status(400).json({ message: 'Bunday fan nomi allaqachon mavjud' });
-        }
+        // Fan nomi mavjudligini tekshirish
+        // const existingSubject = await Subject.findOne({ name });
+        // if (existingSubject) {
+        //     return res.status(400).json({ message: 'Bu fan allaqachon mavjud!' });
+        // }
 
-        // Yangi fan yaratish
-        const subject = new Subject({ name, adminId });
-        await subject.save();
-        res.status(201).json({ message: 'Fan muvaffaqiyatli yaratildi', subject });
+        // Yangi fan yaratish va adminId biriktirish
+        const newSubject = new Subject({ name, adminId });
+        await newSubject.save();
+
+        res.status(201).json({ message: 'Fan muvaffaqiyatli yaratildi!', subject: newSubject });
     } catch (error) {
-        console.error('Fan yaratishda xatolik:', error);
-        res.status(500).json({ message: 'Fan yaratishda xatolik yuz berdi', error });
+        res.status(500).json({ error: 'Fan yaratishda xato yuz berdi!' });
+    }
+};
+
+
+// Fanlar ro'yxatini olish
+exports.getAllSubjects = async (req, res) => {
+    try {
+        const subjects = await Subject.find().populate('adminId', 'name'); // Fanlar bilan adminlarni ham qo'shish
+        res.status(200).json(subjects);
+    } catch (error) {
+        res.status(500).json({ error: 'Fanlar ro\'yxatini olishda xato yuz berdi!' });
     }
 };
 
@@ -51,7 +56,6 @@ exports.deleteSubject = async (req, res) => {
 
         res.status(200).json({ message: 'Fan muvaffaqiyatli o\'chirildi!' });
     } catch (error) {
-        console.error('Fan o\'chirishda xato:', error);
         res.status(500).json({ error: 'Fan o\'chirishda xato yuz berdi!' });
     }
 };

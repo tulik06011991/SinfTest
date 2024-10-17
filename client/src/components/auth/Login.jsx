@@ -32,7 +32,7 @@ const Login = () => {
             if (response.data.redirect === "/superadmin/dashboard") {
                 navigate('/superadmin');
             } else {
-                navigate('/savollarjavoblar');
+                navigate('/dashboard');
             }
         } catch (err) {
             if (err.response && err.response.data) {
