@@ -6,7 +6,7 @@ const { getSubjects, getSubjectId, getAllSubjects } = require('../admin/Fanlarni
 // router.get('/subjects', getSubjects);
 
 router.post('/subjects', getSubjects);
-router.get('/subjects/:fan', getSubjectId);
+router.get('/subjects/:fanId', getSubjectId);
 router.get('/subjectlar', getAllSubjects);// adminId ixtiyoriy
 
 module.exports = router;

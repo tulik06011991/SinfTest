@@ -3,6 +3,7 @@ import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
+import {jwtDecode} from 'jwt-decode';
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -12,23 +13,38 @@ const Dashboard = () => {
   const [subjectDetails, setSubjectDetails] = useState(null);
   const [savollar, setsavollar] = useState({});
   const navigate = useNavigate();
+  const fanId = localStorage.getItem('fanId');
+console.log(fanId)
 
   // Token tekshiruvi va yo'naltirish
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
+    } else {
+      try {
+        const decodedToken = jwtDecode(token); // Tokenni dekodlash
+
+        // adminId ni olish
+        const adminId = decodedToken.userId; // Token ichidagi adminId ni olish (token tuzilmasiga qarab o'zgartiring)
+
+        // adminId ni localStorage'ga saqlash
+        localStorage.setItem('adminId', adminId);
+      } catch (error) {
+        console.error('Tokenni dekodlashda xatolik:', error);
+        navigate('/'); // Dekodlashda xatolik bo'lsa login sahifasiga o'tish
+      }
     }
   }, [navigate]);
-
+  
   // Fanlar ro'yxatini olish
   const fetchSubjects = async () => {
     setLoading(true);
     setError('');
-
+    
     try {
       const token = localStorage.getItem('token');
-      const fanId = localStorage.getItem('fanId');
+      const fanId = localStorage.getItem('adminId');
 
       if (!token) {
         navigate('/');
@@ -36,9 +52,9 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await axios.post(
-        `http://localhost:5000/api/subjects`,
-        { fanId },
+      const response = await axios.get(
+        `http://localhost:5000/api/subjects${fanId}`,
+        
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -98,11 +114,15 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
 
+
+
       if (!token) {
         throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
       }
 
+
       await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
+
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -132,6 +152,7 @@ const Dashboard = () => {
 
     try {
       const token = localStorage.getItem('token');
+
       const response = await axios.get(
         `http://localhost:5000/admin/subjects/${subject._id}`,
         {
@@ -140,6 +161,7 @@ const Dashboard = () => {
           },
         }
       );
+
 
       setsavollar(response.data.questionsWithOptions);
       setSubjectDetails(response.data);
@@ -224,7 +246,9 @@ const Dashboard = () => {
                       <span className='"px-2 py-2 md:px-4 md:py-2"'> savollar yuklangan vaqt: {new Date(question.createdAt).toLocaleDateString()}</span>
                       <td className="px-2 py-2 md:px-4 md:py-2 text-center">
                         <button
+
                           onClick={() => handleDelete(question.questionId)}
+
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />
@@ -285,4 +309,6 @@ const Dashboard = () => {
   );
 };
 
+
 export default Dashboard;
+

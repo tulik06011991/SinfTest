@@ -127,13 +127,14 @@ const getSubjectDetails = async (req, res) => {
 };
 
 const deleteQuestion = async (req, res) => {
+
     const { questionId } = req.params;
 
-    try {
-        const question = await Question.findByIdAndDelete(questionId);
-        if (!question) {
-            return res.status(404).json({ message: 'Savol topilmadi.' });
-        }
+
+  try {
+    // `subject` maydoni bo'yicha barcha savollarni o'chirish
+    const result = await Question.deleteMany({ subject: subjectId });
+
 
         res.status(200).json({ message: 'Savol muvaffaqiyatli o\'chirildi.' });
     } catch (error) {
@@ -144,6 +145,7 @@ const deleteQuestion = async (req, res) => {
 
 const deleteResult = async (req, res) => {
     const { id } = req.params; // userId ni req.params dan olamiz
+
 
     try {
         // Natijani userId bo'yicha o'chirish
