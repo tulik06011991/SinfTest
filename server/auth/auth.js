@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 
 // Register Controller
 const registerController = async (req, res) => {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     try {
         const existingUser = await User.findOne({ email });
@@ -20,7 +20,7 @@ const registerController = async (req, res) => {
             name,
             email,
             password,
-            role // Admin yoki user
+            
         });
 
         await user.save();
@@ -71,19 +71,21 @@ const loginController = async (req, res) => {
         if (admin) {
             // Parolni tekshirish
             const isMatch = await admin.comparePassword(password);
+            console.log(isMatch)
             if (!isMatch) {
                 return res.status(400).json({ message: 'Noto\'g\'ri parol!' });
             }
 
             // Adminning o'ziga tegishli fanlar ro'yxati
-            
+            const allSubjects = await Subject.find("_id").select('_id name');
 
             // JWT token yaratish
-            const token = jwt.sign({ userId: admin._id,  }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ userId: admin._id, role:'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
             return res.status(200).json({
                 token,
                 redirect: '/admin/dashboard',
+                subjects: allSubjects
               
             });
         }

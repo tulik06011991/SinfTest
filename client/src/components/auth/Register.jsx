@@ -12,7 +12,9 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/register', { name, email, password });
+            const response = await axios.post('http://localhost:5000/api/register', { name, email, password });
+            console.log(response);
+            
             navigate('/'); // Muvaffaqiyatli ro'yxatdan o'tgandan so'ng kirish sahifasiga o'tish
         } catch (err) {
             setError('Ro\'yxatdan o\'tishda xatolik yuz berdi');
