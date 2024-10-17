@@ -68,6 +68,8 @@ const loginController = async (req, res) => {
 
         // Oddiy admin uchun login
         const admin = await Admin.findOne({ email });
+        console.log(admin);
+        
         if (admin) {
             // Parolni tekshirish
             const isMatch = await admin.comparePassword(password);
