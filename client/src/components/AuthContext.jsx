@@ -6,6 +6,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [authState, setAuthState] = useState({ token: null, role: null });
 
+    // Sahifa yuklanganda tokenni tekshirish
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {

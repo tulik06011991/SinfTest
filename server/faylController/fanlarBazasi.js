@@ -3,7 +3,9 @@ const Subject = require('../Model/Fanlar'); // Fanlar modeli
 // Barcha fanlarni olish funksiyasi
 const getAllSubjects = async (req, res) => {
     try {
-        const subjects = await Subject.find(); // Barcha fanlarni bazadan olamiz
+        const subjects = await Subject.find();
+        console.log(subjects);
+         // Barcha fanlarni bazadan olamiz
         res.status(200).json(subjects); // Fanlarni JSON formatda qaytaramiz
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving subjects', error });

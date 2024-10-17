@@ -12,7 +12,9 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/register', { name, email, password });
+            const response = await axios.post('http://localhost:5000/api/register', { name, email, password });
+            console.log(response);
+            
             navigate('/'); // Muvaffaqiyatli ro'yxatdan o'tgandan so'ng kirish sahifasiga o'tish
         } catch (err) {
             setError('Ro\'yxatdan o\'tishda xatolik yuz berdi');
@@ -20,8 +22,8 @@ const Register = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 to-purple-600">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 to-purple-600 px-4">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md sm:w-auto sm:max-w-sm">
                 <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Ro'yxatdan o'tish</h2>
                 {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
                 <form onSubmit={handleSubmit}>
@@ -32,7 +34,7 @@ const Register = () => {
                             id="name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
                     </div>
@@ -43,7 +45,7 @@ const Register = () => {
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
                     </div>
@@ -54,7 +56,7 @@ const Register = () => {
                             id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
                     </div>

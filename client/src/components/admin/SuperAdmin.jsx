@@ -1,51 +1,75 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Link import qilish
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios'; // axios import qilish
 
 const SuperadminPanel = () => {
-  const [activeTab, setActiveTab] = useState('users'); // Foydalanuvchilar default tanlanadi
+  const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
-  const [admins, setAdmins] = useState([]);
-  const [categories, setCategories] = useState([]);
-
   const [newUser, setNewUser] = useState('');
-  const [newAdmin, setNewAdmin] = useState('');
-  const [newCategory, setNewCategory] = useState('');
+  const navigate = useNavigate()
 
   useEffect(() => {
-    // Backend API orqali ma'lumotlarni olish
-    fetch('/http://localhost:5000/api/users').then((response) => response.json()).then((data) => setUsers(data));
-   
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await axios.get('http://localhost:5000/api/dashboard', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Xatolik:', error);
+      }
+    };
+    fetchUsers();
   }, []);
+
   // Foydalanuvchilar CRUD
-  const createUser = () => {
+  const createUser = async () => {
     const user = { name: newUser };
-    fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(user),
-    }).then(() => {
-      setUsers([...users, user]);
-      setNewUser('');
-    });
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://localhost:5000/api/dashboard',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }, user);
+      setUsers([...users, response.data]); // Yangi foydalanuvchini ro'yxatga qo'shish
+      setNewUser(''); // Inputni tozalash
+    } catch (error) {
+      console.error('Xatolik:', error);
+    }
   };
 
-  const deleteUser = (id) => {
-    fetch(`/api/users/${id}`, { method: 'DELETE' }).then(() => {
-      setUsers(users.filter((user) => user.id !== id));
-    });
+  const deleteUser = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/users/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      ); // Foydalanuvchini o'chirish
+      setUsers(users.filter((user) => user._id !== id)); // O'chirilgan foydalanuvchini ro'yxatdan olib tashlash
+    } catch (error) {
+      console.error('Xatolik:', error);
+    }
   };
-
-  // Adminlar CRUD
-  
-
-
-  // Kategoriyalar CRUD
-  
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navbar */}
-      <nav className="bg-blue-600 p-4 text-white flex justify-between">
+      <nav className="bg-blue-600 p-4 text-white flex flex-col sm:flex-row justify-between items-center">
         <div className="flex space-x-4">
           <button
             className={`${activeTab === 'users' ? 'border-b-4 border-white' : ''} py-2 px-4`}
@@ -53,7 +77,7 @@ const SuperadminPanel = () => {
           >
             Foydalanuvchilar
           </button>
-          
+
           <Link to="/quiz">
             <button
               className={`${activeTab === 'admins' ? 'border-b-4 border-white' : ''} py-2 px-4`}
@@ -75,34 +99,58 @@ const SuperadminPanel = () => {
       </nav>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-6 max-w-6xl mx-auto">
         {activeTab === 'users' && (
           <div>
             <h2 className="text-2xl font-bold mb-4">Foydalanuvchilar</h2>
-            <input
-              type="text"
-              value={newUser}
-              onChange={(e) => setNewUser(e.target.value)}
-              className="border p-2 mb-4"
-              placeholder="Yangi foydalanuvchi ismi"
-            />
-            <button onClick={createUser} className="bg-blue-500 text-white px-4 py-2 rounded">
-              Yaratish
-            </button>
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
+              <input
+                type="text"
+                value={newUser}
+                onChange={(e) => setNewUser(e.target.value)}
+                className="border p-2 flex-1"
+                placeholder="Yangi foydalanuvchi ismi"
+              />
+              <button onClick={createUser} className="bg-blue-500 text-white px-4 py-2 rounded">
+                Yaratish
+              </button>
+            </div>
 
-            <ul className="mt-4 space-y-2">
-              {users.map((user) => (
-                <li key={user.id} className="flex justify-between p-2 bg-white shadow">
-                  {user.name}
-                  <button
-                    onClick={() => deleteUser(user.id)}
-                    className="text-red-600 hover:underline"
-                  >
-                    O'chirish
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white border border-gray-300">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 border">Emaili</th>
+                    <th className="px-4 py-2 border">Foydalanuvchi Ismi</th>
+                    <th className="px-4 py-2 border">Amallar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.length > 0 ? (
+                    users.map((user) => (
+                      <tr key={user._id} className="border-b border-gray-300">
+                        <td className="px-4 py-2 text-center">{user.email}</td>
+                        <td className="px-4 py-2">{user.name}</td>
+                        <td className="px-4 py-2 text-center">
+                          <button
+                            onClick={() => deleteUser(user._id)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            O'chirish
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3" className="text-gray-500 italic text-center py-4">
+                        Foydalanuvchilar topilmadi.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

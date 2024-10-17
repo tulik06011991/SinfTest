@@ -1,111 +1,132 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
+const FileUpload = () => {
+  const [file, setFile] = useState(null); // Fayl holatini saqlash
+  const [fanId, setFanId] = useState(""); // Fan ID holatini saqlash
+  const [fanlar, setFanlar] = useState([]); // Dinamik ravishda fanlar ro'yxatini saqlash
+  const [uploading, setUploading] = useState(false); // Yuklash holatini boshqarish
+  const [error, setError] = useState(""); // Xatolik holati
 
-const UploadFile = () => {
-  const [file, setFile] = useState(null); // Faylni saqlash
-  const [selectedSubject, setSelectedSubject] = useState(''); // Tanlangan fan
-  const [subjects, setSubjects] = useState([]); // Barcha fanlarni saqlash
-  const [message, setMessage] = useState(''); // Xabarni saqlash
-const navigate = useNavigate()
-
+  // Fanlar ro'yxatini olish uchun useEffect
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/'); // Token topilmasa, login sahifasiga yo'naltirish
-    }
-  }, [navigate]);
-
-  // Backenddan fanlar ro'yxatini olish uchun useEffect
-  useEffect(() => {
-    const fetchSubjects = async () => {
+    const fetchFanlar = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/subjects'); // Fanlarni olish
-        setSubjects(response.data); // Fanlarni state ga o'rnatamiz
-      } catch (error) {
-        console.error('Fanlarni olishda xato:', error);
+        const res = await axios.get("http://localhost:5000/api/subjectlar");
+        setFanlar(res);
+        
+        // Fanlar ro'yxatini o'rnatish
+      } catch (err) {
+        setError("Fanlarni olishda xatolik yuz berdi");
       }
     };
-    fetchSubjects();
+    
+    fetchFanlar(); // Fanlar ro'yxatini olish
   }, []);
+  
+  console.log(fanlar);
 
-  // Fayl tanlanganida
+  // Fayl tanlash funksiyasi
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
-  // Formani submit qilganda fayl yuklash funksiyasi
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Fan tanlash funksiyasi
+  const handleFanChange = (e) => {
+    setFanId(e.target.value);
+  };
 
-    if (!selectedSubject || !file) {
-      setMessage('Iltimos, fan va faylni tanlang!');
+  // Faylni yuklash funksiyasi
+  const handleFileUpload = async (e) => {
+    e.preventDefault();
+    if (!file || !fanId) {
+      alert("Fayl va fanni tanlang!");
       return;
     }
 
     const formData = new FormData();
-    formData.append('file', file); // Faylni FormData ga qo'shamiz
-    formData.append('subjectId', selectedSubject); // Tanlangan fan ID'sini qo'shamiz
+    formData.append("file", file);
+    formData.append("fanId", fanId); // fanId ni yuborish
+
+    setUploading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/upload', formData, {
+      // Faylni backendga POST so'rovi orqali jo'natish
+      const res = await axios.post("http://localhost:5000/api/upload", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
-      setMessage('Fayl muvaffaqiyatli yuklandi!');
+
+      alert("Fayl muvaffaqiyatli yuklandi!");
+      console.log("Server javobi:", res.data);
     } catch (error) {
-      console.error('Faylni yuklashda xato:', error);
-      setMessage('Faylni yuklashda xato yuz berdi!');
+      console.error("Xatolik:", error);
+      alert("Fayl yuklashda xatolik yuz berdi.");
+    } finally {
+      setUploading(false);
+      setFile(null);
+      setFanId(""); // Fan tanlovini tozalash
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-      <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Fan Tanlash va Fayl Yuklash</h2>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+      <h2 className="text-2xl font-bold mb-4 text-center">Word Faylini Yuklash</h2>
+      {error && <p className="text-red-500 text-center">{error}</p>}
+      <form onSubmit={handleFileUpload} className="space-y-4">
+        {/* Fan tanlash */}
         <div className="flex flex-col">
-          <label htmlFor="subject" className="mb-1 text-gray-600">Fan Tanlang:</label>
+          <label htmlFor="fanId" className="font-medium mb-2">
+            Fan Tanlang:
+          </label>
           <select
-            id="subject"
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
+            id="fanId"
+            value={fanId}
+            onChange={handleFanChange}
+            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
-            className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={uploading}
           >
-            <option value="">Fan tanlang</option>
-            {subjects.map((subject) => (
-              <option key={subject._id} value={subject._id}>
-                {subject.name}
+            <option value="">Fanni tanlang</option>
+            {fanlar.map((fan) => (
+              <option key={fan._id} value={fan._id}>
+                {fan.name}
               </option>
             ))}
           </select>
         </div>
 
+        {/* Fayl tanlash */}
         <div className="flex flex-col">
-          <label htmlFor="file" className="mb-1 text-gray-600">Faylni Yuklang:</label>
+          <label htmlFor="file" className="font-medium mb-2">
+            Word Faylini tanlang:
+          </label>
           <input
             type="file"
-            id="file"
+            accept=".doc,.docx"
             onChange={handleFileChange}
+            disabled={uploading}
+            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
-            className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors duration-300"
-        >
-          Yuklash
-        </button>
-
-        {message && <p className="text-center text-red-500 mt-4">{message}</p>}
+        {/* Fayl yuklash tugmasi */}
+        <div className="text-center">
+          <button
+            type="submit"
+            disabled={uploading}
+            className={`px-4 py-2 rounded text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
+              uploading ? "cursor-not-allowed opacity-50" : ""
+            }`}
+          >
+            {uploading ? "Yuklanmoqda..." : "Yuklash"}
+          </button>
+        </div>
       </form>
     </div>
   );
 };
 
-export default UploadFile;
+export default FileUpload;

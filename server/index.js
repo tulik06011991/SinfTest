@@ -8,11 +8,11 @@ const admin = require('./routes/adminlar')
 const admins = require('./routes/adminlar') 
 const adminPut = require('./routes/adminlar') 
 const adminDel = require('./routes/adminlar') 
-const fanlar2 = require('./routes/fanlar2')
+const fanlarBazasi = require('./routes/fanlarBazasi')
 const fanOlish = require('./routes/fanlarOlish')
 const auth  = require('./routes/auth')
 const javob = require('./routes/Javoblar')
-const adminFan = require('./routes/adminFan')
+const adminFan = require('./routes/fanlarYasash')
 const hammasi = require('./routes/hammasi')// questionRoutes'ni import qilish
 const cors = require("cors")
 const path = require('path');
@@ -31,23 +31,26 @@ app.use('/api',  admin);
 app.use('/api',  admins)
 app.use('/api',  adminPut)
 app.use('/api',  adminDel)
-app.use('/api', fanlar2)
+app.use('/api', fanlarBazasi)
 app.use('/api', fanOlish)
 app.use('/api', auth)
 app.use('/api', javob)
 app.use('/admin', adminFan)
 app.use('/admin', hammasi)
+
+
 // MongoDB ga ulanish
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URL, );
-        console.log('MongoDB Atlas bilan ulanish o\'rnatildi');
+      await mongoose.connect(process.env.MONGO_URL, {
+       
+      });
+      console.log('MongoDB Atlas bilan ulanish muvaffaqiyatli amalga oshirildi');
     } catch (error) {
-        console.error('MongoDB Atlas bilan ulanishda xato:', error.message);
-        process.exit(1); // Xato bo'lsa serverni to'xtatadi
+      console.error('MongoDB Atlas bilan ulanishda xato:', error);
+      process.exit(1);
     }
-};
-
+  };
 // MongoDB ulanishini chaqirish
 connectDB();
 

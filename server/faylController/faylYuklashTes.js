@@ -1,107 +1,92 @@
+const fs = require('fs');
 const path = require('path');
-const mammoth = require('mammoth');
+const mammoth = require('mammoth'); // Word faylni matnga o‘girish uchun
 const Question = require('../Model/questionModel');
 
-// Fayldan savollar va variantlarni extract qilish va saqlash
-const parseWordFile = async (filePath, subjectId) => {
-    try {
-        const data = await mammoth.extractRawText({ path: filePath });
-        const content = data.value;
-        const questions = extractQuestions(content);
+// Word faylni JSONga o‘girish va savollarni saqlash
+const extractQuestionsFromWord = async (req, res) => {
+  try {
+    // Yuklangan faylni o‘qiymiz
+    const filePath = req.file.path;
+    const result = await mammoth.extractRawText({ path: filePath });
+    const text = result.value;
 
-        // MongoDB ga savollarni saqlash
-        for (let questionData of questions) {
-            const newQuestion = new Question({
-                question: questionData.question,
-                options: questionData.options.map(option => ({
-                    text: option.text.replace(/^\./, ''), // Nuqtani olib tashlaymiz
-                    isCorrect: option.isCorrect
-                })),
-                correctAnswer: questionData.correctAnswer,
-                subject: subjectId // Fan ID'sini kiritamiz
-            });
-            await newQuestion.save(); // Savollarni saqlash
-        }
-
-        return questions;
-    } catch (error) {
-        console.error('Error parsing Word file:', error);
-        throw error;
+    const questions = parseQuizData(text); // JSON formatga o‘tkazish funksiyasi
+    if (questions.length > 60) {
+      return res.status(400).json({ error: 'Savollar soni 60 tadan oshmasligi kerak' });
     }
-};
 
-// Savollar va variantlarni olish funksiyasi
-const extractQuestions = (content) => {
-    const lines = content.split('\n'); // Faylni qatorlar bo'yicha bo'lamiz
-    let questions = [];
-    let currentQuestion = {}; // Hozirgi savol
-
-    lines.forEach((line) => {
-        // Savolni olish: savol raqami bilan boshlanadi, masalan "1."
-        const questionMatch = line.match(/^\d+\./);
-        if (questionMatch) {
-            // Agar oldingi savol mavjud bo'lsa, uni savollar ro'yxatiga qo'shamiz
-            if (currentQuestion.question) {
-                if (!currentQuestion.correctAnswer) {
-                    // Agar to'g'ri javob aniqlanmagan bo'lsa, birinchi variantni tanlaymiz
-                    currentQuestion.correctAnswer = currentQuestion.options.find(opt => opt.isCorrect)?.text || currentQuestion.options[0].text;
-                }
-                questions.push(currentQuestion);
-            }
-            // Yangi savolni boshlash
-            currentQuestion = {
-                question: line.trim(), // Savol matnini tozalaymiz
-                options: [], // Variantlar ro'yxati
-                correctAnswer: null // To'g'ri javobni aniqlash
-            };
-        }
-
-        // Bir qator ichida bir nechta variantlar mavjud bo'lsa, ularni ajratib olish
-        let optionRegex = /(\.?[A-D])[).]\s*([^A-D]*)/g; // "A)" yoki ".A)" ko'rinishdagi variantlarni qidirish
-        let match;
-        while ((match = optionRegex.exec(line)) !== null) {
-            let optionLabel = match[1]; // A, B, C, D va ularning oldidagi nuqta
-            let optionText = match[2].trim(); // Variantning matni
-
-            // Agar variant oldida nuqta bo'lsa, uni to'g'ri variant deb belgilaymiz
-            let isCorrect = optionLabel.startsWith('.');
-
-            // Variantni qo'shamiz
-            currentQuestion.options.push({
-                text: optionText, // Variant matni
-                isCorrect: isCorrect // To'g'ri javob bo'lsa belgilaymiz
-            });
-
-            // Agar to'g'ri variant bo'lsa, uni currentQuestion.correctAnswer ga o'rnatamiz
-            if (isCorrect) {
-                currentQuestion.correctAnswer = optionText; // To'g'ri javobni saqlaymiz
-            }
-        }
+    // Savollar soni va variantlar sonini tekshirish
+    let totalOptions = 0;
+    questions.forEach(q => {
+      totalOptions += q.options.length;
     });
+    if (totalOptions > 240) {
+      return res.status(400).json({ error: 'Variantlar soni 240 tadan oshmasligi kerak' });
+    }
 
-    // Oxirgi savolni qo'shish, to'g'ri javob aniqlanmagan bo'lsa, birinchi variantni tanlaymiz
-    if (currentQuestion.question) {
-        if (!currentQuestion.correctAnswer) {
-            currentQuestion.correctAnswer = currentQuestion.options.find(opt => opt.isCorrect)?.text || currentQuestion.options[0].text;
-        }
+    // `fanId`ni savollarga qo‘shamiz
+    const fanId = req.body.fanId;
+    if (!fanId) {
+      return res.status(400).json({ error: 'Fan ID talab qilinadi' });
+    }
+
+    // Savollarni bazaga saqlashdan oldin `fanId` ni qo‘shamiz
+    const questionsWithFanId = questions.map(q => ({
+      ...q,
+      fanId: fanId
+    }));
+
+    // Savollarni bazaga saqlash
+    const savedQuestions = await Question.insertMany(questionsWithFanId);
+
+    res.status(201).json({ message: 'Savollar muvaffaqiyatli saqlandi', savedQuestions });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Serverda xatolik yuz berdi' });
+  } finally {
+    // Yuklangan faylni o‘chirib tashlaymiz
+    fs.unlinkSync(req.file.path);
+  }
+};
+
+// JSON formatga o‘tkazish funksiyasi (ilgari ko'rsatgan kod)
+function parseQuizData(text) {
+  const lines = text.split('\n');
+  let questions = [];
+  let currentQuestion = null;
+
+  lines.forEach(line => {
+    const questionRegex = /^\d+\..*\?|\d+\..*\.$/;
+    const optionRegex = /^[A-D]\).+/;
+    const correctOptionRegex = /^\.[A-D]\).+/;
+
+    if (questionRegex.test(line.trim())) {
+      if (currentQuestion) {
         questions.push(currentQuestion);
+      }
+      currentQuestion = {
+        questionText: line.trim(),
+        options: []
+      };
+    } else if (optionRegex.test(line.trim())) {
+      currentQuestion.options.push({
+        text: line.replace(/^[A-D]\)\s*/, '').replace('*', '').trim(),
+        isCorrect: false // Oldida nuqta bo'lmasa, noto'g'ri hisoblanadi
+      });
+    } else if (correctOptionRegex.test(line.trim())) {
+      currentQuestion.options.push({
+        text: line.replace(/^\.[A-D]\)\s*/, '').replace('*', '').trim(),
+        isCorrect: true // Oldida nuqta bo'lsa, to'g'ri hisoblanadi
+      });
     }
+  });
 
-    return questions; // Barcha savollarni qaytaramiz
-};
+  if (currentQuestion) {
+    questions.push(currentQuestion);
+  }
 
-// Fayl yuklash va savollarni extract qilish
-const uploadQuestions = async (req, res) => {
-    try {
-        const filePath = req.file.path;
-        const { subjectId } = req.body; // Fan ID'sini request body'dan olamiz
-        const questions = await parseWordFile(filePath, subjectId);
-        res.json({ questions });
-    } catch (error) {
-        res.status(500).json({ message: 'Error extracting questions' });
-    }
-};
+  return questions;
+}
 
-module.exports = {
-    uploadQuestions
-};
+module.exports = { extractQuestionsFromWord };

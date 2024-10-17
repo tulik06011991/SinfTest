@@ -11,7 +11,15 @@ const AdminCrud = () => {
     subject: ''
   });
   const [editAdmin, setEditAdmin] = useState(null);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+  // Initialize useNavigate
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
+    }
+  }, [navigate]);
 
   // Barcha adminlarni olish
   useEffect(() => {
@@ -19,8 +27,15 @@ const AdminCrud = () => {
   }, []);
 
   const fetchAdmins = async () => {
+    const token  = localStorage.getItem('token') 
     try {
-      const response = await axios.get('http://localhost:5000/api/admins'); // Barcha adminlarni oladi
+      const response = await axios.get('http://localhost:5000/api/admins',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      ); // Barcha adminlarni oladi
       setAdmins(response.data);
     } catch (error) {
       console.error('Adminlarni olishda xato:', error);
@@ -29,19 +44,32 @@ const AdminCrud = () => {
 
   // Yangi admin yaratish
   const createAdmin = async () => {
+    const token = localStorage.getItem('token'); 
     try {
-      const response = await axios.post('http://localhost:5000/api/admin', newAdmin);
-      setAdmins([...admins, response.data.newAdmin]);
-      setNewAdmin({ name: '', email: '', password: '', subject: '' });
+        const response = await axios.post('http://localhost:5000/api/admin',
+            newAdmin, // Bu yerda ma'lumotlar
+            {
+                headers: {
+                    Authorization: `Bearer ${token}` // Tokenni headers'ga qo'shamiz
+                },
+            });
+        setAdmins([...admins, response.data.newAdmin]);
+        setNewAdmin({ name: '', email: '', password: '', subject: '' });
     } catch (error) {
-      console.error('Admin yaratishda xato:', error);
+        console.error('Admin yaratishda xato:', error);
     }
-  };
+};
 
   // Adminni yangilash
   const updateAdmin = async (id) => {
+    const token  = localStorage.getItem('token') 
     try {
-      const response = await axios.put(`http://localhost:5000/api/admin/${id}`, editAdmin);
+      const response = await axios.put(`http://localhost:5000/api/admin/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }, editAdmin);
       const updatedAdmins = admins.map((admin) =>
         admin._id === id ? response.data.updatedAdmin : admin
       );
@@ -54,8 +82,15 @@ const AdminCrud = () => {
 
   // Adminni o'chirish
   const deleteAdmin = async (id) => {
+    const token  = localStorage.getItem('token') 
     try {
-      await axios.delete(`http://localhost:5000/api/admin/${id}`);
+      await axios.delete(`http://localhost:5000/api/admin/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       setAdmins(admins.filter((admin) => admin._id !== id));
     } catch (error) {
       console.error('Adminni o\'chirishda xato:', error);

@@ -1,35 +1,34 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from './AuthContext';
 
 const NavbarSidebar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { authState, logout } = useContext(AuthContext); 
-    // AuthContext'dan foydalanuvchi ma'lumotlarini olish
     const navigate = useNavigate();
-
-    // useEffect(() => {
-    //     const token = localStorage.getItem('token');
-    //     if (!token) {
-    //       navigate('/login'); // Token topilmasa, login sahifasiga yo'naltirish
-    //     }
-    //   }, [navigate]);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
     const handleLogout = () => {
-        logout();
+        // Logout qilish lojiqasi
         localStorage.clear();
         navigate('/');
     };
 
-    // localStorage'dan tokenni olish
     const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
 
-    // Token mavjud bo'lsa Sidebar ni ko'rsatish
-    if (!token) return null;
+    // Token mavjud bo'lmasa, faqat "About" sahifasini ko'rsatadi
+    if (!token) return (
+        <nav className="bg-gray-800 text-white p-4">
+            <div className="container mx-auto flex justify-between items-center text-3xl bold">
+                60-maktab
+                <ul className="flex space-x-8 text-xl">
+                    <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
+                </ul>
+            </div>
+        </nav>
+    );
 
     return (
         <>
@@ -45,17 +44,16 @@ const NavbarSidebar = () => {
             <div className={`fixed top-0 left-0 w-64 h-full bg-gray-800 shadow text-white z-20 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 lg:hidden`}>
                 <button className="text-4xl p-4" onClick={toggleSidebar}>&times;</button>
                 <ul className="mt-10 space-y-4 text-xl">
-                    {/* Token mavjud bo'lsa */}
-                    {authState.token ? (
-                        authState.role === 'admin' ? (
-                            <>
-                                <li><Link to="/faylyuklash" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
-                                {/* <li><Link to="/quiz" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Admin</Link></li>
-                                <li><Link to="/fanlar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Fanlar</Link></li> */}
-                            </>
-                        ) : (
-                            <li><Link to="/savollarjavoblar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Test</Link></li>
-                        )
+                    {role === '/superadmin/dashboard' ? (
+                        <>
+                            <li><Link to="/faylyuklash" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
+                            <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
+                        </>
+                    ) : role === '/admin/dashboard' ? (
+                        <>
+                             <li><Link to="/faylyuklash" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
+                            <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
+                        </>
                     ) : (
                         <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
                     )}
@@ -70,17 +68,16 @@ const NavbarSidebar = () => {
                 <div className="container mx-auto flex justify-between items-center text-3xl bold">
                     60-maktab
                     <ul className="flex space-x-8 text-xl">
-                        {/* Token mavjud bo'lsa */}
-                        {authState.token ? (
-                            authState.role === 'admin' ? (
-                                <>
-                                    <li><Link to="/faylyuklash" className="hover:text-gray-400">Word</Link></li>
-                                    {/* <li><Link to="/quiz" className="hover:text-gray-400">Admin</Link></li>
-                                    <li><Link to="/fanlar" className="hover:text-gray-400">Fanlar</Link></li> */}
-                                </>
-                            ) : (
+                        {role === '/admin/dashboard' ? (
+                            <>
+                                <li><Link to="/faylyuklash" className="hover:text-gray-400">Word</Link></li>
+                                <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
+                            </>
+                        ) : role === '/savollarjavoblar' ? (
+                            <>
                                 <li><Link to="/savollarjavoblar" className="hover:text-gray-400">Test</Link></li>
-                            )
+                                <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
+                            </>
                         ) : (
                             <li><Link to="/about" className="hover:text-gray-400">About</Link></li>
                         )}
