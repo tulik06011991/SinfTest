@@ -1,10 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const FileUpload = () => {
   const [file, setFile] = useState(null); // Fayl holatini saqlash
   const [fanId, setFanId] = useState(""); // Fan ID holatini saqlash
+  const [fanlar, setFanlar] = useState([]); // Dinamik ravishda fanlar ro'yxatini saqlash
   const [uploading, setUploading] = useState(false); // Yuklash holatini boshqarish
+  const [error, setError] = useState(""); // Xatolik holati
+
+  // Fanlar ro'yxatini olish uchun useEffect
+  useEffect(() => {
+    const fetchFanlar = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/subjects");
+        setFanlar(res.data.subjects); // Fanlar ro'yxatini o'rnatish
+      } catch (err) {
+        setError("Fanlarni olishda xatolik yuz berdi");
+      }
+    };
+
+    fetchFanlar(); // Fanlar ro'yxatini olish
+  }, []);
 
   // Fayl tanlash funksiyasi
   const handleFileChange = (e) => {
@@ -53,6 +69,7 @@ const FileUpload = () => {
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
       <h2 className="text-2xl font-bold mb-4 text-center">Word Faylini Yuklash</h2>
+      {error && <p className="text-red-500 text-center">{error}</p>}
       <form onSubmit={handleFileUpload} className="space-y-4">
         {/* Fan tanlash */}
         <div className="flex flex-col">
@@ -68,10 +85,11 @@ const FileUpload = () => {
             disabled={uploading}
           >
             <option value="">Fanni tanlang</option>
-            <option value="1">Matematika</option>
-            <option value="2">Fizika</option>
-            <option value="3">Ingliz Tili</option>
-            {/* Bu yerga fanlar dinamik tarzda qo'shilishi mumkin */}
+            {fanlar.map((fan) => (
+              <option key={fan._id} value={fan._id}>
+                {fan.name}
+              </option>
+            ))}
           </select>
         </div>
 
