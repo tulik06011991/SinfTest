@@ -51,7 +51,7 @@ const NavbarSidebar = () => {
                         </>
                     ) : role === '/admin/dashboard' ? (
                         <>
-                            <li><Link to="/savollarjavoblar" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Test</Link></li>
+                             <li><Link to="/faylyuklash" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
                             <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
                         </>
                     ) : (
