@@ -22,7 +22,7 @@ const Login = () => {
 
             localStorage.setItem('userName', response.data.name || 'Foydalanuvchi');
             localStorage.setItem('token', response.data.token);
-            localStorage.setItem('role', response.data.role); // Rolni saqlash
+            localStorage.setItem('role', response.data.redirect); // Rolni saqlash
 
             if (response.data.subjects && response.data.subjects.length > 0) {
                 const fanId = response.data.subjects[0]._id;
