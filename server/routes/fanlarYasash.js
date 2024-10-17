@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const subjectController = require('../admin/Fanlar');
+const subjectController = require('../admin/FanlarYasash');
 const middleware = require('../middleware/middleware') // Fan controllerini chaqiramiz
 
 // Fan yaratish marshruti (faqat admin uchun)

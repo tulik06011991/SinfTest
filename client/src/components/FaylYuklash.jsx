@@ -12,17 +12,19 @@ const FileUpload = () => {
   useEffect(() => {
     const fetchFanlar = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/subjectss");
-        setFanlar(res.data.subjects);
-        console.log(res);
-         // Fanlar ro'yxatini o'rnatish
+        const res = await axios.get("http://localhost:5000/api/subjectlar");
+        setFanlar(res);
+        
+        // Fanlar ro'yxatini o'rnatish
       } catch (err) {
         setError("Fanlarni olishda xatolik yuz berdi");
       }
     };
-
+    
     fetchFanlar(); // Fanlar ro'yxatini olish
   }, []);
+  
+  console.log(fanlar);
 
   // Fayl tanlash funksiyasi
   const handleFileChange = (e) => {

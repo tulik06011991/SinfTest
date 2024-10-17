@@ -49,12 +49,14 @@ const getSubjectId = async (req, res) => {
 const getAllSubjects = async (req, res) => {
   try {
     // Fanlarni ID va nomi bilan olish
-    const subjects = await Subject.find().select('_id name');
+    const subjects = await Subject.find()
+    console.log(subjects);
+    
     if (!subjects || subjects.length === 0) {
       return res.status(404).json({ message: 'Fanlar topilmadi!' });
     }
 
-    res.status(200).json({ subjects }); // Fanlarni muvaffaqiyatli qaytarish
+    res.status(200).json(subjects ); // Fanlarni muvaffaqiyatli qaytarish
   } catch (error) {
     console.error('Fanlarni olishda xato:', error);
     res.status(500).json({ message: 'Fanlarni olishda xato yuz berdi!' });

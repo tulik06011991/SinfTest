@@ -48,7 +48,7 @@ const CreateSubject = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/create',
+        'http://localhost:5000/admin/create',
         { name: subjectName, adminId }, // Fan nomi va adminId ni post qilamiz
         {
           headers: {
