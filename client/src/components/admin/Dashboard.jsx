@@ -3,6 +3,7 @@ import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
+import {jwtDecode} from 'jwt-decode';
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -20,6 +21,19 @@ console.log(fanId)
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
+    } else {
+      try {
+        const decodedToken = jwtDecode(token); // Tokenni dekodlash
+
+        // adminId ni olish
+        const adminId = decodedToken.userId; // Token ichidagi adminId ni olish (token tuzilmasiga qarab o'zgartiring)
+
+        // adminId ni localStorage'ga saqlash
+        localStorage.setItem('adminId', adminId);
+      } catch (error) {
+        console.error('Tokenni dekodlashda xatolik:', error);
+        navigate('/'); // Dekodlashda xatolik bo'lsa login sahifasiga o'tish
+      }
     }
   }, [navigate]);
   
@@ -30,6 +44,7 @@ console.log(fanId)
     
     try {
       const token = localStorage.getItem('token');
+      const fanId = localStorage.getItem('adminId');
 
       if (!token) {
         navigate('/');
@@ -37,9 +52,9 @@ console.log(fanId)
         return;
       }
 
-      const response = await axios.post(
-        `http://localhost:5000/api/subjects`,
-        { fanId },
+      const response = await axios.get(
+        `http://localhost:5000/api/subjects${fanId}`,
+        
         {
           headers: {
             Authorization: `Bearer ${token}`,
