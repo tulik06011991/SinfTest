@@ -67,7 +67,7 @@ const loginController = async (req, res) => {
         }
 
         // Oddiy admin uchun login
-        const admin = await Admin.findOne({ email });
+        const admin = await Admin.findOne({ email })
         if (admin) {
             // Parolni tekshirish
             const isMatch = await admin.comparePassword(password);
