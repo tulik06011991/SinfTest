@@ -14,14 +14,19 @@ const Quiz = () => {
 
     // Fanlar ro'yxatini olish uchun endpoint
     useEffect(() => {
+        const token = localStorage.getItem('token');
         const fetchSubjects = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/subjectlar');
-                console.log(response);
+                const response = await axios.get('http://localhost:5000/api/subjectlar',
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+                console.log(response.data);
     
-                // Tekshiramiz, response.data obyekt bo'lsa, subjects ro'yxatini olamiz
-                if (response.data && Array.isArray(response.data.subjects)) {
-                    setSubjects(response.data.subjects); // Fanlar ro'yxatini yuklash
+                // Agar ma'lumot obyekt o'rniga to'g'ridan-to'g'ri massiv bo'lsa, shunday tekshirish kerak
+                if (Array.isArray(response.data)) {
+                    setSubjects(response.data); // Fanlar ro'yxatini yuklash
                 } else {
                     console.error('Ma\'lumotlar noto\'g\'ri formatda keldi:', response.data);
                 }
@@ -32,7 +37,6 @@ const Quiz = () => {
         fetchSubjects();
     }, []);
     
-
     // Token mavjudligini tekshirish
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -49,6 +53,7 @@ const Quiz = () => {
             try {
                 const response = await axios.get(`http://localhost:5000/api/questions/subject/${selectedSubject}`); // Tanlangan fanga ko'ra savollarni olish
                 setQuestions(response.data); // Savollarni yuklash
+                console.log(response.data);
             } catch (error) {
                 console.error('Savollarni olishda xato:', error);
             }
@@ -67,8 +72,8 @@ const Quiz = () => {
     // Fan tanlash funksiyasi
     const handleSubjectChange = (event) => {
         setSelectedSubject(event.target.value);
-        setQuestions([]);
-        setSelectedAnswers([]);
+        setQuestions([]); // Eski savollarni tozalash
+        setSelectedAnswers([]); // Belgilangan javoblarni tozalash
         setSubmissionStatus('');
         setResult(null);
     };
@@ -128,7 +133,8 @@ const Quiz = () => {
                 <div className="w-full md:w-3/4 lg:w-1/2">
                     {questions.map((question, index) => (
                         <div key={question._id} className="question-block mb-6 p-4 bg-white shadow-md rounded-lg">
-                            <h3 className="text-xl font-semibold mb-4">{index + 1}. {question.question}</h3>
+                            <h3 className="text-xl font-semibold mb-4">{index + 1}. {question.
+questionText}</h3>
                             <ul className="space-y-3">
                                 {question.options.map((option) => (
                                     <li key={option.text} className="text-lg">
@@ -169,9 +175,7 @@ const Quiz = () => {
                 </div>
             )}
         </div>
-
     );
 };
 
 export default Quiz;
-

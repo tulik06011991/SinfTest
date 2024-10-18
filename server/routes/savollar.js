@@ -4,6 +4,6 @@ const { getQuestionsBySubject } = require('../faylController/Savollar'); // Cont
 const router = express.Router();
 
 // Ma'lum bir fan bo'yicha savollarni olish
-router.get('/questions/subject/:subject', getQuestionsBySubject);
+router.get('/questions/subject/:selectedSubject', getQuestionsBySubject);
 
 module.exports = router;
