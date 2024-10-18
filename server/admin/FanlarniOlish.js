@@ -3,15 +3,16 @@ const Admin = require('../Model/adminlar'); // Admin modelini import qilamiz
 
 // Fanlar ro'yxatini olish va fanId bo'yicha filtrlash
 const getSubjects = async (req, res) => {
-  const { fanId } = req.body; // Body'dan fanId ni olamiz
+  const { adminId } = req.params; // Body'dan adminId ni olamiz
 
   try {
-    if (!fanId) {
+    if (!adminId) {
       return res.status(400).json({ message: 'FanId berilmagan!' });
     }
 
     // fanId bo'yicha fanlarni olamiz
-    const subjects = await Subject.findById(fanId).select('name'); // Faqat fan nomini olamiz
+    const subjects = await Subject.find({ adminId }).select('_id name');
+    console.log(subjects)
     if (!subjects) {
       return res.status(404).json({ message: 'Fan topilmadi!' });
     }
@@ -49,14 +50,14 @@ const getSubjectId = async (req, res) => {
 const getAllSubjects = async (req, res) => {
   try {
     // Fanlarni ID va nomi bilan olish
-    const subjects = await Subject.find()
+    const subjects = await Subject.find().select('_id name')
     console.log(subjects);
     
     if (!subjects || subjects.length === 0) {
       return res.status(404).json({ message: 'Fanlar topilmadi!' });
     }
 
-    res.status(200).json(subjects ); // Fanlarni muvaffaqiyatli qaytarish
+    res.status(200).json(subjects ); // Fanlarni muvaffaqiyatli qaytarishi
   } catch (error) {
     console.error('Fanlarni olishda xato:', error);
     res.status(500).json({ message: 'Fanlarni olishda xato yuz berdi!' });

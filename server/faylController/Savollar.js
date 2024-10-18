@@ -3,7 +3,9 @@ const Question = require('../Model/questionModel'); // Savollar modelini chaqira
 // Ma'lum bir fan bo'yicha savollarni olish
 exports.getQuestionsBySubject = async (req, res) => {
     try {
-        const { subject } = req.params; // URL'dan subject olamiz
+        const { subject } = req.params;
+        console.log(subject)
+         // URL'dan subject olamiz
 
         // Savollarni fan bo'yicha topamiz
         const questions = await Question.find({ subject });

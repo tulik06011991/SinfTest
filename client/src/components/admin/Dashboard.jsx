@@ -3,6 +3,7 @@ import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
+import {jwtDecode }from 'jwt-decode'; 
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -10,7 +11,7 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [subjectDetails, setSubjectDetails] = useState(null);
-  const [savollar, setsavollar] = useState({});
+  const [savollar, setSavollar] = useState([]);
   const navigate = useNavigate();
 
   // Token tekshiruvi va yo'naltirish
@@ -18,6 +19,15 @@ const Dashboard = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
+    } else {
+      try {
+        const decodedToken = jwtDecode(token);
+        const adminId = decodedToken.userId; // Token ichidan adminId olish
+        localStorage.setItem('adminId', adminId);
+      } catch (error) {
+        console.error('Tokenni dekodlashda xatolik:', error);
+        navigate('/');
+      }
     }
   }, [navigate]);
 
@@ -25,26 +35,17 @@ const Dashboard = () => {
   const fetchSubjects = async () => {
     setLoading(true);
     setError('');
-
     try {
       const token = localStorage.getItem('token');
-      const fanId = localStorage.getItem('fanId');
-
       if (!token) {
         navigate('/');
         setError('Token topilmadi. Iltimos, qayta login qiling.');
         return;
       }
 
-      const response = await axios.post(
-        `http://localhost:5000/api/subjects`,
-        { fanId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get('http://localhost:5000/api/subjects', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       setSubjects(response.data.subjects);
       if (response.data.subjects.length === 0) {
@@ -58,72 +59,7 @@ const Dashboard = () => {
     }
   };
 
-  // Foydalanuvchini o'chirish va interfeysdan yangilash
-  const handleDeleteUsers = async (id) => {
-    setLoading(true);
-
-    try {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
-      }
-
-      // Foydalanuvchini o'chirish so'rovi
-      await axios.delete(`http://localhost:5000/admin/users/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // O'chirilgan foydalanuvchini interfeysdan olib tashlash
-      const updatedResults = subjectDetails.userResults.filter(
-        (result) => result.userId !== id
-      );
-      setSubjectDetails((prev) => ({
-        ...prev,
-        userResults: updatedResults,
-      }));
-    } catch (err) {
-      console.error('Xatolik yuz berdi:', err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Savollarni o'chirish va interfeysdan yangilash
-  const handleDelete = async (id) => {
-    setLoading(true);
-
-    try {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
-      }
-
-      await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // O'chirilgan savolni interfeysdan olib tashlash
-      const updatedQuestions = savollar.filter((question) => question._id !== id);
-      setsavollar(updatedQuestions);
-
-      // Tanlangan fan bo'yicha savollarni qayta yuklash
-      handleSubjectClick(selectedSubject);
-
-    } catch (err) {
-      setError("O'chirishda xatolik yuz berdi.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Tanlangan fan bo'yicha savollarni olish
+  // Fanni bosganda fanga oid savollarni olish
   const handleSubjectClick = async (subject) => {
     setLoading(true);
     setSelectedSubject(subject);
@@ -133,28 +69,47 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `http://localhost:5000/admin/subjects/${subject._id}`,
+        `http://localhost:5000/api/subjects/${subject._id}`, // Fan bo'yicha backend so'rovi
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setsavollar(response.data.questionsWithOptions);
+      setSavollar(response.data.questionsWithOptions);
       setSubjectDetails(response.data);
 
       if (response.data.questionsWithOptions.length === 0) {
         setError("Savollar topilmadi.");
       }
     } catch (err) {
-      setError("Ma'lumotlarni o'chirgansiz.");
+      setError("Savollarni olishda xatolik yuz berdi.");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
-  console.log(subjectDetails)
+
+  // Fanga oid savollarni o'chirish
+  const handleDeleteSubject = async (subjectId) => {
+    const confirmDelete = window.confirm("Bu fanga oid barcha savollarni o'chirmoqchimisiz?");
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/subjects/${subjectId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Fan o'chirilganidan so'ng fanlar ro'yxatini qayta yuklash
+      fetchSubjects();
+      setSelectedSubject(null);
+      setSubjectDetails(null);
+      setSavollar([]);
+    } catch (err) {
+      setError("Fan va savollarni o'chirishda xatolik yuz berdi.");
+      console.error(err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
@@ -183,10 +138,15 @@ const Dashboard = () => {
             subjects.map((subject) => (
               <li
                 key={subject._id}
-                onClick={() => handleSubjectClick(subject)}
-                className="cursor-pointer p-4 border border-gray-300 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-200 text-gray-800"
+                className="flex justify-between items-center cursor-pointer p-4 border border-gray-300 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-200 text-gray-800"
               >
-                {subject.name}
+                <span onClick={() => handleSubjectClick(subject)}>{subject.name}</span>
+                <button
+                  onClick={() => handleDeleteSubject(subject._id)}
+                  className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition duration-300"
+                >
+                  <FaTrash />
+                </button>
               </li>
             ))
           ) : (
@@ -204,7 +164,6 @@ const Dashboard = () => {
                 <tr>
                   <th className="px-2 py-2 md:px-4 md:py-2">Savol</th>
                   <th className="px-2 py-2 md:px-4 md:py-2">Variantlar</th>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Amallar</th>
                 </tr>
               </thead>
               <tbody>
@@ -221,58 +180,12 @@ const Dashboard = () => {
                           ))}
                         </ul>
                       </td>
-                      <span className='"px-2 py-2 md:px-4 md:py-2"'> savollar yuklangan vaqt: {new Date(question.createdAt).toLocaleDateString()}</span>
-                      <td className="px-2 py-2 md:px-4 md:py-2 text-center">
-                        <button
-                          onClick={() => handleDelete(question.questionId)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-gray-500 italic text-center py-4">
+                    <td colSpan="2" className="text-gray-500 italic text-center py-4">
                       Savollar topilmadi.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-
-            <h4 className="text-lg font-bold mt-6">Foydalanuvchilar:</h4>
-            <table className="table-auto w-full bg-white shadow-lg rounded-lg">
-              <thead className="bg-indigo-600 text-white">
-                <tr>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Foydalanuvchi ismi</th>
-                  <th className="px-2 py-2 md:px-4 md:py-2"> Natijasi</th>
-                  {/* <th className="px-2 py-2 md:px-4 md:py-2">Imtihon vaqti </th> */}
-                  <th className="px-2 py-2 md:px-4 md:py-2">Amallar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {subjectDetails.userResults.length > 0 ? (
-                  subjectDetails.userResults.map((result) => (
-                    <tr key={result.userId} className="border-b border-gray-300">
-                      <td className="px-2 py-2 md:px-4 md:py-2">{result.userName}</td>
-                      <td className="px-2 py-2 md:px-4 md:py-2">{result.correctAnswersCount}/{result.totalQuestions}to'g'ri</td>
-                      <td className="px-2 py-2 md:px-4 md:py-2 text-center">
-                        <td className='"px-2 py-2 md:px-4 md:py-2"'>Imtihon vaqti{new Date(result.answeredAt).toLocaleDateString()}</td>
-                        <button
-                          onClick={() => handleDeleteUsers(result.userId)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="3" className="text-gray-500 italic text-center py-4">
-                      Foydalanuvchilar topilmadi.
                     </td>
                   </tr>
                 )}

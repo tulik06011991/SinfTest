@@ -36,8 +36,7 @@ const registerController = async (req, res) => {
 
 const loginController = async (req, res) => {
     const { email, password } = req.body;
-    console.log(email, password)
-    
+    console.log(email, password);
 
     try {
         // Superadmin emailini tekshirish
@@ -76,15 +75,15 @@ const loginController = async (req, res) => {
             }
 
             // Adminning o'ziga tegishli fanlar ro'yxati
-            
+         
 
             // JWT token yaratish
-            const token = jwt.sign({ userId: admin._id,  }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ userId: admin._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
             return res.status(200).json({
                 token,
                 redirect: '/admin/dashboard',
-              
+               // Adminning fanlarini qaytarish
             });
         }
 
@@ -113,7 +112,6 @@ const loginController = async (req, res) => {
         return res.status(500).json({ message: 'Serverda xato yuz berdi!' });
     }
 };
-
 
 
 

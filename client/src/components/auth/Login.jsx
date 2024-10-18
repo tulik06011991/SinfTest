@@ -31,8 +31,11 @@ const Login = () => {
 
             if (response.data.redirect === "/superadmin/dashboard") {
                 navigate('/superadmin');
-            } else {
+            } else if(response.data.redirect === "/admin/dashboard") {
                 navigate('/dashboard');
+            }
+            else{
+                navigate("/savollarjavoblar")
             }
         } catch (err) {
             if (err.response && err.response.data) {
