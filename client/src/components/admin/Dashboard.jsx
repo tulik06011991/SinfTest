@@ -3,8 +3,7 @@ import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
-import { jwtDecode } from 'jwt-decode'; 
-
+import {jwtDecode }from 'jwt-decode'; 
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -90,6 +89,28 @@ const Dashboard = () => {
     }
   };
 
+  // Fanga oid savollarni o'chirish
+  const handleDeleteSubject = async (subjectId) => {
+    const confirmDelete = window.confirm("Bu fanga oid barcha savollarni o'chirmoqchimisiz?");
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/subjects/${subjectId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Fan o'chirilganidan so'ng fanlar ro'yxatini qayta yuklash
+      fetchSubjects();
+      setSelectedSubject(null);
+      setSubjectDetails(null);
+      setSavollar([]);
+    } catch (err) {
+      setError("Fan va savollarni o'chirishda xatolik yuz berdi.");
+      console.error(err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-2xl rounded-xl p-6 md:p-8 w-full max-w-7xl">
@@ -117,10 +138,15 @@ const Dashboard = () => {
             subjects.map((subject) => (
               <li
                 key={subject._id}
-                onClick={() => handleSubjectClick(subject)}
-                className="cursor-pointer p-4 border border-gray-300 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-200 text-gray-800"
+                className="flex justify-between items-center cursor-pointer p-4 border border-gray-300 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-200 text-gray-800"
               >
-                {subject.name}
+                <span onClick={() => handleSubjectClick(subject)}>{subject.name}</span>
+                <button
+                  onClick={() => handleDeleteSubject(subject._id)}
+                  className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition duration-300"
+                >
+                  <FaTrash />
+                </button>
               </li>
             ))
           ) : (
