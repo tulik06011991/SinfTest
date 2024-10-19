@@ -1,54 +1,50 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom'; // Link import qilish
-import { TailSpin } from 'react-loader-spinner'; // Loader uchun import
+import { useNavigate, Link } from 'react-router-dom';
+import { TailSpin } from 'react-loader-spinner';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false); // Loading holatini qo'shish
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // Formani yuborishda loading holatini yoqish
+        setError('');
+        setLoading(true);
+
         try {
-            const response = await axios.post('http://localhost:5000/api/login', { email, password },
-                {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-        });
+            const response = await axios.post('http://localhost:5000/api/login', { email, password });
+
             console.log(response);
-            
-            localStorage.setItem('userName', response.data.name);
 
-            if (response.data.token) {
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('role', response.data.redirect);
-                 // Foydalanuvchi rolini saqlash
+            localStorage.setItem('userName', response.data.name || 'Foydalanuvchi');
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('role', response.data.redirect); // Rolni saqlash
 
-                if (response.data.subjects && response.data.subjects.length > 0) {
-                    const fanId = response.data.subjects[0]._id; // Birinchi elementning _id sini oladi
-                    localStorage.setItem('fanId', fanId);
-                }
+            if (response.data.subjects && response.data.subjects.length > 0) {
+                const fanId = response.data.subjects[0]._id;
+                localStorage.setItem('fanId', fanId);
+            }
 
-                // Redirect qilish
-                if (response.data.redirect === "/superadmin/dashboard") {
-                    navigate('/superadmin');
-                } else if (response.data.redirect === '/savollarjavoblar') {
-                    navigate('/savollarjavoblar');
-                } else {
-                    navigate('/dashboard');
-                }
-            } else {
-                setError('Email yoki parol noto\'g\'ri');
+            if (response.data.redirect === "/superadmin/dashboard") {
+                navigate('/superadmin');
+            } else if (response.data.redirect === "/admin/dashboard") {
+                navigate('/dashboard');
+            }
+            else{
+                navigate('/savollarjavoblar')
             }
         } catch (err) {
-            setError('Email yoki parol noto\'g\'ri');
+            if (err.response && err.response.data) {
+                setError(err.response.data.message || 'Email yoki parol noto\'g\'ri');
+            } else {
+                setError('Server bilan bog\'liq xato yuz berdi.');
+            }
         } finally {
-            setLoading(false); // API so'rovi tugagach loading holatini o'chirish
+            setLoading(false);
         }
     };
 
@@ -88,7 +84,7 @@ const Login = () => {
                     <button
                         type="submit"
                         className={`w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={loading} // Yuklanish holatida tugmani o'chirish
+                        disabled={loading}
                     >
                         Kirish
                     </button>

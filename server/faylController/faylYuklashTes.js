@@ -25,8 +25,20 @@ const extractQuestionsFromWord = async (req, res) => {
       return res.status(400).json({ error: 'Variantlar soni 240 tadan oshmasligi kerak' });
     }
 
+    // `fanId`ni savollarga qo‘shamiz
+    const fanId = req.body.fanId;
+    if (!fanId) {
+      return res.status(400).json({ error: 'Fan ID talab qilinadi' });
+    }
+
+    // Savollarni bazaga saqlashdan oldin `fanId` ni qo‘shamiz
+    const questionsWithFanId = questions.map(q => ({
+      ...q,
+      fanId: fanId
+    }));
+
     // Savollarni bazaga saqlash
-    const savedQuestions = await Question.insertMany(questions);
+    const savedQuestions = await Question.insertMany(questionsWithFanId);
 
     res.status(201).json({ message: 'Savollar muvaffaqiyatli saqlandi', savedQuestions });
   } catch (error) {
@@ -45,11 +57,8 @@ function parseQuizData(text) {
   let currentQuestion = null;
 
   lines.forEach(line => {
-    // Savolni aniqlash: raqam bilan boshlanadi va oxirida nuqta yoki ? bilan tugaydi
     const questionRegex = /^\d+\..*\?|\d+\..*\.$/;
-    // Variantlarni aniqlash: A), B), C), D) bilan boshlanadi
     const optionRegex = /^[A-D]\).+/;
-    // To'g'ri variantlarni aniqlash: faqat nuqta bilan boshlangan variantlar .A), .B), .C), .D)
     const correctOptionRegex = /^\.[A-D]\).+/;
 
     if (questionRegex.test(line.trim())) {

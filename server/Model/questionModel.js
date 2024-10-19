@@ -10,6 +10,7 @@ const OptionSchema = new mongoose.Schema({
 const QuestionSchema = new mongoose.Schema({
   questionText: { type: String, required: true },
   options: [OptionSchema], // Har bir savolning variantlari bo'ladi
+  fanId: { type: mongoose.Schema.Types.ObjectId, ref: 'Subject', required: true }, // Fan ID
   createdAt: { type: Date, default: Date.now }
 });
 
