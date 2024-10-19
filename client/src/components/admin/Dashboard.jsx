@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
-import jwtDecode from 'jwt-decode'; // To'g'ri import
+import {jwtDecode }from 'jwt-decode'; // To'g'ri import
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
