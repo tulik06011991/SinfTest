@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode }from 'jwt-decode'; // To'g'ri import
+import {jwtDecode} from 'jwt-decode'; // To'g'ri import
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -45,6 +45,8 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const adminId = localStorage.getItem('adminId');
+      console.log('Admin ID:', adminId); // Tekshirish uchun
+      console.log('Token:', token); // Tekshirish uchun
   
       if (!token || !adminId) {
         navigate('/');
@@ -54,12 +56,14 @@ const Dashboard = () => {
   
       const response = await axios.get(
         `http://localhost:5000/api/subjects`, 
+        // adminId ni yuborish
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+
 
       setSubjects(response.data.subjects);
       if (response.data.subjects.length === 0) {
@@ -72,11 +76,12 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+  console.log(subjects)
 
   // Tanlangan fan haqida ma'lumot olish
-  const handleSubjectClick = async (subjectId) => {
+  const handleSubjectClick = async (subject) => {
     setLoading(true);
-    setSelectedSubject(subjectId);
+    setSelectedSubject(subject);
     setError('');
     setSubjectDetails(null);
 
@@ -84,7 +89,7 @@ const Dashboard = () => {
       const token = localStorage.getItem('token');
 
       const response = await axios.get(
-        `http://localhost:5000/api/questions/subject/${subjectId}`,
+        `http://localhost:5000/api/questions/subject/${subject}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -92,7 +97,8 @@ const Dashboard = () => {
         }
       );
 
-      setQuestions(response.data.questionsWithOptions); // Savollar va variantlar
+
+      setQuestions(response.data);
       setSubjectDetails(response.data);
 
       if (response.data.questionsWithOptions.length === 0) {
@@ -105,7 +111,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
+  console.log(questions)
   // Fanlarni o'chirish funksiyasi
   const handleDelete = async (id) => {
     setLoading(true);
@@ -207,28 +213,8 @@ const Dashboard = () => {
 
         {selectedSubject && subjectDetails && (
           <div className="mt-8 bg-gray-100 p-4 md:p-6 rounded-lg shadow-lg">
-            <h3 className="text-xl font-semibold mb-4">Savollar</h3>
-            <ul className="list-disc ml-6">
-              {questions.map((question, index) => (
-                <li key={question._id} className="mb-2">
-                  <strong>{index + 1}. {question.questionsText}</strong> (Yaratilgan: {new Date(question.createdAt).toLocaleDateString()})
-                  <ul className="list-inside list-decimal ml-4">
-                    {question.options.map((option, idx) => (
-                      <li key={idx}>{option}</li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-
-            <h3 className="text-xl font-semibold mt-8 mb-4">Foydalanuvchilar va ularning natijalari</h3>
-            <ul className="list-disc ml-6">
-              {subjectDetails.userResults.map((result) => (
-                <li key={result.userId}>
-                  <strong>{result.userName}</strong> - Imtihon vaqti: {new Date(result.testDate).toLocaleDateString()}, Natija: {result.score}%
-                </li>
-              ))}
-            </ul>
+            {/* Savollar va Foydalanuvchilar */}
+            {/* Bu yerda savollarni ko'rsatishingiz mumkin */}
           </div>
         )}
       </div>
