@@ -3,7 +3,7 @@ import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
-import {jwtDecode} from 'jwt-decode'
+import {jwtDecode }from 'jwt-decode';
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -14,43 +14,53 @@ const Dashboard = () => {
   const [savollar, setsavollar] = useState([]);
   const navigate = useNavigate();
 
-  // Token tekshiruvi va yo'naltirish
   useEffect(() => {
     const token = localStorage.getItem('token');
+    
     if (!token) {
       navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
+    } else {
+      try {
+        const decodedToken = jwtDecode(token); 
+        const adminId = decodedToken.userId;
+
+        if (!adminId) {
+          throw new Error("Invalid Token");
+        }
+        
+        localStorage.setItem('adminId', adminId);
+      } catch (error) {
+        console.log('Invalid token:', error);
+        navigate('/'); // Token noto'g'ri bo'lsa, login sahifasiga yo'naltirish
+      }
     }
   }, [navigate]);
 
-  // Fanlar ro'yxatini olish
   const fetchSubjects = async () => {
     setLoading(true);
     setError('');
-
+  
     try {
       const token = localStorage.getItem('token');
-
-      if (!token) {
+      const admin = localStorage.getItem('adminId');
+      console.log('Admin ID:', admin); // Tekshirish uchun
+      console.log('Token:', token); // Tekshirish uchun
+  
+      if (!token || !admin) {
         navigate('/');
-        setError('Token topilmadi. Iltimos, qayta login qiling.');
+        setError('Token yoki admin ma\'lumotlari topilmadi. Iltimos, qayta login qiling.');
         return;
-      }else{
-       
-        const decodedToken = jwtDecode(token); // Tokenni dekodlash
-        const adminId = decodedToken.adminId;
-
       }
-
-      // Backendga fanlar uchun so'rov yuborish
+  
       const response = await axios.get(
-        `http://localhost:5000/api/subjects/${adminId}`,
+        `http://localhost:5000/api/subjects/${admin}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
+  
       setSubjects(response.data.subjects);
       if (response.data.subjects.length === 0) {
         setError("Fanlar topilmadi.");
@@ -62,8 +72,8 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+  
 
-  // Tanlangan fan bo'yicha savollar va foydalanuvchilarni olish
   const handleSubjectClick = async (subject) => {
     setLoading(true);
     setSelectedSubject(subject);
@@ -73,7 +83,6 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
 
-      // Tanlangan fan uchun ma'lumotlarni olish
       const response = await axios.get(
         `http://localhost:5000/api/subjects/${subject._id}`,
         {
@@ -97,7 +106,6 @@ const Dashboard = () => {
     }
   };
 
-  // Savollarni o'chirish
   const handleDelete = async (id) => {
     setLoading(true);
 
@@ -126,7 +134,6 @@ const Dashboard = () => {
     }
   };
 
-  // Foydalanuvchini o'chirish
   const handleDeleteUsers = async (id) => {
     setLoading(true);
 
@@ -179,6 +186,7 @@ const Dashboard = () => {
 
         {error && <div className="text-red-600 text-center mb-6">{error}</div>}
 
+        {/* Fanlar ro'yxati */}
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {subjects.length > 0 ? (
             subjects.map((subject) => (
@@ -197,87 +205,8 @@ const Dashboard = () => {
 
         {selectedSubject && subjectDetails && (
           <div className="mt-8 bg-gray-100 p-4 md:p-6 rounded-lg shadow-lg">
-            <h3 className="text-2xl font-semibold text-gray-700 mb-6">Savollar va Foydalanuvchilar</h3>
-
-            {/* Savollar jadvali */}
-            <h4 className="text-lg font-bold mt-6">Savollar:</h4>
-            <table className="table-auto w-full bg-white shadow-lg rounded-lg">
-              <thead className="bg-indigo-600 text-white">
-                <tr>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Savol</th>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Variantlar</th>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Amallar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {savollar.length > 0 ? (
-                  savollar.map((question, index) => (
-                    <tr key={index} className="border-b border-gray-300">
-                      <td className="px-2 py-2 md:px-4 md:py-2">{question.questionText}</td>
-                      <td className="px-2 py-2 md:px-4 md:py-2">
-                        <ul>
-                          {question.options.map((option) => (
-                            <li key={option._id} className={option.isCorrect ? 'text-green-500' : ''}>
-                              {option.text}
-                            </li>
-                          ))}
-                        </ul>
-                      </td>
-                      <td className="px-2 py-2 md:px-4 md:py-2 text-center">
-                        <button
-                          onClick={() => handleDelete(question._id)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="3" className="text-gray-500 italic text-center py-4">
-                      Savollar topilmadi.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-
-            {/* Foydalanuvchilar jadvali */}
-            <h4 className="text-lg font-bold mt-6">Foydalanuvchilar:</h4>
-            <table className="table-auto w-full bg-white shadow-lg rounded-lg">
-              <thead className="bg-indigo-600 text-white">
-                <tr>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Foydalanuvchi</th>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Ballar</th>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Amallar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {subjectDetails.userResults.length > 0 ? (
-                  subjectDetails.userResults.map((result, index) => (
-                    <tr key={index} className="border-b border-gray-300">
-                      <td className="px-2 py-2 md:px-4 md:py-2">{result.userId}</td>
-                      <td className="px-2 py-2 md:px-4 md:py-2">{result.score}</td>
-                      <td className="px-2 py-2 md:px-4 md:py-2 text-center">
-                        <button
-                          onClick={() => handleDeleteUsers(result.userId)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="3" className="text-gray-500 italic text-center py-4">
-                      Foydalanuvchilar topilmadi.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+            {/* Savollar va Foydalanuvchilar */}
+            ...
           </div>
         )}
       </div>
