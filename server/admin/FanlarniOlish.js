@@ -1,22 +1,25 @@
 const Subject = require('../Model/Fanlar'); // Subject modelini import qilamiz
-const Admin = require('../Model/adminlar'); // Admin modelini import qilamiz
+const Admin = require('../Model/adminlar');
+require('dotenv').config() // Admin modelini import qilamiz
 
 // Fanlar ro'yxatini olish va fanId bo'yicha filtrlash
+const jwt = require('jsonwebtoken'); // Tokenni dekodlash uchun
+
 const getSubjects = async (req, res) => {
-  const { fanId } = req.params
-  console.log(fanId)
-   // Body'dan fanId ni olamiz
+  const token = req.headers.authorization?.split(' ')[1]; // Tokenni headerdan olish
 
   try {
-    if (!fanId) {
-      return res.status(400).json({ message: 'FanId berilmagan!' });
+    if (!token) {
+      return res.status(401).json({ message: 'Token topilmadi!' });
     }
 
-    // fanId bo'yicha fanlarni olamiz
-    const subjects = await Subject.findById(fanId).select('_id name'); 
-    console.log(subjects)
-    // Faqat fan nomini olamiz
-    if (!subjects) {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET); // Tokenni dekodlash
+    const userId = decodedToken.userId;
+    const adminId = userId // Token ichidan userId ni olish
+
+    // userId ga mos fanlarni olish
+    const subjects = await Subject.find({ adminId }).select('_id name'); 
+    if (!subjects.length) {
       return res.status(404).json({ message: 'Fan topilmadi!' });
     }
 
@@ -26,6 +29,7 @@ const getSubjects = async (req, res) => {
     res.status(500).json({ message: 'Fanlarni olishda xato yuz berdi!' });
   }
 };
+
 
 // Fan Id bo'yicha fan nomini olish
 const getSubjectId = async (req, res) => {

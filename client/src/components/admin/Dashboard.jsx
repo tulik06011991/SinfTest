@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
-import { FaTrash } from 'react-icons/fa';
-import {jwtDecode }from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode'; // To'g'ri import
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -11,56 +10,60 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [subjectDetails, setSubjectDetails] = useState(null);
-  const [savollar, setsavollar] = useState([]);
+  const [questions, setQuestions] = useState([]);
   const navigate = useNavigate();
 
+  // Tokenni tekshirish va adminId ni saqlash
   useEffect(() => {
     const token = localStorage.getItem('token');
     
     if (!token) {
       navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
-    } else {
-      try {
-        const decodedToken = jwtDecode(token); 
-        const adminId = decodedToken.userId;
+      return;
+    }
 
-        if (!adminId) {
-          throw new Error("Invalid Token");
-        }
-        
-        localStorage.setItem('adminId', adminId);
-      } catch (error) {
-        console.log('Invalid token:', error);
-        navigate('/'); // Token noto'g'ri bo'lsa, login sahifasiga yo'naltirish
+    try {
+      const decodedToken = jwtDecode(token);
+      const adminId = decodedToken.userId;
+
+      if (!adminId) {
+        throw new Error("Invalid Token");
       }
+      
+      localStorage.setItem('adminId', adminId);
+    } catch (error) {
+      console.log('Invalid token:', error);
+      navigate('/'); // Token noto'g'ri bo'lsa, login sahifasiga yo'naltirish
     }
   }, [navigate]);
 
+  // Fanlarni olish funksiyasi
   const fetchSubjects = async () => {
     setLoading(true);
     setError('');
   
     try {
       const token = localStorage.getItem('token');
-      const admin = localStorage.getItem('adminId');
-      console.log('Admin ID:', admin); // Tekshirish uchun
+      const adminId = localStorage.getItem('adminId');
+      console.log('Admin ID:', adminId); // Tekshirish uchun
       console.log('Token:', token); // Tekshirish uchun
   
-      if (!token || !admin) {
+      if (!token || !adminId) {
         navigate('/');
         setError('Token yoki admin ma\'lumotlari topilmadi. Iltimos, qayta login qiling.');
         return;
       }
   
       const response = await axios.get(
-        `http://localhost:5000/api/subjects/${admin}`,
+        `http://localhost:5000/api/subjects`, 
+        // adminId ni yuborish
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-  
+
       setSubjects(response.data.subjects);
       if (response.data.subjects.length === 0) {
         setError("Fanlar topilmadi.");
@@ -72,8 +75,8 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-  
 
+  // Tanlangan fan haqida ma'lumot olish
   const handleSubjectClick = async (subject) => {
     setLoading(true);
     setSelectedSubject(subject);
@@ -92,7 +95,7 @@ const Dashboard = () => {
         }
       );
 
-      setsavollar(response.data.questionsWithOptions);
+      setQuestions(response.data.questionsWithOptions);
       setSubjectDetails(response.data);
 
       if (response.data.questionsWithOptions.length === 0) {
@@ -106,6 +109,7 @@ const Dashboard = () => {
     }
   };
 
+  // Fanlarni o'chirish funksiyasi
   const handleDelete = async (id) => {
     setLoading(true);
 
@@ -122,10 +126,10 @@ const Dashboard = () => {
         },
       });
 
-      const updatedQuestions = savollar.filter((question) => question._id !== id);
-      setsavollar(updatedQuestions);
+      const updatedQuestions = questions.filter((question) => question._id !== id);
+      setQuestions(updatedQuestions);
 
-      handleSubjectClick(selectedSubject);
+      handleSubjectClick(selectedSubject); // Tanlangan fanni yangilash
     } catch (err) {
       setError("O'chirishda xatolik yuz berdi.");
       console.error(err);
@@ -134,6 +138,7 @@ const Dashboard = () => {
     }
   };
 
+  // Foydalanuvchilarni o'chirish funksiyasi
   const handleDeleteUsers = async (id) => {
     setLoading(true);
 
@@ -206,7 +211,7 @@ const Dashboard = () => {
         {selectedSubject && subjectDetails && (
           <div className="mt-8 bg-gray-100 p-4 md:p-6 rounded-lg shadow-lg">
             {/* Savollar va Foydalanuvchilar */}
-            ...
+            {/* Bu yerda savollarni ko'rsatishingiz mumkin */}
           </div>
         )}
       </div>
