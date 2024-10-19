@@ -3,6 +3,7 @@ import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
+import {jwtDecode} from 'jwt-decode'
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -10,7 +11,7 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [subjectDetails, setSubjectDetails] = useState(null);
-  const [savollar, setsavollar] = useState({});
+  const [savollar, setsavollar] = useState([]);
   const navigate = useNavigate();
 
   // Token tekshiruvi va yo'naltirish
@@ -28,17 +29,21 @@ const Dashboard = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const fanId = localStorage.getItem('fanId');
 
       if (!token) {
         navigate('/');
         setError('Token topilmadi. Iltimos, qayta login qiling.');
         return;
+      }else{
+       
+        const decodedToken = jwtDecode(token); // Tokenni dekodlash
+        const adminId = decodedToken.adminId;
+
       }
 
-      const response = await axios.post(
-        `http://localhost:5000/api/subjects`,
-        { fanId },
+      // Backendga fanlar uchun so'rov yuborish
+      const response = await axios.get(
+        `http://localhost:5000/api/subjects${adminId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -58,40 +63,41 @@ const Dashboard = () => {
     }
   };
 
-  // Foydalanuvchini o'chirish va interfeysdan yangilash
-  const handleDeleteUsers = async (id) => {
+  // Tanlangan fan bo'yicha savollar va foydalanuvchilarni olish
+  const handleSubjectClick = async (subject) => {
     setLoading(true);
+    setSelectedSubject(subject);
+    setError('');
+    setSubjectDetails(null);
 
     try {
       const token = localStorage.getItem('token');
 
-      if (!token) {
-        throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
-      }
-
-      // Foydalanuvchini o'chirish so'rovi
-      await axios.delete(`http://localhost:5000/admin/users/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // O'chirilgan foydalanuvchini interfeysdan olib tashlash
-      const updatedResults = subjectDetails.userResults.filter(
-        (result) => result.userId !== id
+      // Tanlangan fan uchun ma'lumotlarni olish
+      const response = await axios.get(
+        `http://localhost:5000/api/subjects/${subject._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-      setSubjectDetails((prev) => ({
-        ...prev,
-        userResults: updatedResults,
-      }));
+
+      setsavollar(response.data.questionsWithOptions);
+      setSubjectDetails(response.data);
+
+      if (response.data.questionsWithOptions.length === 0) {
+        setError("Savollar topilmadi.");
+      }
     } catch (err) {
-      console.error('Xatolik yuz berdi:', err.message);
+      setError("Ma'lumotlarni olishda xatolik yuz berdi.");
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Savollarni o'chirish va interfeysdan yangilash
+  // Savollarni o'chirish
   const handleDelete = async (id) => {
     setLoading(true);
 
@@ -108,13 +114,10 @@ const Dashboard = () => {
         },
       });
 
-      // O'chirilgan savolni interfeysdan olib tashlash
       const updatedQuestions = savollar.filter((question) => question._id !== id);
       setsavollar(updatedQuestions);
 
-      // Tanlangan fan bo'yicha savollarni qayta yuklash
       handleSubjectClick(selectedSubject);
-
     } catch (err) {
       setError("O'chirishda xatolik yuz berdi.");
       console.error(err);
@@ -123,38 +126,36 @@ const Dashboard = () => {
     }
   };
 
-  // Tanlangan fan bo'yicha savollarni olish
-  const handleSubjectClick = async (subject) => {
+  // Foydalanuvchini o'chirish
+  const handleDeleteUsers = async (id) => {
     setLoading(true);
-    setSelectedSubject(subject);
-    setError('');
-    setSubjectDetails(null);
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `http://localhost:5000/admin/subjects/${subject._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
 
-      setsavollar(response.data.questionsWithOptions);
-      setSubjectDetails(response.data);
-
-      if (response.data.questionsWithOptions.length === 0) {
-        setError("Savollar topilmadi.");
+      if (!token) {
+        throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
       }
+
+      await axios.delete(`http://localhost:5000/admin/users/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const updatedResults = subjectDetails.userResults.filter(
+        (result) => result.userId !== id
+      );
+      setSubjectDetails((prev) => ({
+        ...prev,
+        userResults: updatedResults,
+      }));
     } catch (err) {
-      setError("Ma'lumotlarni o'chirgansiz.");
-      console.error(err);
+      console.error('Xatolik yuz berdi:', err.message);
     } finally {
       setLoading(false);
     }
   };
-  console.log(subjectDetails)
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
@@ -198,6 +199,7 @@ const Dashboard = () => {
           <div className="mt-8 bg-gray-100 p-4 md:p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold text-gray-700 mb-6">Savollar va Foydalanuvchilar</h3>
 
+            {/* Savollar jadvali */}
             <h4 className="text-lg font-bold mt-6">Savollar:</h4>
             <table className="table-auto w-full bg-white shadow-lg rounded-lg">
               <thead className="bg-indigo-600 text-white">
@@ -208,7 +210,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {savollar && savollar.length > 0 ? (
+                {savollar.length > 0 ? (
                   savollar.map((question, index) => (
                     <tr key={index} className="border-b border-gray-300">
                       <td className="px-2 py-2 md:px-4 md:py-2">{question.questionText}</td>
@@ -221,10 +223,9 @@ const Dashboard = () => {
                           ))}
                         </ul>
                       </td>
-                      <span className='"px-2 py-2 md:px-4 md:py-2"'> savollar yuklangan vaqt: {new Date(question.createdAt).toLocaleDateString()}</span>
                       <td className="px-2 py-2 md:px-4 md:py-2 text-center">
                         <button
-                          onClick={() => handleDelete(question.questionId)}
+                          onClick={() => handleDelete(question._id)}
                           className="text-red-600 hover:text-red-800"
                         >
                           <FaTrash />
@@ -242,24 +243,23 @@ const Dashboard = () => {
               </tbody>
             </table>
 
+            {/* Foydalanuvchilar jadvali */}
             <h4 className="text-lg font-bold mt-6">Foydalanuvchilar:</h4>
             <table className="table-auto w-full bg-white shadow-lg rounded-lg">
               <thead className="bg-indigo-600 text-white">
                 <tr>
-                  <th className="px-2 py-2 md:px-4 md:py-2">Foydalanuvchi ismi</th>
-                  <th className="px-2 py-2 md:px-4 md:py-2"> Natijasi</th>
-                  {/* <th className="px-2 py-2 md:px-4 md:py-2">Imtihon vaqti </th> */}
+                  <th className="px-2 py-2 md:px-4 md:py-2">Foydalanuvchi</th>
+                  <th className="px-2 py-2 md:px-4 md:py-2">Ballar</th>
                   <th className="px-2 py-2 md:px-4 md:py-2">Amallar</th>
                 </tr>
               </thead>
               <tbody>
                 {subjectDetails.userResults.length > 0 ? (
-                  subjectDetails.userResults.map((result) => (
-                    <tr key={result.userId} className="border-b border-gray-300">
-                      <td className="px-2 py-2 md:px-4 md:py-2">{result.userName}</td>
-                      <td className="px-2 py-2 md:px-4 md:py-2">{result.correctAnswersCount}/{result.totalQuestions}to'g'ri</td>
+                  subjectDetails.userResults.map((result, index) => (
+                    <tr key={index} className="border-b border-gray-300">
+                      <td className="px-2 py-2 md:px-4 md:py-2">{result.userId}</td>
+                      <td className="px-2 py-2 md:px-4 md:py-2">{result.score}</td>
                       <td className="px-2 py-2 md:px-4 md:py-2 text-center">
-                        <td className='"px-2 py-2 md:px-4 md:py-2"'>Imtihon vaqti{new Date(result.answeredAt).toLocaleDateString()}</td>
                         <button
                           onClick={() => handleDeleteUsers(result.userId)}
                           className="text-red-600 hover:text-red-800"
