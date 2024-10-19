@@ -49,7 +49,7 @@ const getSubjectId = async (req, res) => {
 const getAllSubjects = async (req, res) => {
   try {
     // Fanlarni ID va nomi bilan olish
-    const subjects = await Subject.find()
+    const subjects = await Subject.find().select('_id name')
     console.log(subjects);
     
     if (!subjects || subjects.length === 0) {
