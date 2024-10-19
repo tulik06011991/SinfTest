@@ -36,6 +36,7 @@ const Dashboard = () => {
     setLoading(true);
     setError('');
     try {
+      const adminId = localStorage.getItem('adminId')
       const token = localStorage.getItem('token');
       if (!token) {
         navigate('/');
