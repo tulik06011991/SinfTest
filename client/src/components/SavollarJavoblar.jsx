@@ -19,9 +19,11 @@ const Quiz = () => {
                 const response = await axios.get('http://localhost:5000/api/subjectlar');
                 console.log(response);
     
-                // Tekshiramiz, response.data obyekt bo'lsa, subjects ro'yxatini olamiz
-                if (response.data && Array.isArray(response.data.subjects)) {
-                    setSubjects(response.data.subjects); // Fanlar ro'yxatini yuklash
+                // Agar kelgan ma'lumot oddiy array bo'lsa
+                if (Array.isArray(response.data)) {
+                    setSubjects(response.data); // Fanlar ro'yxatini yuklash
+                } else if (response.data && Array.isArray(response.data.subjects)) {
+                    setSubjects(response.data.subjects); // Agar obyekt ichida subjects bo'lsa
                 } else {
                     console.error('Ma\'lumotlar noto\'g\'ri formatda keldi:', response.data);
                 }
@@ -31,6 +33,7 @@ const Quiz = () => {
         };
         fetchSubjects();
     }, []);
+    
     
 
     // Token mavjudligini tekshirish
