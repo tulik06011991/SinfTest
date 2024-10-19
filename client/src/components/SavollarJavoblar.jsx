@@ -131,7 +131,7 @@ const Quiz = () => {
                 <div className="w-full md:w-3/4 lg:w-1/2">
                     {questions.map((question, index) => (
                         <div key={question._id} className="question-block mb-6 p-4 bg-white shadow-md rounded-lg">
-                            <h3 className="text-xl font-semibold mb-4">{index + 1}. {question.question}</h3>
+                            <h3 className="text-xl font-semibold mb-4">{index + 1}. {question.questionText}</h3>
                             <ul className="space-y-3">
                                 {question.options.map((option) => (
                                     <li key={option.text} className="text-lg">
