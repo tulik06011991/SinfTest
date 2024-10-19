@@ -43,7 +43,7 @@ const Dashboard = () => {
 
       // Backendga fanlar uchun so'rov yuborish
       const response = await axios.get(
-        `http://localhost:5000/api/subjects${adminId}`,
+        `http://localhost:5000/api/subjects/${adminId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
