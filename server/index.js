@@ -21,7 +21,16 @@ const path = require('path');
 
 
 app.use(express.json());
-app.use(cors())
+
+// CORS sozlamalari
+app.use(cors({
+  origin: 'http://localhost:3000', // Frontend React app domeni
+  credentials: true, // Cookie va autentifikatsiya ma'lumotlarini yuborishga ruxsat
+  allowedHeaders: ['Content-Type', 'Authorization'], // Kerakli header'lar ro'yxati
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Ruxsat etilgan metodlar
+  maxAge: 600 // Preflight so'rovlari uchun cache muddatini o'rnatish (10 daqiqa)
+}));
+
 app.use(express.static(path.join(__dirname, 'uploads')));
 
 // Routes
