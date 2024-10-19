@@ -64,6 +64,7 @@ const Dashboard = () => {
         }
       );
 
+
       setSubjects(response.data.subjects);
       if (response.data.subjects.length === 0) {
         setError("Fanlar topilmadi.");
@@ -75,6 +76,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+  console.log(subjects)
 
   // Tanlangan fan haqida ma'lumot olish
   const handleSubjectClick = async (subject) => {
@@ -87,7 +89,7 @@ const Dashboard = () => {
       const token = localStorage.getItem('token');
 
       const response = await axios.get(
-        `http://localhost:5000/api/subjects/${subject._id}`,
+        `http://localhost:5000/api/questions/subject/${subject}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -95,7 +97,8 @@ const Dashboard = () => {
         }
       );
 
-      setQuestions(response.data.questionsWithOptions);
+
+      setQuestions(response.data);
       setSubjectDetails(response.data);
 
       if (response.data.questionsWithOptions.length === 0) {
@@ -108,7 +111,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
+  console.log(questions)
   // Fanlarni o'chirish funksiyasi
   const handleDelete = async (id) => {
     setLoading(true);
@@ -197,7 +200,7 @@ const Dashboard = () => {
             subjects.map((subject) => (
               <li
                 key={subject._id}
-                onClick={() => handleSubjectClick(subject)}
+                onClick={() => handleSubjectClick(subject._id)}
                 className="cursor-pointer p-4 border border-gray-300 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-200 text-gray-800"
               >
                 {subject.name}
