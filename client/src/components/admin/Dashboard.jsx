@@ -44,7 +44,7 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/subjects', {
+      const response = await axios.get(`http://localhost:5000/api/subjects/${adminId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
