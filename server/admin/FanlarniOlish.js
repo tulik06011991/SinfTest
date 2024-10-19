@@ -57,7 +57,7 @@ const getAllSubjects = async (req, res) => {
       return res.status(404).json({ message: 'Fanlar topilmadi!' });
     }
 
-    res.status(200).json(subjects ); // Fanlarni muvaffaqiyatli qaytarish
+    res.status(200).json(subjects ); // Fanlarni muvaffaqiyatli qaytarishi
   } catch (error) {
     console.error('Fanlarni olishda xato:', error);
     res.status(500).json({ message: 'Fanlarni olishda xato yuz berdi!' });
