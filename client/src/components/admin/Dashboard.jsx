@@ -96,7 +96,7 @@ const Dashboard = () => {
           },
         }
       );
-
+console.log(response)
 
       setQuestions(response.data);
       setSubjectDetails(response.data);
@@ -111,7 +111,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-  console.log(questions)
+
   // Fanlarni o'chirish funksiyasi
   const handleDelete = async (id) => {
     setLoading(true);
