@@ -213,6 +213,7 @@ const Dashboard = () => {
               <thead>
                 <tr>
                   <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Savol</th>
+                  <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Vaqti </th>
                   <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Variantlar</th>
                   <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Amallar</th>
                 </tr>
@@ -221,6 +222,7 @@ const Dashboard = () => {
                 {questions.map((question) => (
                   <tr key={question._id}>
                     <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">{question.questionText}</td>
+                    <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">{new Date(question.createdAt).toLocaleString()} </td>
                     <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">
                       <ul>
                         {question.options.map((option, idx) => (
