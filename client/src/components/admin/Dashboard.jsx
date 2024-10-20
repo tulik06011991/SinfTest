@@ -203,46 +203,46 @@ const Dashboard = () => {
           <div className="mt-6 sm:mt-8 bg-gray-100 p-4 sm:p-6 rounded-lg shadow-lg">
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">Savollar va variantlar</h3>
 
-            <table className="min-w-full bg-white border text-sm sm:text-base">
-              <thead>
-                <tr>
-                  <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Savol</th>
-                  <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Vaqti</th>
-                  <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Variantlar</th>
-                  <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Amallar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {questions.map((question) => (
-                  <tr key={question._id}>
-                    <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">{question.questionText}</td>
-                    <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">{new Date(question.createdAt).toLocaleString()}</td>
-                    <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">
-                      <ul className="list-disc pl-5">
-                        {question.options.map((option, idx) => (
-                          <li
-                            key={idx}
-                            className={`${
-                              option.isCorrect ? 'text-green-600 font-semibold' : 'text-gray-700'
-                            }`}
-                          >
-                            {option.text}
-                          </li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">
-                      <button
-                        onClick={() => handleDelete(question._id)}
-                        className="text-red-600 hover:text-red-800 transition duration-200"
-                      >
-                        O'chirish
-                      </button>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white border text-sm sm:text-base">
+                <thead>
+                  <tr>
+                    <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Savol</th>
+                    <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Vaqti</th>
+                    <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Variantlar</th>
+                    <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Amallar</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {questions.map((question) => (
+                    <tr key={question._id}>
+                      <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">{question.questionText}</td>
+                      <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">{new Date(question.createdAt).toLocaleString()}</td>
+                      <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">
+                        <ul className="list-disc pl-5">
+                          {question.options.map((option, idx) => (
+                            <li
+                              key={idx}
+                              className={`text-gray-800 ${option.isCorrect ? 'font-bold' : ''}`}
+                            >
+                              {option.text}
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">
+                        <button
+                          onClick={() => handleDelete(question._id)}
+                          className="text-red-600 hover:text-red-800 transition duration-200"
+                        >
+                          O'chirish
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
             <button
               onClick={handleDeleteAll}
