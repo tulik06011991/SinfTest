@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode'; // To'g'ri import
+import {jwtDecode} from 'jwt-decode';
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -91,7 +91,7 @@ const Dashboard = () => {
           },
         }
       );
-      console.log(response.data)
+      console.log(response.data);
 
       setQuestions(response.data || []); // Agar ma'lumot bo'lmasa, bo'sh array qabul qilinadi
       setSubjectDetails(response.data);
@@ -166,15 +166,15 @@ const Dashboard = () => {
 
   // Savollarni va variantlarini jadval ko'rinishda ko'rsatish
   return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
-      <div className="bg-white shadow-2xl rounded-xl p-6 md:p-8 w-full max-w-7xl">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">Admin Dashboard</h1>
+    <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-4 sm:p-6">
+      <div className="bg-white shadow-2xl rounded-xl p-4 sm:p-6 md:p-8 w-full max-w-4xl">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8 text-gray-800">Admin Dashboard</h1>
 
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Fanlar ro'yxati</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-4 sm:mb-6">Fanlar ro'yxati</h2>
 
         <button
           onClick={fetchSubjects}
-          className="mb-6 w-full py-3 px-6 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300"
+          className="mb-4 sm:mb-6 w-full py-2 sm:py-3 px-4 sm:px-6 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300"
         >
           Fanlarni yuklash
         </button>
@@ -185,10 +185,10 @@ const Dashboard = () => {
           </div>
         )}
 
-        {error && <div className="text-red-600 text-center mb-6">{error}</div>}
+        {error && <div className="text-red-600 text-center mb-4 sm:mb-6">{error}</div>}
 
         {/* Fanlar ro'yxati */}
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {subjects.length > 0 ? (
             subjects.map((subject) => (
               <li
@@ -206,22 +206,22 @@ const Dashboard = () => {
 
         {/* Savollar va variantlar jadvali */}
         {selectedSubject && questions.length > 0 && (
-          <div className="mt-8 bg-gray-100 p-4 md:p-6 rounded-lg shadow-lg">
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">Savollar va variantlar</h3>
+          <div className="mt-6 sm:mt-8 bg-gray-100 p-4 sm:p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">Savollar va variantlar</h3>
 
-            <table className="min-w-full bg-white border">
+            <table className="min-w-full bg-white border text-sm sm:text-base">
               <thead>
                 <tr>
-                  <th className="px-6 py-3 border-b">Savol</th>
-                  <th className="px-6 py-3 border-b">Variantlar</th>
-                  <th className="px-6 py-3 border-b">Amallar</th>
+                  <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Savol</th>
+                  <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Variantlar</th>
+                  <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Amallar</th>
                 </tr>
               </thead>
               <tbody>
                 {questions.map((question) => (
                   <tr key={question._id}>
-                    <td className="px-6 py-4 border-b">{question.questionText}</td>
-                    <td className="px-6 py-4 border-b">
+                    <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">{question.questionText}</td>
+                    <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">
                       <ul>
                         {question.options.map((option, idx) => (
                           <li
@@ -235,10 +235,10 @@ const Dashboard = () => {
                         ))}
                       </ul>
                     </td>
-                    <td className="px-6 py-4 border-b">
+                    <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">
                       <button
                         onClick={() => handleDelete(question._id)}
-                        className="py-2 px-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-300"
+                        className="bg-red-500 text-white py-1 sm:py-2 px-3 sm:px-4 rounded hover:bg-red-600 transition duration-300"
                       >
                         O'chirish
                       </button>
@@ -248,7 +248,6 @@ const Dashboard = () => {
               </tbody>
             </table>
 
-            {/* Barcha savollarni o'chiradigan tugma */}
             <button
               onClick={handleDeleteAll}
               className="mt-6 w-full py-3 px-6 bg-red-500 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
