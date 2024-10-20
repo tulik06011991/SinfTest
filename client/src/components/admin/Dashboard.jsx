@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode'; // To'g'ri import
+import { jwtDecode } from 'jwt-decode'; // To'g'ri import
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -45,8 +45,6 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const adminId = localStorage.getItem('adminId');
-      console.log('Admin ID:', adminId); // Tekshirish uchun
-      console.log('Token:', token); // Tekshirish uchun
   
       if (!token || !adminId) {
         navigate('/');
@@ -56,14 +54,12 @@ const Dashboard = () => {
   
       const response = await axios.get(
         `http://localhost:5000/api/subjects`, 
-        // adminId ni yuborish
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
 
       setSubjects(response.data.subjects);
       if (response.data.subjects.length === 0) {
@@ -76,7 +72,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-  console.log(subjects)
 
   // Tanlangan fan haqida ma'lumot olish
   const handleSubjectClick = async (subject) => {
@@ -97,13 +92,10 @@ const Dashboard = () => {
         }
       );
   
-      console.log(response.data);
-  
-      setQuestions(response.data.questionsWithOptions || []); // Agar ma'lumot bo'lmasa, bo'sh array qabul qilinadi
+      setQuestions(response.data || []); // Agar ma'lumot bo'lmasa, bo'sh array qabul qilinadi
       setSubjectDetails(response.data);
   
-      // Xatolik kelib chiqadigan joyni tekshirish
-      if (!response.data.questionsWithOptions || response.data.questionsWithOptions.length === 0) {
+      if (!response.data || response.data.length === 0) {
         setError("Savollar topilmadi.");
       }
     } catch (err) {
@@ -113,7 +105,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-  
 
   // Fanlarni o'chirish funksiyasi
   const handleDelete = async (id) => {
@@ -144,37 +135,7 @@ const Dashboard = () => {
     }
   };
 
-  // Foydalanuvchilarni o'chirish funksiyasi
-  const handleDeleteUsers = async (id) => {
-    setLoading(true);
-
-    try {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
-      }
-
-      await axios.delete(`http://localhost:5000/admin/users/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const updatedResults = subjectDetails.userResults.filter(
-        (result) => result.userId !== id
-      );
-      setSubjectDetails((prev) => ({
-        ...prev,
-        userResults: updatedResults,
-      }));
-    } catch (err) {
-      console.error('Xatolik yuz berdi:', err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Savollarni va variantlarini ko'rsatish
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-2xl rounded-xl p-6 md:p-8 w-full max-w-7xl">
@@ -214,10 +175,27 @@ const Dashboard = () => {
           )}
         </ul>
 
-        {selectedSubject && subjectDetails && (
+        {/* Savollar va variantlar */}
+        {selectedSubject && questions.length > 0 && (
           <div className="mt-8 bg-gray-100 p-4 md:p-6 rounded-lg shadow-lg">
-            {/* Savollar va Foydalanuvchilar */}
-            {/* Bu yerda savollarni ko'rsatishingiz mumkin */}
+            <h3 className="text-xl font-semibold text-gray-700 mb-4">Savollar va variantlar</h3>
+            {questions.map((question) => (
+              <div key={question._id} className="mb-6">
+                <h4 className="font-bold text-lg">{question.text}</h4>
+                <ul className="mt-2 ml-4">
+                  {question.options.map((option, idx) => (
+                    <li
+                      key={idx}
+                      className={`mt-1 ${
+                        option.isCorrect ? 'text-green-600 font-semibold' : 'text-gray-700'
+                      }`}
+                    >
+                      {option.text} {option.isCorrect && <span>(To'g'ri javob)</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         )}
       </div>
