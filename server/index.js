@@ -14,6 +14,7 @@ const auth  = require('./routes/auth')
 const javob = require('./routes/Javoblar')
 const adminFan = require('./routes/fanlarYasash')
 const hammasi = require('./routes/hammasi')// questionRoutes'ni import qilish
+const SavolDelete = require('./routes/SavollarDelete')
 const cors = require("cors")
 const path = require('path');
 
@@ -46,6 +47,7 @@ app.use('/api', auth)
 app.use('/api', javob)
 app.use('/admin', adminFan)
 app.use('/admin', hammasi)
+app.use('/admin', SavolDelete)
 
 
 // MongoDB ga ulanish
