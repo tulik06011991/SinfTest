@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // To'g'ri import
+import {jwtDecode} from 'jwt-decode'; // To'g'ri import
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -16,7 +16,7 @@ const Dashboard = () => {
   // Tokenni tekshirish va adminId ni saqlash
   useEffect(() => {
     const token = localStorage.getItem('token');
-    
+
     if (!token) {
       navigate('/'); // Token bo'lmasa login sahifasiga yo'naltirish
       return;
@@ -29,7 +29,7 @@ const Dashboard = () => {
       if (!adminId) {
         throw new Error("Invalid Token");
       }
-      
+
       localStorage.setItem('adminId', adminId);
     } catch (error) {
       console.log('Invalid token:', error);
@@ -41,19 +41,19 @@ const Dashboard = () => {
   const fetchSubjects = async () => {
     setLoading(true);
     setError('');
-  
+
     try {
       const token = localStorage.getItem('token');
       const adminId = localStorage.getItem('adminId');
-  
+
       if (!token || !adminId) {
         navigate('/');
         setError('Token yoki admin ma\'lumotlari topilmadi. Iltimos, qayta login qiling.');
         return;
       }
-  
+
       const response = await axios.get(
-        `http://localhost:5000/api/subjects`, 
+        `http://localhost:5000/api/subjects`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -79,10 +79,10 @@ const Dashboard = () => {
     setSelectedSubject(subject);
     setError('');
     setSubjectDetails(null);
-  
+
     try {
       const token = localStorage.getItem('token');
-  
+
       const response = await axios.get(
         `http://localhost:5000/api/questions/subject/${subject}`,
         {
@@ -91,11 +91,11 @@ const Dashboard = () => {
           },
         }
       );
-  console.log(response.data)
-  
+      console.log(response.data)
+
       setQuestions(response.data || []); // Agar ma'lumot bo'lmasa, bo'sh array qabul qilinadi
       setSubjectDetails(response.data);
-  
+
       if (!response.data || response.data.length === 0) {
         setError("Savollar topilmadi.");
       }
@@ -107,7 +107,7 @@ const Dashboard = () => {
     }
   };
 
-  // Fanlarni o'chirish funksiyasi
+  // Tanlangan savolni o'chirish funksiyasi
   const handleDelete = async (id) => {
     setLoading(true);
 
@@ -118,7 +118,7 @@ const Dashboard = () => {
         throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
       }
 
-      await axios.delete(`http://localhost:5000/admin/subjects/${id}`, {
+      await axios.delete(`http://localhost:5000/admin/questions/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -136,7 +136,35 @@ const Dashboard = () => {
     }
   };
 
-  // Savollarni va variantlarini ko'rsatish
+  // Barcha savollarni o'chirish funksiyasi
+  const handleDeleteAll = async () => {
+    if (!window.confirm('Barcha savollarni o‘chirishni istaysizmi?')) return;
+
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        throw new Error('Token topilmadi. Iltimos, qayta login qiling.');
+      }
+
+      await axios.delete(`http://localhost:5000/admin/questions/subject/${selectedSubject}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setQuestions([]);
+    } catch (err) {
+      setError("Barcha savollarni o'chirishda xatolik yuz berdi.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Savollarni va variantlarini jadval ko'rinishda ko'rsatish
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-2xl rounded-xl p-6 md:p-8 w-full max-w-7xl">
@@ -176,27 +204,57 @@ const Dashboard = () => {
           )}
         </ul>
 
-        {/* Savollar va variantlar */}
+        {/* Savollar va variantlar jadvali */}
         {selectedSubject && questions.length > 0 && (
           <div className="mt-8 bg-gray-100 p-4 md:p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Savollar va variantlar</h3>
-            {questions.map((question) => (
-              <div key={question._id} className="mb-6">
-                <h4 className="font-bold text-lg">{question.questionText}</h4>
-                <ul className="mt-2 ml-4">
-                  {question.options.map((option, idx) => (
-                    <li
-                      key={idx}
-                      className={`mt-1 ${
-                        option.isCorrect ? 'text-green-600 font-semibold' : 'text-gray-700'
-                      }`}
-                    >
-                      {option.text} {option.isCorrect && <span>(To'g'ri javob)</span>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+
+            <table className="min-w-full bg-white border">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 border-b">Savol</th>
+                  <th className="px-6 py-3 border-b">Variantlar</th>
+                  <th className="px-6 py-3 border-b">Amallar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {questions.map((question) => (
+                  <tr key={question._id}>
+                    <td className="px-6 py-4 border-b">{question.questionText}</td>
+                    <td className="px-6 py-4 border-b">
+                      <ul>
+                        {question.options.map((option, idx) => (
+                          <li
+                            key={idx}
+                            className={`${
+                              option.isCorrect ? 'text-green-600 font-semibold' : 'text-gray-700'
+                            }`}
+                          >
+                            {option.text} {option.isCorrect && <span>(To'g'ri javob)</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="px-6 py-4 border-b">
+                      <button
+                        onClick={() => handleDelete(question._id)}
+                        className="py-2 px-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-300"
+                      >
+                        O'chirish
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Barcha savollarni o'chiradigan tugma */}
+            <button
+              onClick={handleDeleteAll}
+              className="mt-6 w-full py-3 px-6 bg-red-500 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
+            >
+              Barcha savollarni o'chirish
+            </button>
           </div>
         )}
       </div>
