@@ -12,6 +12,10 @@ const extractQuestionsFromWord = async (req, res) => {
     const text = result.value;
 
     const questions = parseQuizData(text); // JSON formatga o‘tkazish funksiyasi
+    if (!questions) {
+      return res.status(400).json({ error: 'Fayl formatida xatolik mavjud. Iltimos, to\'g\'ri formatda ma\'lumotlar kiriting.' });
+    }
+
     if (questions.length > 60) {
       return res.status(400).json({ error: 'Savollar soni 60 tadan oshmasligi kerak' });
     }
@@ -50,7 +54,7 @@ const extractQuestionsFromWord = async (req, res) => {
   }
 };
 
-// JSON formatga o‘tkazish funksiyasi (ilgari ko'rsatgan kod)
+// JSON formatga o‘tkazish funksiyasi
 function parseQuizData(text) {
   const lines = text.split('\n');
   let questions = [];
@@ -69,24 +73,27 @@ function parseQuizData(text) {
         questionText: line.trim(),
         options: []
       };
-    } else if (optionRegex.test(line.trim())) {
+    } else if (optionRegex.test(line.trim()) || correctOptionRegex.test(line.trim())) {
+      const isCorrect = correctOptionRegex.test(line.trim());
+      const optionText = line.replace(/^[A-D]\)\s*/, '').replace(/^\./, '').trim();
+      
       currentQuestion.options.push({
-        text: line.replace(/^[A-D]\)\s*/, '').replace('*', '').trim(),
-        isCorrect: false // Oldida nuqta bo'lmasa, noto'g'ri hisoblanadi
+        text: optionText,
+        isCorrect: isCorrect // To'g'ri javobni belgilash
       });
-    } else if (correctOptionRegex.test(line.trim())) {
-      currentQuestion.options.push({
-        text: line.replace(/^\.[A-D]\)\s*/, '').replace('*', '').trim(),
-        isCorrect: true // Oldida nuqta bo'lsa, to'g'ri hisoblanadi
-      });
+    } else if (line.trim().length > 0) {
+      // Noto'g'ri formatdagi qatorlarni tekshirish
+      console.warn(`Noto'g'ri formatdagi qator: ${line}`);
     }
   });
 
+  // Oxirgi savolni ham qo'shamiz
   if (currentQuestion) {
     questions.push(currentQuestion);
   }
 
-  return questions;
+  // Agar savollar to'g'ri formatda bo'lmasa, null qaytaramiz
+  return questions.length > 0 ? questions : null;
 }
 
 module.exports = { extractQuestionsFromWord };
