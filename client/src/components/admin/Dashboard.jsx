@@ -84,10 +84,10 @@ const Dashboard = () => {
     setSelectedSubject(subject);
     setError('');
     setSubjectDetails(null);
-
+  
     try {
       const token = localStorage.getItem('token');
-
+  
       const response = await axios.get(
         `http://localhost:5000/api/questions/subject/${subject}`,
         {
@@ -96,12 +96,14 @@ const Dashboard = () => {
           },
         }
       );
-console.log(response)
-
-      setQuestions(response.data);
+  
+      console.log(response.data);
+  
+      setQuestions(response.data.questionsWithOptions || []); // Agar ma'lumot bo'lmasa, bo'sh array qabul qilinadi
       setSubjectDetails(response.data);
-
-      if (response.data.questionsWithOptions.length === 0) {
+  
+      // Xatolik kelib chiqadigan joyni tekshirish
+      if (!response.data.questionsWithOptions || response.data.questionsWithOptions.length === 0) {
         setError("Savollar topilmadi.");
       }
     } catch (err) {
@@ -111,6 +113,7 @@ console.log(response)
       setLoading(false);
     }
   };
+  
 
   // Fanlarni o'chirish funksiyasi
   const handleDelete = async (id) => {

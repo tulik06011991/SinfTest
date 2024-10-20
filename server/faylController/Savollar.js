@@ -1,23 +1,30 @@
 const Question = require('../Model/questionModel'); // Savollar modelini chaqiramiz
 
-// Ma'lum bir fan bo'yicha savollarni olish
-exports.getQuestionsBySubject = async (req, res) => {
-    try {
-        const { fanId } = req.params; // URL'dan fanId olamiz
-        console.log(fanId);
+ // Sizning modelingiz qayerda bo'lsa, shu joydan kiritasiz
 
-        // fanId bo'yicha savollarni qidiramiz
-        const questions = await Question.find({ fanId });
+// Savollarni olish funksiyasi
+const getQuestionsBySubject  = async (req, res) => {
+  try {
+    const fanId = req.params.subject;
+    console.log(fanId)
+     // URL'dan kelyapti deb hisoblaymiz, masalan: /questions/:fanId
 
-        // Agar savollar topilmasa
-        if (!questions.length) {
-            return res.status(404).json({ message: 'Bu fanga oid savollar topilmadi!' });
-        }
+    // fanId ga mos barcha savollarni olish
+    const questions = await Question.find({ fanId: fanId })
+      .select('questionText options createdAt') // Faqat kerakli maydonlarni olamiz
+      .exec();
 
-        // Agar savollar mavjud bo'lsa, ularni qaytarish
-        res.status(200).json(questions);
-    } catch (error) {
-        console.error('Savollarni olishda xatolik yuz berdi:', error);
-        res.status(500).json({ error: 'Savollarni olishda xato yuz berdi!' });
+    if (!questions || questions.length === 0) {
+      return res.status(404).json({ message: 'Savollar topilmadi' });
     }
+
+    res.status(200).json(questions);
+  } catch (error) {
+    res.status(500).json({ message: 'Xatolik yuz berdi', error: error.message });
+  }
 };
+
+module.exports = {
+  getQuestionsBySubject 
+};
+
