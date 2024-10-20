@@ -91,6 +91,7 @@ const Dashboard = () => {
           },
         }
       );
+  console.log(response.data)
   
       setQuestions(response.data || []); // Agar ma'lumot bo'lmasa, bo'sh array qabul qilinadi
       setSubjectDetails(response.data);
@@ -181,7 +182,7 @@ const Dashboard = () => {
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Savollar va variantlar</h3>
             {questions.map((question) => (
               <div key={question._id} className="mb-6">
-                <h4 className="font-bold text-lg">{question.text}</h4>
+                <h4 className="font-bold text-lg">{question.questionText}</h4>
                 <ul className="mt-2 ml-4">
                   {question.options.map((option, idx) => (
                     <li
