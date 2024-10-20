@@ -3,17 +3,18 @@ const Question = require('../Model/questionModel'); // Savollar modelini chaqira
 // Ma'lum bir fan bo'yicha savollarni olish
 exports.getQuestionsBySubject = async (req, res) => {
     try {
-        const { subject } = req.params; // URL'dan subject olamiz
+        const { fanId } = req.params; // URL'dan fanId olamiz
+        console.log(fanId);
 
-        // Savollarni fan bo'yicha topamiz
-        const questions = await Question.find({ subject });
+        // fanId bo'yicha savollarni qidiramiz
+        const questions = await Question.find({ fanId });
 
         // Agar savollar topilmasa
         if (!questions.length) {
-            return res.status(404).json({ message: 'Savollar topilmadi!' });
+            return res.status(404).json({ message: 'Bu fanga oid savollar topilmadi!' });
         }
 
-        // Savollarni muvaffaqiyatli qaytarish
+        // Agar savollar mavjud bo'lsa, ularni qaytarish
         res.status(200).json(questions);
     } catch (error) {
         console.error('Savollarni olishda xatolik yuz berdi:', error);

@@ -13,9 +13,7 @@ const FileUpload = () => {
     const fetchFanlar = async () => {
       try {
         const res = await axios.get("http://localhost:5000/api/subjectlar");
-        setFanlar(res);
-        
-        // Fanlar ro'yxatini o'rnatish
+        setFanlar(res.data); // Fanlar ro'yxatini o'rnatish
       } catch (err) {
         setError("Fanlarni olishda xatolik yuz berdi");
       }
@@ -89,11 +87,15 @@ const FileUpload = () => {
             disabled={uploading}
           >
             <option value="">Fanni tanlang</option>
-            {fanlar.map((fan) => (
-              <option key={fan._id} value={fan._id}>
-                {fan.name}
-              </option>
-            ))}
+            {fanlar.length > 0 ? (
+              fanlar.map((fan) => (
+                <option key={fan._id} value={fan._id}>
+                  {fan.name}
+                </option>
+              ))
+            ) : (
+              <option value="">Fanlar mavjud emas</option>
+            )}
           </select>
         </div>
 
