@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TailSpin } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 const Dashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -52,14 +52,11 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await axios.get(
-        `http://localhost:5000/api/subjects`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`http://localhost:5000/api/subjects`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setSubjects(response.data.subjects);
       if (response.data.subjects.length === 0) {
@@ -83,14 +80,11 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await axios.get(
-        `http://localhost:5000/api/questions/subject/${subject}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`http://localhost:5000/api/questions/subject/${subject}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log(response.data);
 
       setQuestions(response.data || []); // Agar ma'lumot bo'lmasa, bo'sh array qabul qilinadi
@@ -166,7 +160,7 @@ const Dashboard = () => {
 
   // Savollarni va variantlarini jadval ko'rinishda ko'rsatish
   return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-r w-full from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-4 sm:p-6">
       <div className="bg-white shadow-2xl rounded-xl p-4 sm:p-6 md:p-8 w-full max-w-4xl">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8 text-gray-800">Admin Dashboard</h1>
 
@@ -213,7 +207,7 @@ const Dashboard = () => {
               <thead>
                 <tr>
                   <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Savol</th>
-                  <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Vaqti </th>
+                  <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Vaqti</th>
                   <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Variantlar</th>
                   <th className="px-4 sm:px-6 py-2 sm:py-3 border-b">Amallar</th>
                 </tr>
@@ -222,9 +216,9 @@ const Dashboard = () => {
                 {questions.map((question) => (
                   <tr key={question._id}>
                     <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">{question.questionText}</td>
-                    <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">{new Date(question.createdAt).toLocaleString()} </td>
+                    <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">{new Date(question.createdAt).toLocaleString()}</td>
                     <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">
-                      <ul>
+                      <ul className="list-disc pl-5">
                         {question.options.map((option, idx) => (
                           <li
                             key={idx}
@@ -232,7 +226,7 @@ const Dashboard = () => {
                               option.isCorrect ? 'text-green-600 font-semibold' : 'text-gray-700'
                             }`}
                           >
-                            {option.text} {option.isCorrect && <span>(To'g'ri javob)</span>}
+                            {option.text}
                           </li>
                         ))}
                       </ul>
@@ -240,7 +234,7 @@ const Dashboard = () => {
                     <td className="px-4 sm:px-6 py-2 sm:py-4 border-b">
                       <button
                         onClick={() => handleDelete(question._id)}
-                        className="bg-red-500 text-white py-1 sm:py-2 px-3 sm:px-4 rounded hover:bg-red-600 transition duration-300"
+                        className="text-red-600 hover:text-red-800 transition duration-200"
                       >
                         O'chirish
                       </button>
@@ -252,7 +246,7 @@ const Dashboard = () => {
 
             <button
               onClick={handleDeleteAll}
-              className="mt-6 w-full py-3 px-6 bg-red-500 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 transition duration-300"
+              className="mt-4 w-full py-2 sm:py-3 px-4 sm:px-6 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-700 transition duration-300"
             >
               Barcha savollarni o'chirish
             </button>
