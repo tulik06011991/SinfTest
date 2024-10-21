@@ -34,12 +34,11 @@ exports.extractAndSave = async (req, res) => {
                 isValid = true; // Savol borligi aniqlandi
 
                 // Savolni yarating va saqlang
-                const newQuestion = new Question({
+                currentQuestion = new Question({
                     questionText: line,
-                    fanId: fanId, // Savolni fanga bog'lash
-                    options: []
+                    fanId: fanId // Savolni fanga bog'lash
                 });
-                currentQuestion = await newQuestion.save(); // Yangi savol saqlanadi
+                await currentQuestion.save(); // Yangi savol saqlanadi
             } 
             // Agar A) yoki B) bilan boshlansa, bu variant hisoblanadi
             else if (/^[A-D]\)/.test(line) || /^\.[A-D]\)/.test(line)) {
@@ -51,20 +50,17 @@ exports.extractAndSave = async (req, res) => {
 
                 // Oldida . bo'lsa, to'g'ri variant
                 const isCorrect = /^\.[A-D]\)/.test(line);
-                // Agar to'g'ri variant bo'lsa, .A) kabi nuqta bilan boshlanadigan qismini olib tashlaymiz
                 const optionText = line.replace(/^\.[A-D]\)/, '').replace(/^[A-D]\)/, '').trim();
 
                 // Variantni saqlash
                 const newOption = new Option({
-                    optionText: optionText,
-                    isCorrect: isCorrect,
+                    options: [{
+                        optionText: optionText,
+                        isCorrect: isCorrect
+                    }],
                     question: currentQuestion._id // Savol bilan bog'lash
                 });
-                const savedOption = await newOption.save();
-
-                // Savolga variant ID'sini qo'shish
-                currentQuestion.options.push(savedOption._id);
-                await currentQuestion.save();
+                await newOption.save(); // Variantni saqlash
             }
         }
 

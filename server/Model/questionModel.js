@@ -7,14 +7,11 @@ const questionSchema = new mongoose.Schema({
     },
     fanId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Fan', // Fan modeliga ishora qiladi
+        ref: 'Fan', // Fanga bog'lash
         required: true
-    },
-    options: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Option'
-    }]
+    }
 });
 
 const Question = mongoose.model('Question', questionSchema);
+
 module.exports = Question;

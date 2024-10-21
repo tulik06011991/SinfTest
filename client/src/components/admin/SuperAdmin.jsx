@@ -15,22 +15,22 @@ const SuperadminPanel = () => {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const response = await axios.get('http://localhost:5173/api/dashboard', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUsers(response.data);
-      } catch (error) {
-        console.error('Xatolik:', error);
-      }
-    };
-    fetchUsers();
-  }, []);
+  // useEffect(() => {
+  //   const fetchUsers = async () => {
+  //     const token = localStorage.getItem('token');
+  //     try {
+  //       const response = await axios.get('http://localhost:5173/api/dashboard', {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
+  //       setUsers(response.data);
+  //     } catch (error) {
+  //       console.error('Xatolik:', error);
+  //     }
+  //   };
+  //   fetchUsers();
+  // }, []);
 
   // Foydalanuvchilar CRUD
   const createUser = async () => {
@@ -126,7 +126,7 @@ const SuperadminPanel = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.length > 0 ? (
+                  {/* {users.length > 0 ? (
                     users.map((user) => (
                       <tr key={user._id} className="border-b border-gray-300">
                         <td className="px-4 py-2 text-center">{user.email}</td>
@@ -140,14 +140,14 @@ const SuperadminPanel = () => {
                           </button>
                         </td>
                       </tr>
-                    ))
-                  ) : (
+                    )) */}
+                  {/* ) : (
                     <tr>
                       <td colSpan="3" className="text-gray-500 italic text-center py-4">
                         Foydalanuvchilar topilmadi.
                       </td>
                     </tr>
-                  )}
+                  )} */}
                 </tbody>
               </table>
             </div>
