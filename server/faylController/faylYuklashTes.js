@@ -42,15 +42,17 @@ exports.extractAndSave = async (req, res) => {
                 currentQuestion = await newQuestion.save(); // Yangi savol saqlanadi
             } 
             // Agar A) yoki B) bilan boshlansa, bu variant hisoblanadi
-            else if (/^[A-D]\)/.test(line)) {
+            else if (/^[A-D]\)/.test(line) || /^\.[A-D]\)/.test(line)) {
                 if (!currentQuestion) {
                     return res.status(400).json({
                         message: "Variantlarni saqlashdan oldin savol kiritilishi kerak!"
                     });
                 }
 
-                const isCorrect = /^\.[A-D]\)/.test(line); // Oldida . bo'lsa, to'g'ri variant
-                const optionText = line.replace(/^\.[A-D]\)/, '').trim(); // Oldidagi belgilarni olib tashlash
+                // Oldida . bo'lsa, to'g'ri variant
+                const isCorrect = /^\.[A-D]\)/.test(line);
+                // Agar to'g'ri variant bo'lsa, .A) kabi nuqta bilan boshlanadigan qismini olib tashlaymiz
+                const optionText = line.replace(/^\.[A-D]\)/, '').replace(/^[A-D]\)/, '').trim();
 
                 // Variantni saqlash
                 const newOption = new Option({

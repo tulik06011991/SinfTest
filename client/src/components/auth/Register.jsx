@@ -13,7 +13,7 @@ const Register = () => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:5173/api/register', { name, email, password });
-            console.log(response);
+            console.log(response.data);
             
             navigate('/'); // Muvaffaqiyatli ro'yxatdan o'tgandan so'ng kirish sahifasiga o'tish
         } catch (err) {
