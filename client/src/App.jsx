@@ -31,12 +31,12 @@ const App = () => {
                 {/* Sahifalar uchun Router */}
                 <NavbarSidebar/>
                 <Routes>
-                    <Route path="/faylyuklash" element={<Home />} /> {/* Bosh sahifa */}
-                    <Route path="/savollarjavoblar" element={<SavollarJavoblar />} /> {/* About sahifasi */}
-                    <Route path="/quiz" element={<Admin />} /> Quiz sahifasi
-                    <Route path="/fanlar" element={<CreateSubject />} />
-                    <Route path="/" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
+                    <Route path="/" element={<Home />} /> {/* Bosh sahifa */}
+                    <Route path="/sdds/savollarjavoblar" element={<SavollarJavoblar />} /> {/* About sahifasi */}
+                    <Route path="/dsds/quiz" element={<Admin />} /> Quiz sahifasi
+                    <Route path="/dsdsd/fanlar" element={<CreateSubject />} />
+                    <Route path="/dsdsd/dsdsdsd" element={<Login />} />
+                    <Route path="/dsdsd/register" element={<Register />} />
                     <Route path="/dashboard" element={<Dashboard/>} />
                     <Route path="/about" element={<About/>} />
                     <Route path="/superadmin" element={<SuperAdmin/>} />
