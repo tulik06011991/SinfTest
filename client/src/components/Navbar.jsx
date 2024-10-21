@@ -55,7 +55,10 @@ const NavbarSidebar = () => {
                             <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
                         </>
                     ) : (
+                        <>
                         <li><Link to="/about" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">About</Link></li>
+                        <li><Link to="/faylyuklash" onClick={toggleSidebar} className="block p-4 hover:bg-gray-700">Word</Link></li>
+                        </>
                     )}
                     <li>
                         <button onClick={handleLogout} className="block w-full p-4 hover:bg-gray-700 text-left">Logout</button>

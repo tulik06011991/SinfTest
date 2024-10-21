@@ -16,7 +16,7 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('https://sinftest6.onrender.com/api/login', { email, password });
+            const response = await axios.post('http://localhost:5173/api/login', { email, password });
 
             console.log(response);
 
