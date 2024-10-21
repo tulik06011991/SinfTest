@@ -63,7 +63,7 @@ function parseQuizData(text) {
   lines.forEach(line => {
     const questionRegex = /^\d+\..*\?|\d+\..*\.$/;
     const optionRegex = /^[A-D]\).+/;
-    const correctOptionRegex = /^[A-D]\).+?\*$/; // Oxirida * belgisiga ega variantlar
+    const correctOptionRegex = /^\.[A-D]\).+/;
 
     if (questionRegex.test(line.trim())) {
       if (currentQuestion) {
@@ -73,9 +73,9 @@ function parseQuizData(text) {
         questionText: line.trim(),
         options: []
       };
-    } else if (optionRegex.test(line.trim())) {
+    } else if (optionRegex.test(line.trim()) || correctOptionRegex.test(line.trim())) {
       const isCorrect = correctOptionRegex.test(line.trim());
-      const optionText = line.replace(/^[A-D]\)\s*/, '').replace(/\*$/, '').trim(); // * belgisini olib tashlash
+      const optionText = line.replace(/^[A-D]\)\s*/, '').replace(/^\./, '').trim();
       
       currentQuestion.options.push({
         text: optionText,
@@ -89,7 +89,7 @@ function parseQuizData(text) {
 
   // Oxirgi savolni ham qo'shamiz
   if (currentQuestion) {
-    questions.push(currentQuestion);
+    questions.push(currentQuestion)
   }
 
   // Agar savollar to'g'ri formatda bo'lmasa, null qaytaramiz
