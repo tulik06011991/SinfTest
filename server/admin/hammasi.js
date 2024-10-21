@@ -81,7 +81,7 @@ const getSubjectDetails = async (req, res) => {
                 // Null qiymatlar uchun tekshirish
                 if (!question || !userAnswer.userId) continue; // Savol yoki foydalanuvchi mavjud bo'lmasa, davomini o'tkazib yuborish
 
-                const correctAnswer = question.correctAnswer;
+                const correctAnswer = question.correctAnswer; // Savolning to'g'ri javobi
 
                 // Agar savol ID allaqachon objectga qo'shilmagan bo'lsa, uni qo'shamiz
                 if (!allQuestionsWithOptions[question._id]) {
@@ -126,43 +126,9 @@ const getSubjectDetails = async (req, res) => {
     }
 };
 
-const deleteQuestion = async (req, res) => {
-    const { questionId } = req.params;
-
-    try {
-        const question = await Question.findByIdAndDelete(questionId);
-        if (!question) {
-            return res.status(404).json({ message: 'Savol topilmadi.' });
-        }
-
-        res.status(200).json({ message: 'Savol muvaffaqiyatli o\'chirildi.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Savolni o\'chirishda xatolik yuz berdi.' });
-    }
-};
-
-const deleteResult = async (req, res) => {
-    const { id } = req.params; // userId ni req.params dan olamiz
-
-    try {
-        // Natijani userId bo'yicha o'chirish
-        const result = await Answer.deleteMany({ userId: id }); // userId ga tegishli barcha natijalarni o'chiradi
-
-        if (result.deletedCount === 0) {
-            return res.status(404).json({ message: 'Natija topilmadi.' });
-        }
-
-        res.status(200).json({ message: 'Foydalanuvchiga tegishli barcha natijalar muvaffaqiyatli o\'chirildi.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'O\'chirishda xatolik yuz berdi.' });
-    }
-};
 
 module.exports = {
     verifyAdminToken,
     getSubjectDetails,
-    deleteQuestion,
-    deleteResult,
+  
 };
