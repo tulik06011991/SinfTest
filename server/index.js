@@ -21,13 +21,14 @@ const path = require('path');
 app.use(express.json());
 
 // CORS sozlamalari
-app.use(cors({
-  origin: '*', // Frontend React app domeni
-  credentials: true, // Cookie va autentifikatsiya ma'lumotlarini yuborishga ruxsat
-  allowedHeaders: ['Content-Type', 'Authorization'], // Kerakli header'lar ro'yxati
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Ruxsat etilgan metodlar
-  maxAge: 600 // Preflight so'rovlari uchun cache muddatini o'rnatish (10 daqiqa)
-}));
+// app.use(cors({
+//   origin: '*', // Frontend React app domeni
+//   credentials: true, // Cookie va autentifikatsiya ma'lumotlarini yuborishga ruxsat
+//   allowedHeaders: ['Content-Type', 'Authorization'], // Kerakli header'lar ro'yxati
+//   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Ruxsat etilgan metodlar
+//   maxAge: 600 // Preflight so'rovlari uchun cache muddatini o'rnatish (10 daqiqa)
+// }));
+app.use(cors())
 
 app.use(express.static(path.join(__dirname, 'uploads')));
 
