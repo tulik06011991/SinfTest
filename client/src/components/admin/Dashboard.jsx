@@ -172,6 +172,13 @@ const Dashboard = () => {
         >
           Fanlarni yuklash
         </button>
+        <br />
+        <button
+          onClick={fetchSubjects}
+          className="mb-4 sm:mb-6 w-full py-2 sm:py-3 px-4 sm:px-6 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300"
+        >
+          Natijalarni yuklash 
+        </button>
 
         {loading && (
           <div className="flex justify-center items-center">
