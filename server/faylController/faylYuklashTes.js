@@ -1,103 +1,72 @@
 const fs = require('fs');
 const path = require('path');
-const mammoth = require('mammoth'); // Word faylni matnga o‘girish uchun
 const Question = require('../Model/questionModel');
+const Option = require('../Model/options');
+const mammoth = require('mammoth');
 
-// Word faylni JSONga o‘girish va savollarni saqlash
-const extractQuestionsFromWord = async (req, res) => {
-  try {
-    // Yuklangan faylni o‘qiymiz
-    const filePath = req.file.path;
-    const result = await mammoth.extractRawText({ path: filePath });
-    const text = result.value;
+// Fayldan matn olish va tahlil qilish funksiyasi
+exports.extractAndSave = async (req, res) => {
+    try {
+        // Yuklangan Word faylidan matn oling
+        const filePath = path.join(__dirname, '../', req.file.path);
+        const result = await mammoth.extractRawText({ path: filePath });
+        const text = result.value; // Word faylidagi matn
 
-    const questions = parseQuizData(text); // JSON formatga o‘tkazish funksiyasi
-    if (!questions) {
-      return res.status(400).json({ error: 'Fayl formatida xatolik mavjud. Iltimos, to\'g\'ri formatda ma\'lumotlar kiriting.' });
+        // Fayl mazmunini ajratish
+        const lines = text.split('\n'); // Har bir qatorni ajratib olamiz
+        let currentQuestion = null;
+        let isValid = false; // Savol yoki variant borligini tekshirish uchun flag
+
+        for (let line of lines) {
+            line = line.trim();
+
+            // Agar raqam va . bilan boshlanib, oxirida . yoki ? bilan tugasa, bu savol hisoblanadi
+            if (/^\d+\./.test(line) && /[.?]$/.test(line)) {
+                isValid = true; // Savol borligi aniqlandi
+
+                // Savolni yarating va saqlang
+                const newQuestion = new Question({
+                    questionText: line,
+                    options: []
+                });
+                currentQuestion = await newQuestion.save(); // Yangi savol saqlanadi
+            } 
+            // Agar A) yoki B) bilan boshlansa, bu variant hisoblanadi
+            else if (/^[A-D]\)/.test(line)) {
+                if (!currentQuestion) {
+                    return res.status(400).json({
+                        message: "Variantlarni saqlashdan oldin savol kiritilishi kerak!"
+                    });
+                }
+
+                const isCorrect = /^\.[A-D]\)/.test(line); // Oldida . bo'lsa, to'g'ri variant
+                const optionText = line.replace(/^\.[A-D]\)/, '').trim(); // Oldidagi belgilarni olib tashlash
+
+                // Variantni saqlash
+                const newOption = new Option({
+                    optionText: optionText,
+                    isCorrect: isCorrect,
+                    question: currentQuestion._id // Savol bilan bog'lash
+                });
+                const savedOption = await newOption.save();
+
+                // Savolga variant ID'sini qo'shish
+                currentQuestion.options.push(savedOption._id);
+                await currentQuestion.save();
+            }
+        }
+
+        // Agar hech qanday savol yoki variant topilmasa, foydalanuvchiga xabar bering
+        if (!isValid) {
+            return res.status(400).json({
+                message: "Yuklangan faylda hech qanday savol yoki variant topilmadi. Iltimos, faylni tekshiring!"
+            });
+        }
+
+        res.status(200).json({ message: "Savollar va variantlar muvaffaqiyatli saqlandi!" });
+        
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Serverda xatolik yuz berdi!" });
     }
-
-    if (questions.length > 60) {
-      return res.status(400).json({ error: 'Savollar soni 60 tadan oshmasligi kerak' });
-    }
-
-    // Savollar soni va variantlar sonini tekshirish
-    let totalOptions = 0;
-    questions.forEach(q => {
-      totalOptions += q.options.length;
-    });
-    if (totalOptions > 240) {
-      return res.status(400).json({ error: 'Variantlar soni 240 tadan oshmasligi kerak' });
-    }
-
-    // `fanId`ni savollarga qo‘shamiz
-    const fanId = req.body.fanId;
-    if (!fanId) {
-      return res.status(400).json({ error: 'Fan ID talab qilinadi' });
-    }
-
-    // Savollarni bazaga saqlashdan oldin `fanId` ni qo‘shamiz
-    const questionsWithFanId = questions.map(q => ({
-      ...q,
-      fanId: fanId
-    }));
-
-    // Savollarni bazaga saqlash
-    const savedQuestions = await Question.insertMany(questionsWithFanId);
-
-    res.status(201).json({ message: 'Savollar muvaffaqiyatli saqlandi', savedQuestions });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Serverda xatolik yuz berdi' });
-  } finally {
-    // Yuklangan faylni o‘chirib tashlaymiz
-    fs.unlinkSync(req.file.path);
-  }
 };
-
-// JSON formatga o‘tkazish funksiyasi
-function parseQuizData(text) {
-  const lines = text.split('\n');
-  let questions = [];
-  let currentQuestion = null;
-
-  lines.forEach(line => {
-    const questionRegex = /^\d+\..*\?|\d+\..*\.$/;
-    const optionRegex = /^[A-D]\).+/;
-    const correctOptionRegex = /^\.\s*[A-D]\).+/; // Nuqtadan keyin bo'shliqni ham qabul qilish
-
-    if (questionRegex.test(line.trim())) {
-      if (currentQuestion) {
-        questions.push(currentQuestion);
-      }
-      currentQuestion = {
-        questionText: line.trim(),
-        options: []
-      };
-    } else if (optionRegex.test(line.trim()) || correctOptionRegex.test(line.trim())) {
-      const isCorrect = correctOptionRegex.test(line.trim());
-      const optionText = line.replace(/^[A-D]\)\s*/, '').replace(/^\./, '').trim();
-
-      currentQuestion.options.push({
-        text: optionText,
-        isCorrect: isCorrect // To'g'ri javobni belgilash
-      });
-    } else if (line.trim().length > 0) {
-      // Noto'g'ri formatdagi qatorlarni ham variant sifatida qo'shish
-      currentQuestion.options.push({
-        text: line.trim(),
-        isCorrect: false // Noto'g'ri javob
-      });
-      console.warn(`Noto'g'ri formatdagi qator qo'shildi: ${line}`);
-    }
-  });
-
-  // Oxirgi savolni ham qo'shamiz
-  if (currentQuestion) {
-    questions.push(currentQuestion);
-  }
-
-  // Agar savollar to'g'ri formatda bo'lmasa, null qaytaramiz
-  return questions.length > 0 ? questions : null;
-}
-
-module.exports = { extractQuestionsFromWord };
