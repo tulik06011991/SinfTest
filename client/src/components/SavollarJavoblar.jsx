@@ -16,7 +16,7 @@ const Quiz = () => {
     useEffect(() => {
         const fetchSubjects = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/subjectlar');
+                const response = await axios.get('https://sinftest6.onrender.com/api/subjectlar');
                 console.log(response);
     
                 // Agar kelgan ma'lumot oddiy array bo'lsa
@@ -50,7 +50,7 @@ const Quiz = () => {
             if (!selectedSubject) return; // Fanning ID'si bo'lmasa, hech narsa qilmaslik
 
             try {
-                const response = await axios.get(`http://localhost:5000/api/questions/subject/${selectedSubject}`); // Tanlangan fanga ko'ra savollarni olish
+                const response = await axios.get(`https://sinftest6.onrender.com/api/questions/subject/${selectedSubject}`); // Tanlangan fanga ko'ra savollarni olish
                 setQuestions(response.data); // Savollarni yuklash
             } catch (error) {
                 console.error('Savollarni olishda xato:', error);
@@ -84,7 +84,7 @@ const Quiz = () => {
 
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/submit-answers',
+                'https://sinftest6.onrender.com/api/submit-answers',
                 {
                     subjectId: selectedSubject,
                     answers: selectedAnswers,

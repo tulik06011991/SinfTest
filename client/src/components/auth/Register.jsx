@@ -12,7 +12,7 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5000/api/register', { name, email, password });
+            const response = await axios.post('https://sinftest6.onrender.com/api/register', { name, email, password });
             console.log(response);
             
             navigate('/'); // Muvaffaqiyatli ro'yxatdan o'tgandan so'ng kirish sahifasiga o'tish

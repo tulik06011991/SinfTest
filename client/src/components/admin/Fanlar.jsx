@@ -26,7 +26,7 @@ const CreateSubject = () => {
         const token = localStorage.getItem('token');
         
         // Adminlarni olish
-        const adminsResponse = await axios.get('http://localhost:5000/api/admins', {
+        const adminsResponse = await axios.get('https://sinftest6.onrender.com/api/admins', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAdmins(adminsResponse.data);
@@ -48,7 +48,7 @@ const CreateSubject = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/admin/create',
+        'https://sinftest6.onrender.com/admin/create',
         { name: subjectName, adminId }, // Fan nomi va adminId ni post qilamiz
         {
           headers: {

@@ -12,7 +12,7 @@ const FileUpload = () => {
   useEffect(() => {
     const fetchFanlar = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/subjectlar");
+        const res = await axios.get("https://sinftest6.onrender.com/api/subjectlar");
         setFanlar(res.data); // Fanlar ro'yxatini o'rnatish
       } catch (err) {
         setError("Fanlarni olishda xatolik yuz berdi");
@@ -50,7 +50,7 @@ const FileUpload = () => {
 
     try {
       // Faylni backendga POST so'rovi orqali jo'natish
-      const res = await axios.post("http://localhost:5000/api/upload", formData, {
+      const res = await axios.post("https://sinftest6.onrender.com/api/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
