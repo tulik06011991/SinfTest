@@ -76,14 +76,18 @@ function parseQuizData(text) {
     } else if (optionRegex.test(line.trim()) || correctOptionRegex.test(line.trim())) {
       const isCorrect = correctOptionRegex.test(line.trim());
       const optionText = line.replace(/^[A-D]\)\s*/, '').replace(/^\./, '').trim();
-      
+
       currentQuestion.options.push({
         text: optionText,
         isCorrect: isCorrect // To'g'ri javobni belgilash
       });
     } else if (line.trim().length > 0) {
-      // Noto'g'ri formatdagi qatorlarni tekshirish
-      console.warn(`Noto'g'ri formatdagi qator: ${line}`);
+      // Noto'g'ri formatdagi qatorlarni ham variant sifatida qo'shish
+      currentQuestion.options.push({
+        text: line.trim(),
+        isCorrect: false // Noto'g'ri javob
+      });
+      console.warn(`Noto'g'ri formatdagi qator qo'shildi: ${line}`);
     }
   });
 
