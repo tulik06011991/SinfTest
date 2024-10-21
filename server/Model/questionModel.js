@@ -1,9 +1,19 @@
 const mongoose = require('mongoose');
 
-// Savol modeli
 const questionSchema = new mongoose.Schema({
-    questionText: { type: String, required: true },
-    options: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Option' }] // Variantlar bilan bog'lanish
+    questionText: {
+        type: String,
+        required: true
+    },
+    fanId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Fan', // Fan modeliga ishora qiladi
+        required: true
+    },
+    options: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Option'
+    }]
 });
 
 const Question = mongoose.model('Question', questionSchema);
