@@ -63,7 +63,7 @@ function parseQuizData(text) {
   lines.forEach(line => {
     const questionRegex = /^\d+\..*\?|\d+\..*\.$/;
     const optionRegex = /^[A-D]\).+/;
-    const correctOptionRegex = /^\.[A-D]\).*\*$/; // Oldida '.' bo'lsa va oxirida '*' bilan tugasa to'g'ri javob
+    const correctOptionRegex = /^\.[A-D]\).+/;
 
     if (questionRegex.test(line.trim())) {
       if (currentQuestion) {
@@ -75,7 +75,7 @@ function parseQuizData(text) {
       };
     } else if (optionRegex.test(line.trim()) || correctOptionRegex.test(line.trim())) {
       const isCorrect = correctOptionRegex.test(line.trim());
-      const optionText = line.replace(/^[A-D]\)\s*/, '').replace(/^\.[A-D]\)\s*/, '').replace(/\*$/, '').trim(); // '.' va '*' belgisini olib tashlash
+      const optionText = line.replace(/^[A-D]\)\s*/, '').replace(/^\./, '').trim();
       
       currentQuestion.options.push({
         text: optionText,
