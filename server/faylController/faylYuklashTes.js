@@ -7,6 +7,15 @@ const mammoth = require('mammoth');
 // Fayldan matn olish va tahlil qilish funksiyasi
 exports.extractAndSave = async (req, res) => {
     try {
+        // URL orqali kelayotgan fanId ni olish
+        const { fanId } = req.body;
+
+        if (!fanId) {
+            return res.status(400).json({
+                message: "Fan ID kiritilishi shart!"
+            });
+        }
+
         // Yuklangan Word faylidan matn oling
         const filePath = path.join(__dirname, '../', req.file.path);
         const result = await mammoth.extractRawText({ path: filePath });
@@ -27,6 +36,7 @@ exports.extractAndSave = async (req, res) => {
                 // Savolni yarating va saqlang
                 const newQuestion = new Question({
                     questionText: line,
+                    fanId: fanId, // Savolni fanga bog'lash
                     options: []
                 });
                 currentQuestion = await newQuestion.save(); // Yangi savol saqlanadi
