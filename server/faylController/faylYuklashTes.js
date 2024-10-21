@@ -63,7 +63,7 @@ function parseQuizData(text) {
   lines.forEach(line => {
     const questionRegex = /^\d+\..*\?|\d+\..*\.$/;
     const optionRegex = /^[A-D]\).+/;
-    const correctOptionRegex = /^\.[A-D]\).+/;
+    const correctOptionRegex = /^\.\s*[A-D]\).+/; // Nuqtadan keyin bo'shliqni ham qabul qilish
 
     if (questionRegex.test(line.trim())) {
       if (currentQuestion) {
