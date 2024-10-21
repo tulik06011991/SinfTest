@@ -25,7 +25,7 @@ app.use(express.json());
 
 // CORS sozlamalari
 app.use(cors({
-  origin: 'https://sinftest6.onrender.com', // Frontend React app domeni
+  origin: '*', // Frontend React app domeni
   credentials: true, // Cookie va autentifikatsiya ma'lumotlarini yuborishga ruxsat
   allowedHeaders: ['Content-Type', 'Authorization'], // Kerakli header'lar ro'yxati
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Ruxsat etilgan metodlar
